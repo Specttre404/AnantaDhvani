@@ -2,22 +2,19 @@
 
 ## Supported Versions
 
-Security fixes are provided for the latest stable release of LastWave.
+Security fixes are provided for the latest release of LastWaveX.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 4.1.x   | Yes                |
-| < 4.1.0 | No                 |
+| v1.1.x  | Yes                |
+| < v1.1  | No                 |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in LastWave, please report it privately rather than creating a public issue.
+If you discover a security vulnerability in LastWaveX, please report it privately rather than creating a public issue.
 
 ### How to Report
-* Reach out privately to the maintainers on Telegram:
-  * Channel: https://t.me/clashprojects
-  * Discussion Group: https://t.me/clashdiscussion
-* Alternatively, submit a private security advisory through the GitHub repository.
+* Submit a private security advisory through the GitHub repository.
 * Include:
   * Description of the vulnerability
   * Affected versions and components
@@ -29,4 +26,4 @@ If you discover a security vulnerability in LastWave, please report it privately
 * **Assessment & mitigation plan:** Within 5 business days.
 * **Public disclosure:** Coordinated after a patched release is published.
 
-Thank you for helping keep LastWave secure for all users.
+Thank you for helping keep LastWaveX secure for all users.

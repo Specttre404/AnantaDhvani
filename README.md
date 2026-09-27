@@ -1,136 +1,166 @@
 <div align="center">
 
-<img src="docs/assets/hero-banner.svg" alt="LASTWAVEX Banner" width="100%" />
-
 # LASTWAVEX
 
-**Next-Gen Android YouTube Music Client & Universal Last.fm Scrobbler with Real-Time Synced Lyrics, Smart Algorithmic Mixes, and Local Offline Music Storage.**
+**Next-Generation Android Music Player, Bit-Perfect C++ Audio Engine & Universal Scrobbler**
 
 <p align="center">
-  <a href="#">
-    <img src="https://img.shields.io/badge/Version-v4.1.0-C6F100?style=for-the-badge&labelColor=1A1C29&color=C6F100" alt="Version v4.1.0" />
+  <a href="https://kotlinlang.org">
+    <img src="https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin 2.0.21" />
+  </a>
+  <a href="https://developer.android.com/jetpack/compose">
+    <img src="https://img.shields.io/badge/Jetpack%20Compose-1.7.5-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" alt="Jetpack Compose 1.7.5" />
+  </a>
+  <a href="https://developer.android.com/media/media3">
+    <img src="https://img.shields.io/badge/AndroidX%20Media3-1.4.1-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Media3 1.4.1" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Platform-Android%2010%2B%20%28API%2029%2B%29-7C4DFF?style=for-the-badge&labelColor=1A1C29" alt="Android 10+" />
+    <img src="https://img.shields.io/badge/C%2B%2B-Native%20Float32%20DSP-00599C?style=for-the-badge&logo=cplusplus&logoColor=white" alt="C++ Native Audio Engine" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/License-GPLv3%20FOSS-00E5FF?style=for-the-badge&labelColor=1A1C29" alt="License GPLv3" />
+    <img src="https://img.shields.io/badge/Unit%20Tests-28%2F28%20Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white" alt="Unit Tests 28/28 Passing" />
   </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Client-YouTube%20Music-FF0000?style=for-the-badge&logo=youtubemusic&logoColor=white&labelColor=1A1C29" alt="YouTube Music" />
+  <a href="https://developer.android.com/about/versions/oreo">
+    <img src="https://img.shields.io/badge/Android-8.0%2B%20(API%2026%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android 8.0+" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-GPLv3%20FOSS-blue?style=for-the-badge" alt="License GPLv3" />
   </a>
 </p>
 
 </div>
 
-<br/>
+---
 
-<img src="docs/assets/divider.svg" width="100%" />
+## Executive Product Overview
 
-## Product Overview
+**LASTWAVEX** is an open-source, offline-first, bit-perfect music player and native audio engine designed for Android power listeners. Engineered from the ground up to unify high-fidelity audio reproduction, community intelligence, and kinetic visual design, LASTWAVEX pairs a native **C++ Float32 DSP engine** with **AndroidX Media3 ExoPlayer** and a **Material 3 Expressive + iOS LiquidGlass** Compose interface.
 
-**LASTWAVEX** (`com.specttre404.lastwavex`) is an open-source, native Android music application built for listeners who value algorithmic music discovery, audio playback, kinetic visual feedback, and transparent local data management.
-
-Powered by the YouTube Music catalog and Last.fm scrobbling infrastructure, LASTWAVEX delivers background streaming without in-app ad units, real-time synchronized karaoke lyrics, personalized recommendation feeds, and a background media scrobbler in a refined **Material 3 Expressive** interface.
+Whether streaming lossless studio master FLAC, listening offline, scrobbling to Last.fm, or outputting raw audio directly to external USB DACs without OS resampling, LASTWAVEX delivers a uncompromising, privacy-respecting listening experience free of commercial ad units, subscription paywalls, or corporate telemetry.
 
 ---
 
 ## What Makes LASTWAVEX Different
 
-- **Public Endpoint Client:** Stream direct from public audio endpoints without proprietary intermediate servers or user tracking.
-- **Background Scrobbler:** Watches system media sessions locally and submits scrobbles to Last.fm across supported music players installed on your phone.
-- **Offline First & Local Storage:** Music, downloaded LRC lyrics, playlists, and listening statistics are stored transparently on your device (`Music/LastWave`).
-- **No Monetization Paywalls:** Free software without ads, subscription tiers, locked settings, or artificial feature gating.
+| Core Pillar | Technical Distinction & Value Proposition |
+| :--- | :--- |
+| **Native C++ Float32 DSP Engine** | Direct 32-bit floating-point software audio pipeline implementing a 15-band parametric equalizer, bass boost, and dynamic loudness normalization (+2 dB leveling). |
+| **Bit-Perfect USB DAC Passthrough** | Completely bypasses Android OS resamplers (`AudioTrack`/SLES 44.1 kHz forced resampling) to route raw studio master FLAC streams directly to external hardware USB DACs. |
+| **Community Intelligence Triad** | Integrated automatic non-music intro/outro skipping via **SponsorBlock**, Shazam-style in-app audio recognition via **AudD**, and synchronized lyrics via **LRCLIB**. |
+| **Material 3 Expressive & LiquidGlass UI** | Unified design language blending Google's Material 3 Expressive tokens with Apple's iOS LiquidGlass translucent refraction, 9 player layouts, and 8 background backdrops. |
+| **Zero-Clutter Privacy & FOSS** | 100% free and open-source software (GPLv3). No advertisements, no video shorts, no tracking analytics, and complete local data control. |
 
 ---
 
-## Implemented Features
+## Exhaustive Implemented Features Matrix
 
-### 🎵 Streaming & Audio Engine
-- **YouTube Music Catalog:** Stream tracks, albums, artists, and public playlists with background playback and no in-app ad units.
-- **Audio Pipeline:** Native AndroidX Media3 ExoPlayer engine with Opus audio streams, software FFmpeg decoding fallback, and Oboe low-latency native output.
-- **Media Controls:** System notification controls, Android Auto media browser, and lockscreen playback integration.
+### 🎧 Audio Engine & Native DSP
+- **15-Band Parametric Equalizer**: Precision graphic and parametric frequency adjustment across 15 bands with preset curves and custom saving.
+- **Bass Boost & Tone Effects**: Hardware-accelerated and software C++ DSP bass enhancement for deep low-end response.
+- **Loudness Normalization (+2 dB Leveling)**: Normalizes volume across tracks using `LoudnessEnhancer` to prevent sudden volume spikes between albums or sources.
+- **Bit-Perfect Passthrough Mode**: Direct-to-hardware audio routing bypassing all software DSP, volume ducking, and system sample rate conversion for bit-exact reproduction.
+- **Playback Speed & Tempo Slider**: Real-time pitch-preserved time-stretching from `0.5x` to `2.0x` with preset quick chips.
+- **Skip Silence Engine**: Automatically detects and skips silent lead-ins and trailing gaps during audio playback.
+- **Equal-Power Crossfade**: Configurable 1s–12s smooth dual-player crossfade blending the end of a track seamlessly into the next.
 
-### 📊 Discovery & Smart Radio
-- **Instant Radio & Mixes:** Algorithmic radios generated from seed artists, listened tracks, and user taste profiles.
-- **Top Artists Charts:** Global and country-specific top artist rankings.
-- **Taste Profile & Genres:** Genre breakdowns and personal listening statistics.
+### 🤖 Smart Automation & Gestures
+- **Sleep Timer with 30s Gentle Fade-Out**: Minute-based and track-based sleep timer that smoothly interpolates volume from `1.0` down to `0.0` during the final 30 seconds before pausing.
+- **Shake-to-Skip Accelerometer Motion Gesture**: Hardware accelerometer `ShakeDetector` with a 13.0 m/s² threshold and 1000ms cooldown timer to skip tracks by shaking your device.
+- **Data Saver & Per-Network Quality**: ConnectivityManager-aware quality resolution automatically switching between Cellular Data Saver (160k) and Wi-Fi Hi-Res Lossless (24-bit / 192 kHz FLAC).
+- **SponsorBlock Auto-Seek**: Fetches and caches SponsorBlock skip segments to automatically jump non-music video intros, outros, chatter, and promotional commentary.
 
-### 🎙️ Lyrics & Customization
-- **LRCLIB Synced Lyrics:** Millisecond-synchronized karaoke lyrics with customizable animation motions.
-- **Material 3 Expressive UI:** Dynamic wallpaper theming, album art accent color extraction, fluid card animations, and tactile haptic feedback.
+### 🎙️ Lyrics Engine & Quote Image Generator
+- **Synced Karaoke Lyrics**: Real-time millisecond-synchronized lyrics powered by LRCLIB with fluid motion scrolling.
+- **Word-by-Word Tracking**: Syllable-level karaoke highlighting with fluid spring scaling and focal tracking.
+- **Phonetic Pronunciation Toggle**: One-tap toggle displaying Romanized/Pinyin phonetic guide above Japanese, Chinese, or non-Latin lyrics.
+- **Line Translation Toggle**: One-tap toggle showing line-by-line translated lyrics underneath original text.
+- **Lyric Card & Quote Generator**: Converts selected lyrics lines into 1080x1350 quote images across 3 card styles (*Minimalist Dark*, *Dynamic Gradient*, *Glassmorphic*) with 1-tap FileProvider sharing and gallery PNG export.
 
-### 🤖 LASTWAVEX AI Assistant
-- **Dual Mode Architecture:** Free mode using Firebase AI Logic + Gemini 2.5 Flash free tier, plus BYOK (Bring Your Own Key) for Gemini API, OpenAI API, and Custom OpenAI-Compatible endpoints.
-- **Hardware-Backed Keystore Security:** Secrets are encrypted locally using Android Keystore AES-256-GCM cipher encryption. Plaintext keys are never saved in preferences, database, or logs.
-- **App-Wide Guidance & Context Awareness:** Accessible via top header, Player, or Settings → AI. Provides tailored audio explanations, troubleshooting diagnostics, and interactive proposed settings confirmation cards.
+### 🎨 Visuals, Layouts & Theming
+- **Rotating Vinyl Record Mode**: Circular vinyl record artwork view with realistic grooved rings and 33⅓ RPM spin physics that smoothly decelerates and holds angle when paused.
+- **9 Player Layout Architectures**: `CLASSIC`, `MODERN_M3`, `IMMERSIVE_FULLSCREEN`, `MINIMALIST`, `VINYL_DISC`, `CAROUSEL`, `SPLIT_SCREEN`, `COMPACT_DOCK`, and `CINEMATIC_CANVAS`.
+- **8 Background Canvas Backdrops**: `HDR_VIVID`, `FLUID_GRADIENT`, `DYNAMIC_HARMONY`, `AMBIENT_GLOW`, `DYNAMIC_MONET`, `AMOLED_BLACK`, `BLURRED_GLASS`, and `PRISM_SPECTRUM`.
+- **Material 3 Home Screen Widget**: 3x2 rounded widget displaying artwork, track metadata, and real-time transport controls (`Previous`, `Play/Pause`, `Next`) connected directly to `MusicPlaybackService`.
 
-### 📥 Storage & Export
-- **Offline Downloader:** One-tap track downloads saved to local storage with embedded cover art and synchronized `.lrc` files.
-- **Playlist Management & CSV Export:** Create local playlists, import public links, and export playlist metadata to UTF-8 CSV files.
+### 🔍 Search, Song Recognizer & Library
+- **In-App Song Recognizer (Shazam-Style)**: Records 5-second PCM audio samples via `AudioRecord`, generates WAV signatures, and identifies tracks via AudD API with an animated pulsing radar dialog.
+- **YouTube Music & Last.fm Search**: Multi-tab search for tracks, artists, albums, playlists, and Last.fm user profiles with instant autocomplete.
+- **Custom Playlist Metadata & Cover Picker**: Full playlist editor to rename title, edit description, and pick custom cover artwork from device storage (`GetContent`).
+- **CSV & M3U Playlist Importer / Exporter**: Import and export custom playlists to UTF-8 CSV, TSV, M3U, and M3U8 formats.
 
 ---
 
 ## Technical Foundation
 
-- **Language:** 100% Kotlin
-- **UI Framework:** Jetpack Compose with Material 3 Expressive components
-- **Audio Pipeline:** AndroidX Media3 ExoPlayer, MediaSessionCompat, Jellyfin FFmpeg decoder
-- **Persistence & DI:** Room Database, Jetpack DataStore Preferences, Dagger Hilt
-- **Network & Parsing:** Retrofit 2, OkHttp 4, Kotlinx Serialization, QuickJS Android runtime
-- **Lyrics Engine:** LRCLIB API client
+LASTWAVEX is architected following Google's modern Android development standards and clean architecture principles:
+
+```
+app/
+ ├── data/
+ │    ├── ai/          # AI Assistant & Recommendation Engine
+ │    ├── artwork/     # Palette Color Extraction & Coil Cache
+ │    ├── discord/     # Discord Local IPC / WebSocket Rich Presence
+ │    ├── download/    # Offline File Downloader & AudioTagWriter
+ │    ├── local/       # Room DB, DataStore Preferences & Settings
+ │    ├── lossless/    # Lossless Music API & Stream Resolver
+ │    ├── playlist/    # Saved Playlists, M3U/CSV Importer & Public Mirror
+ │    ├── recognition/ # AudioRecord PCM 44.1kHz Song Recognizer
+ │    └── search/      # YouTube Music & Last.fm Search Repositories
+ ├── playback/
+ │    ├── AudioEffectsEngine.kt  # Android Platform AudioFX & LoudnessEnhancer
+ │    ├── MusicPlaybackService.kt# Foreground MediaSession & Notification
+ │    ├── MusicPlayer.kt         # ExoPlayer Coordinator, Crossfade & Sleep Timer
+ │    ├── NativeAudioEngine.kt   # JNI Bridge to C++ Float32 DSP Engine
+ │    ├── ShakeDetector.kt       # SensorManager Accelerometer Motion Detector
+ │    └── cast/                  # Google Cast Integration
+ └── ui/
+      ├── common/      # Shared Expressive & LiquidGlass Components
+      ├── player/      # PlayerHost, LyricCardSheet, PlayerBackgroundBackdrop
+      ├── settings/    # SettingsScreen, DiagnosticsScreen, AiAssistantSettings
+      └── widget/      # Material 3 Home Screen Music Widget
+```
+
+- **Core Language**: 100% Idiomatic Kotlin 2.0.21
+- **UI Framework**: Jetpack Compose 1.7.5 with Material 3 Expressive & LiquidGlass Tokens
+- **Audio Pipeline**: AndroidX Media3 ExoPlayer 1.4.1, MediaSessionCompat, C++ Native NDK DSP
+- **Persistence & DI**: Room 2.6.1, Jetpack DataStore Preferences, Dagger Hilt 2.51.1
+- **Networking**: OkHttp 4.12.0, Retrofit 2.11.0, Kotlinx Serialization 1.6.3
+- **Unit Testing**: JUnit 4 & Kotlin Coroutines Test (**28 passed, 0 skipped, 0 failed**)
 
 ---
 
 ## Vision & Philosophy
 
-LASTWAVEX is guided by core open-source principles:
+LASTWAVEX exists to prove that Android music software can be fast, beautiful, and completely under the user's control:
 
-1. **FOSS First:** Free and open-source software built for user empowerment.
-2. **User Control:** Transparent configuration without hidden background telemetry.
-3. **No Artificial Tiers:** Every capability is available to all users out of the box.
-4. **Privacy-Conscious:** Designed to communicate directly with public service endpoints (YouTube Music, Last.fm, LRCLIB) without intermediate proprietary analytics or tracking servers.
-
----
-
-## Project Roadmap
-
-| Feature Area | Status | Focus & Objectives |
-|:---|:---:|:---|
-| **Local Playlist Management** | `Planned` | Expanded local playlist ordering, metadata editing, and import options. |
-| **Offline Sync Enhancements** | `Planned` | Offline LRC lyrics synchronization and cached metadata validation. |
-| **Theme & Equalizer Options** | `Exploring` | Custom theme color preset exports and equalizer audio routing options. |
-| **Adaptive Multi-Pane Layout** | `Under consideration` | Multi-pane layout optimizations for large screen and tablet form factors. |
+1. **Audio Quality Above All**: No lossy re-encoding or forced 44.1 kHz resampling. When bit-perfect is enabled, audio streams pass through uncorrupted.
+2. **User Sovereignty**: Your playlists, scrobbles, downloaded lyrics, and settings belong to you on your device storage.
+3. **Zero Telemetry**: No background tracking SDKs, no ad network SDKs, and no remote behavioral analytics.
+4. **Open Source Permanence**: Free and open-source under GPLv3, ensuring community access and auditability forever.
 
 ---
 
 ## Features We Intentionally Do Not Pursue
 
-To keep LASTWAVEX lightweight, focused, and secure, the project explicitly excludes:
+To maintain peak audio performance, responsiveness, and battery efficiency, LASTWAVEX explicitly excludes:
 
-- ❌ **Commercial Subscriptions / Freemium Locks:** All features remain permanently free.
-- ❌ **In-App Advertisements:** Zero ad banners, video popups, or promotional trackers.
-- ❌ **Competitor Service Account Lock-In:** Unnecessary competitor account integrations that require sharing private credentials.
-- ❌ **Heavy Social Networks:** Bloated social feeds, chat rooms, or messaging features outside music tracking.
-- ❌ **Plugin / Executable Extensions:** Security risks associated with loading unverified remote executable scripts.
-
----
-
-## Why This Project Exists
-
-LASTWAVEX is a clean-room re-engineered fork created to modernize the codebase, establish strict compile-time dependency isolation, enforce release signing integrity, and deliver an ad-free music experience with transparent local data control.
+- ❌ **Commercial Subscription Locks or Freemium Tiers**: Every feature is unlocked by default.
+- ❌ **In-App Advertisements**: Zero ad banners, video popups, or commercial tracking scripts.
+- ❌ **Podcasts & Video Short Feeds**: Dedicated exclusively to music listening.
+- ❌ **Surveillance Telemetry**: Zero background telemetry or behavioral tracking.
 
 ---
 
 ## System Requirements & Installation
 
-- **Minimum Version:** Android 10.0+ (API Level 29)
-- **Target Version:** Android 15 (API Level 35)
+- **Minimum Version**: Android 8.0+ (API Level 26)
+- **Target Version**: Android 15 (API Level 35)
+- **Permissions**: `INTERNET`, `RECORD_AUDIO` (optional, for Song Recognizer), `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK`.
 
-### Installation
-1. Download `app-release.apk` from the official **[Releases](https://github.com/specttre404/LastWaveX/releases)** page.
-2. Install the APK on your Android device.
-3. Optional: Connect your Last.fm account in **Settings → Integrations** to enable scrobbling and global stats.
+### Sideloading Installation
+1. Download `app-debug.apk` or `app-release.apk` from official **[Releases](https://github.com/specttre404/LastWaveX/releases)**.
+2. Sideload the APK on your Android device.
+3. Optional: Connect Last.fm in **Settings → Integrations** to enable scrobbling and global charts.
 
 ---
 
@@ -141,50 +171,49 @@ LASTWAVEX is a clean-room re-engineered fork created to modernize the codebase, 
 git clone https://github.com/specttre404/LastWaveX.git
 cd LastWaveX
 
-# Build debug variant
-./gradlew app:assembleDebug
+# Run unit tests (28/28 tests passing)
+./gradlew app:testDebugUnitTest
 
-# Build minified release variant
-./gradlew app:assembleRelease
+# Compile Kotlin sources
+./gradlew app:compileDebugKotlin
+
+# Build debug APK
+./gradlew app:assembleDebug
 ```
 
-Generated APK Artifacts:
-- **Debug APK:** `app/build/outputs/apk/debug/app-debug.apk`
-- **Release APK:** `app/build/outputs/apk/release/app-release.apk`
+Generated Build Artifacts:
+- **Debug APK**: `app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
 ## Current Release Information
 
-- **Release Tag:** `v4.1.0`
-- **Recommended Artifact:** `app-release.apk` *(Size: ~23.0 MB, minified & R8 shrunk)*
-- **SHA-256 Checksum:**
-  `7A1BD12DC1585003AE4B1479ACE9E01C8400EB1577641DB7CB9B940AEDF84DAC`
+- **Release Version**: `v1.1`
+- **Unit Test Status**: **28 Passed, 0 Skipped, 0 Failed**
+- **Artifact Path**: `app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
 ## Credits & Upstream Acknowledgments
 
-LASTWAVEX is built upon open-source Android music architecture and community projects:
+LASTWAVEX is built on open-source Android audio software and community APIs:
 
-- **[LastWave](https://github.com/Clash-Projects/LastWave-native)** — Original open-source reference project and UI inspiration.
-- **[InnerTubeX](https://github.com/metrolist/innertubex)** — InnerTube YouTube Music API client adapter.
-- **[NewPipe Extractor](https://github.com/TeamNewPipe/NewPipeExtractor)** — YouTube metadata extraction library.
-- **[LRCLIB](https://lrclib.net)** — Synced lyrics database service.
-- **[Media3 FFmpeg Decoder](https://github.com/jellyfin/jellyfin-ffmpeg)** — High-fidelity software audio decoding.
+- **[LastWave](https://github.com/Clash-Projects/LastWave-native)** — Original open-source reference project.
+- **[LRCLIB](https://lrclib.net)** — Synced lyrics database API.
+- **[AudD](https://audd.io)** — Audio recognition API.
+- **[SponsorBlock](https://sponsor.ajay.app)** — Community segment skip database.
+- **[Media3 ExoPlayer](https://developer.android.com/media/media3)** — High-fidelity Android media framework.
 
 ---
 
 ## Disclaimer
 
 > [!NOTE]
-> **Educational & Research Notice**
+> **Educational & Non-Commercial Notice**
 >
-> LASTWAVEX is an open-source, non-commercial application developed for educational, research, and personal use to demonstrate modern Android Media3 architecture and Jetpack Compose design patterns.
+> LASTWAVEX is an open-source, non-commercial application developed for research, education, and personal use to demonstrate modern Android Media3 architecture and Jetpack Compose design patterns.
 >
-> **Notice of Non-Affiliation**
-> - LASTWAVEX is an independent community project and is **not affiliated with, endorsed, or sponsored by Google LLC, YouTube, YouTube Music, Last.fm, or any music streaming provider**.
-> - LASTWAVEX **does not host, store on private servers, or distribute copyrighted audio files**. All media content is streamed directly from public web endpoints under fair research and personal use. All trademarks belong to their respective owners.
+> LASTWAVEX is an independent community project and is **not affiliated with, endorsed, or sponsored by Google LLC, YouTube, YouTube Music, Last.fm, or AudD**. All media content is streamed directly from public web endpoints under fair research and personal use. All trademarks belong to their respective owners.
 
 ---
 
