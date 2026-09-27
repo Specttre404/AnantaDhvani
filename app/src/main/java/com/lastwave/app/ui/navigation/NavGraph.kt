@@ -486,6 +486,26 @@ fun LastWaveNavHost(
             }
         }
 
+        composable(Screen.Settings.AiAssistant.route) {
+            val settingsViewModel: com.lastwave.app.ui.settings.SettingsViewModel = hiltViewModel()
+            PredictiveBackScreen(onBack = { navController.popBackStack() }) {
+                com.lastwave.app.ui.settings.AiAssistantSettingsScreen(
+                    viewModel = settingsViewModel,
+                    onBackClick = { navController.popBackStack() },
+                )
+            }
+        }
+
+        composable(Screen.Settings.Diagnostics.route) {
+            val playerViewModel: com.lastwave.app.ui.player.PlayerViewModel = hiltViewModel()
+            PredictiveBackScreen(onBack = { navController.popBackStack() }) {
+                com.lastwave.app.ui.settings.DiagnosticsScreen(
+                    player = playerViewModel.player,
+                    onBackClick = { navController.popBackStack() },
+                )
+            }
+        }
+
         composable(Screen.Search.route) {
             PredictiveBackScreen(onBack = { navController.popBackStack() }) {
                 SearchScreen(

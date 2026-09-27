@@ -541,6 +541,7 @@ class MusicPlayer @Inject constructor(
         }
         override fun onPlayerError(error: PlaybackException) {
             if (isCasting) return
+            android.util.Log.e("MusicPlayer", "Playback error code: ${error.errorCodeName}, message: ${error.message}", error)
             cancelCrossfade()
             resolutionRequests.clear()
             val currentTrack = _state.value.current
