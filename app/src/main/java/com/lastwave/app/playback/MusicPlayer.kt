@@ -968,6 +968,8 @@ class MusicPlayer @Inject constructor(
                 sponsorBlockEnabled = settings.sponsorBlockEnabled
                 skipMusicVideoIntros = settings.skipMusicVideoIntros
                 bitPerfectEnabled = settings.isBitPerfectEnabled
+                audioEffectsEngine.setLoudnessNormalizationEnabled(settings.loudnessNormalizationEnabled)
+                secondaryEffects?.setLoudnessNormalizationEnabled(settings.loudnessNormalizationEnabled)
                 updateBitPerfectState()
                 if (bitPerfectEnabled && settings.isStudioMasterClarityEnabled) {
                     // Self-heal: both must never be on — Bit-Perfect wins.

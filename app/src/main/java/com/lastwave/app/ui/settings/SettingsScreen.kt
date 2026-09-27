@@ -915,7 +915,7 @@ fun SettingsScreen(
                         else -> "Max (24-bit / 192 kHz FLAC)"
                     }
 
-                    val totalAudioRows = if (misc.crossfadeEnabled) 9 else 8
+                    val totalAudioRows = if (misc.crossfadeEnabled) 10 else 9
                     SettingsGroup(rowCount = totalAudioRows) { index, position ->
                         when (index) {
                             0 -> SettingsActionCard(
@@ -974,6 +974,37 @@ fun SettingsScreen(
                                 )
                             } else {
                                 SettingsToggleCard(
+                                    icon = Icons.Filled.VolumeUp,
+                                    iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                                    iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    title = stringResource(R.string.settings_loudness_normalization),
+                                    subtitle = if (misc.loudnessNormalizationEnabled) {
+                                        "Leveling volume across tracks to prevent sudden loudness spikes"
+                                    } else {
+                                        stringResource(R.string.settings_loudness_normalization_sub)
+                                    },
+                                    checked = misc.loudnessNormalizationEnabled,
+                                    onCheckedChange = viewModel::setLoudnessNormalizationEnabled,
+                                    position = position,
+                                )
+                            }
+                            5 -> if (misc.crossfadeEnabled) {
+                                SettingsToggleCard(
+                                    icon = Icons.Filled.VolumeUp,
+                                    iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                                    iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    title = stringResource(R.string.settings_loudness_normalization),
+                                    subtitle = if (misc.loudnessNormalizationEnabled) {
+                                        "Leveling volume across tracks to prevent sudden loudness spikes"
+                                    } else {
+                                        stringResource(R.string.settings_loudness_normalization_sub)
+                                    },
+                                    checked = misc.loudnessNormalizationEnabled,
+                                    onCheckedChange = viewModel::setLoudnessNormalizationEnabled,
+                                    position = position,
+                                )
+                            } else {
+                                SettingsToggleCard(
                                     icon = Icons.Filled.FastForward,
                                     iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
                                     iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -988,7 +1019,7 @@ fun SettingsScreen(
                                     position = position,
                                 )
                             }
-                            5 -> if (misc.crossfadeEnabled) {
+                            6 -> if (misc.crossfadeEnabled) {
                                 SettingsToggleCard(
                                     icon = Icons.Filled.FastForward,
                                     iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
@@ -1019,7 +1050,7 @@ fun SettingsScreen(
                                     position = position,
                                 )
                             }
-                            6 -> if (misc.crossfadeEnabled) {
+                            7 -> if (misc.crossfadeEnabled) {
                                 SettingsToggleCard(
                                     icon = Icons.Filled.AutoAwesome,
                                     iconContainer = MaterialTheme.colorScheme.primaryContainer,
@@ -1050,7 +1081,7 @@ fun SettingsScreen(
                                     position = position,
                                 )
                             }
-                            7 -> if (misc.crossfadeEnabled) {
+                            8 -> if (misc.crossfadeEnabled) {
                                 SettingsToggleCard(
                                     icon = Icons.Filled.Lyrics,
                                     iconContainer = MaterialTheme.colorScheme.secondaryContainer,
@@ -1081,7 +1112,7 @@ fun SettingsScreen(
                                     position = position,
                                 )
                             }
-                            8 -> {
+                            9 -> {
                                 val isIgnored = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
                                 SettingsActionCard(
                                     icon = Icons.Filled.Bolt,

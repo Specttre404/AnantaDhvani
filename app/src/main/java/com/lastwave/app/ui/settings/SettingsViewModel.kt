@@ -413,6 +413,9 @@ class SettingsViewModel @Inject constructor(
     fun setSkipSilenceEnabled(enabled: Boolean) = launchSettingsAction("update skip silence") {
         settingsPreferences.setSkipSilenceEnabled(enabled)
     }
+    fun setLoudnessNormalizationEnabled(enabled: Boolean) = launchSettingsAction("update loudness normalization") {
+        settingsPreferences.setLoudnessNormalizationEnabled(enabled)
+    }
     fun setSponsorBlockEnabled(enabled: Boolean) = launchSettingsAction("update SponsorBlock setting") {
         settingsPreferences.setSponsorBlockEnabled(enabled)
     }

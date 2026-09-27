@@ -1,5 +1,9 @@
+@file:OptIn(UnstableApi::class)
+
 package com.lastwave.app.playback
 
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import android.media.audiofx.DynamicsProcessing
 import android.media.audiofx.Equalizer
 import android.media.audiofx.LoudnessEnhancer
@@ -45,9 +49,11 @@ class AudioEffectsEngine @Inject constructor(
     @Volatile private var equalizerSettings = EqualizerSettings()
     @Volatile private var studioClarityEnabled = false
     @Volatile private var bitPerfectActive = false
+    @Volatile private var loudnessNormalizationEnabled = true
 
     private var attachedSessionId = C.AUDIO_SESSION_ID_UNSET
     private var toneEffect: ToneEffect? = null
+    private var loudnessEnhancer: LoudnessEnhancer? = null
 
     init {
         applicationScope.launch(Dispatchers.Default) {
@@ -64,6 +70,7 @@ class AudioEffectsEngine @Inject constructor(
         applicationScope.launch(Dispatchers.Default) {
             settingsPreferences.settings.collect { settings ->
                 studioClarityEnabled = settings.isStudioMasterClarityEnabled
+                loudnessNormalizationEnabled = settings.loudnessNormalizationEnabled
                 requestApply()
             }
         }
@@ -90,6 +97,12 @@ class AudioEffectsEngine @Inject constructor(
         requestApply()
     }
 
+    fun setLoudnessNormalizationEnabled(enabled: Boolean) {
+        if (loudnessNormalizationEnabled == enabled) return
+        loudnessNormalizationEnabled = enabled
+        requestApply()
+    }
+
     fun detach() {
         requestedSessionId = C.AUDIO_SESSION_ID_UNSET
         fallbackRequired = false
@@ -106,8 +119,19 @@ class AudioEffectsEngine @Inject constructor(
             releaseAllInternal()
             attachedSessionId = targetSessionId
         }
-        if (bitPerfectActive || !fallbackRequired || attachedSessionId == C.AUDIO_SESSION_ID_UNSET) {
+        if (bitPerfectActive || attachedSessionId == C.AUDIO_SESSION_ID_UNSET) {
             releaseAllInternal()
+            return
+        }
+
+        if (loudnessNormalizationEnabled) {
+            applyLoudnessEnhancerInternal()
+        } else {
+            releaseLoudnessEnhancerInternal()
+        }
+
+        if (!fallbackRequired) {
+            releaseToneInternal()
             return
         }
 
@@ -118,6 +142,34 @@ class AudioEffectsEngine @Inject constructor(
         } else {
             releaseToneInternal()
         }
+    }
+
+    private fun applyLoudnessEnhancerInternal() {
+        try {
+            var enhancer = loudnessEnhancer
+            if (enhancer == null) {
+                enhancer = LoudnessEnhancer(attachedSessionId)
+                loudnessEnhancer = enhancer
+            }
+            enhancer.setTargetGain(200)
+            enhancer.enabled = true
+        } catch (e: Exception) {
+            Log.w(TAG, "LoudnessEnhancer unavailable on session $attachedSessionId", e)
+            releaseLoudnessEnhancerInternal()
+        }
+    }
+
+    private fun releaseLoudnessEnhancerInternal() {
+        runCatching {
+            loudnessEnhancer?.enabled = false
+            loudnessEnhancer?.release()
+        }
+        loudnessEnhancer = null
+    }
+
+    private fun releaseAllInternal() {
+        releaseToneInternal()
+        releaseLoudnessEnhancerInternal()
     }
 
     private fun buildCombinedCurve(userEqEnabled: Boolean): FloatArray =
@@ -163,9 +215,6 @@ class AudioEffectsEngine @Inject constructor(
         return LegacyEqualizerEffect.create(audioSessionId)
     }
 
-    private fun releaseAllInternal() {
-        releaseToneInternal()
-    }
 
     private fun releaseToneInternal() {
         toneEffect?.release()

@@ -84,6 +84,8 @@ data class MiscSettings(
     val crossfadeSeconds: Int = 4,
     /** Automatically skip silent periods during audio playback. */
     val skipSilenceEnabled: Boolean = false,
+    /** Balance volume levels across different tracks to prevent volume spikes. */
+    val loudnessNormalizationEnabled: Boolean = true,
     /** Automatically skip non-music video intros, outros, and chatter using SponsorBlock. */
     val sponsorBlockEnabled: Boolean = true,
     /** Skip music video intro commentary and non-music segments. */
@@ -191,6 +193,7 @@ class SettingsPreferences @Inject constructor(
         val CROSSFADE_ENABLED = booleanPreferencesKey("lw_crossfade_enabled")
         val CROSSFADE_SECONDS = intPreferencesKey("lw_crossfade_seconds")
         val SKIP_SILENCE_ENABLED = booleanPreferencesKey("lw_skip_silence_enabled")
+        val LOUDNESS_NORMALIZATION_ENABLED = booleanPreferencesKey("lw_loudness_normalization_enabled")
         val SPONSOR_BLOCK_ENABLED = booleanPreferencesKey("lw_sponsor_block_enabled")
         val SKIP_MUSIC_VIDEO_INTROS = booleanPreferencesKey("lw_skip_music_video_intros")
         val WAVY_SEEKBAR_ENABLED = booleanPreferencesKey("lw_wavy_seekbar_enabled")
@@ -222,6 +225,7 @@ class SettingsPreferences @Inject constructor(
                 crossfadeEnabled = p.readSafely(Keys.CROSSFADE_ENABLED) ?: false,
                 crossfadeSeconds = (p.readSafely(Keys.CROSSFADE_SECONDS) ?: 4).coerceIn(1, 12),
                 skipSilenceEnabled = p.readSafely(Keys.SKIP_SILENCE_ENABLED) ?: false,
+                loudnessNormalizationEnabled = p.readSafely(Keys.LOUDNESS_NORMALIZATION_ENABLED) ?: true,
                 sponsorBlockEnabled = p.readSafely(Keys.SPONSOR_BLOCK_ENABLED) ?: true,
                 skipMusicVideoIntros = p.readSafely(Keys.SKIP_MUSIC_VIDEO_INTROS) ?: true,
                 wavySeekbarEnabled = p.readSafely(Keys.WAVY_SEEKBAR_ENABLED) ?: true,
@@ -301,6 +305,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setSkipSilenceEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.SKIP_SILENCE_ENABLED] = enabled }
+    }
+
+    suspend fun setLoudnessNormalizationEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.LOUDNESS_NORMALIZATION_ENABLED] = enabled }
     }
 
     suspend fun setSponsorBlockEnabled(enabled: Boolean) {
