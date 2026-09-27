@@ -45,6 +45,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -214,10 +215,12 @@ fun ModernLyricsPanel(
                             targetState.lines.toSyncedLyrics(track.title, track.artist, isOverallRtl)
                         }
 
-                        val initialLineIndex = remember(syncedLyrics) {
-                            val time = smoothedPositionMs.toInt()
-                            val idx = syncedLyrics.lines.indexOfFirst { time in it.start..it.end }
-                            if (idx != -1) idx else syncedLyrics.lines.indexOfFirst { it.start > time }.takeIf { it != -1 } ?: 0
+                        val initialLineIndex by remember(syncedLyrics) {
+                            derivedStateOf {
+                                val time = smoothedPositionMs.toInt()
+                                val idx = syncedLyrics.lines.indexOfFirst { time in it.start..it.end }
+                                if (idx != -1) idx else syncedLyrics.lines.indexOfFirst { it.start > time }.takeIf { it != -1 } ?: 0
+                            }
                         }
                         val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialLineIndex)
 

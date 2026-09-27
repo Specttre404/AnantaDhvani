@@ -218,7 +218,7 @@ private fun MinimalistDarkCard(
                     color = Color(0xFF2A2A2A),
                 ) {
                     Text(
-                        text = "LASTWAVE",
+                        text = "LASTWAVEX",
                         style = MaterialTheme.typography.labelSmall.copy(
                             letterSpacing = 1.sp,
                             fontWeight = FontWeight.ExtraBold,
@@ -333,7 +333,7 @@ private fun DynamicGradientCard(
                     color = Color.Black.copy(alpha = 0.3f),
                 ) {
                     Text(
-                        text = "LASTWAVE",
+                        text = "LASTWAVEX",
                         style = MaterialTheme.typography.labelSmall.copy(
                             letterSpacing = 1.sp,
                             fontWeight = FontWeight.Bold,

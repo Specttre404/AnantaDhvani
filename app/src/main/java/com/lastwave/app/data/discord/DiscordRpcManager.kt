@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.InputStream
-import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -38,6 +38,7 @@ class DiscordRpcManager @Inject constructor(
     private var rpcJob: Job? = null
     private var socket: Socket? = null
     private var isConnected = false
+    private var lastConnectionAttemptTime = 0L
     private val clientId = "1345000000000000000"
 
     fun start(playerStateFlow: StateFlow<MusicPlayerState>) {
@@ -92,7 +93,7 @@ class DiscordRpcManager @Inject constructor(
 
                 val assetsJson = JSONObject().apply {
                     if (!activity.artworkUrl.isNullOrBlank()) put("large_image", activity.artworkUrl)
-                    put("large_text", activity.album ?: "LastWave Music")
+                    put("large_text", activity.album ?: "LastWaveX Music")
                     put("small_image", if (activity.isPlaying) "play" else "pause")
                     put("small_text", if (activity.isPlaying) "Playing" else "Paused")
                 }
@@ -134,10 +135,15 @@ class DiscordRpcManager @Inject constructor(
         if (isConnected && socket?.isConnected == true && !socket!!.isClosed) return
         disconnect()
 
+        val now = System.currentTimeMillis()
+        if (now - lastConnectionAttemptTime < 60_000L) return
+        lastConnectionAttemptTime = now
+
         for (port in 6463..6472) {
             try {
-                val s = Socket(InetAddress.getByName("127.0.0.1"), port)
-                s.soTimeout = 3000
+                val s = Socket()
+                s.connect(InetSocketAddress("127.0.0.1", port), 250)
+                s.soTimeout = 1000
                 socket = s
 
                 val handshakeJson = JSONObject().apply {

@@ -20,7 +20,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="14dp"
         android:layout_marginEnd="8dp"
         android:orientation="vertical">
 
@@ -28,7 +28,7 @@
             android:id="@+id/widget_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="LastWave Music"
+            android:text="LastWaveX Music"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="Select a track to play"
-            android:textColor="#B0B0B0"
+            android:textColor="#E0E0E0"
             android:textSize="13sp"
             android:singleLine="true"
             android:ellipsize="end" />
@@ -55,8 +55,8 @@
 
         <ImageButton
             android:id="@+id/widget_btn_prev"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_widget_skip_previous"
             android:contentDescription="Previous" />
@@ -65,16 +65,16 @@
             android:id="@+id/widget_btn_play_pause"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_widget_play"
             android:contentDescription="Play/Pause" />
 
         <ImageButton
             android:id="@+id/widget_btn_next"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_widget_skip_next"
             android:contentDescription="Next" />

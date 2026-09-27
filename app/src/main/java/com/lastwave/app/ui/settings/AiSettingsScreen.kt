@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -67,6 +68,7 @@ import com.lastwave.app.ui.player.LocalMiniPlayerScrollClearance
 @Composable
 fun AiSettingsScreen(
     onBack: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: AiSettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -75,11 +77,16 @@ fun AiSettingsScreen(
     var apiKeyInput by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .adaptiveContentWidth(maxWidth = 860.dp),
-    ) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = modifier.fillMaxSize(),
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .adaptiveContentWidth(maxWidth = 860.dp),
+        ) {
         ExpressiveHeader(title = "LASTWAVEX AI Assistant", onBack = onBack)
 
         LazyColumn(
@@ -433,4 +440,5 @@ fun AiSettingsScreen(
             }
         }
     }
+}
 }
