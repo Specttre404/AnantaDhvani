@@ -83,6 +83,8 @@
     <string name="settings_crossfade_sub">Blend the end of a track into the next one</string>
     <string name="settings_skip_silence">Skip Silence</string>
     <string name="settings_skip_silence_sub">Automatically skip silent sections during audio playback</string>
+    <string name="settings_loudness_normalization" tools:ignore="MissingTranslation">Loudness Normalization</string>
+    <string name="settings_loudness_normalization_sub" tools:ignore="MissingTranslation">Balance volume levels across different tracks to prevent sudden volume spikes</string>
     <string name="settings_sponsorblock" tools:ignore="MissingTranslation">SponsorBlock (Auto-Skip Non-Music)</string>
     <string name="settings_sponsorblock_sub" tools:ignore="MissingTranslation">Automatically skip non-music video intros, outros, and chatter</string>
     <string name="settings_skip_intros" tools:ignore="MissingTranslation">Skip Music Video Intros &amp; Outros</string>

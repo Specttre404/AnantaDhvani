@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.OpenInNew
@@ -62,6 +63,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -73,6 +75,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlin.math.roundToInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -190,6 +193,34 @@ class ExploreGenreMenuViewModel @Inject constructor(private val genreExplorer: c
     }
 }
 
+@HiltViewModel
+class EqualizerMenuViewModel @Inject constructor(
+    val equalizerPreferences: com.lastwave.app.data.local.EqualizerPreferences,
+) : ViewModel() {
+    val settings = equalizerPreferences.settings
+
+    fun setEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            equalizerPreferences.setEnabled(enabled)
+        }
+    }
+
+    fun applyPreset(preset: com.lastwave.app.data.local.EqPreset) {
+        viewModelScope.launch {
+            equalizerPreferences.applyPreset(preset)
+        }
+    }
+
+    fun setBassBoost(percent: Float) {
+        viewModelScope.launch {
+            val boostDb = (percent.coerceIn(0f, 100f) / 100f) * 6.0f
+            for (i in 0..4) {
+                equalizerPreferences.setBandGain(i, boostDb)
+            }
+        }
+    }
+}
+
 /** music.youtube.com rather than youtube.com: if YouTube Music is installed
  *  it's registered as that domain's Android App Link target, so a plain
  *  ACTION_VIEW opens the app directly — no explicit package targeting (and
@@ -273,6 +304,7 @@ fun TrackContextMenuSheet(
     val musicPlayer = LocalMusicPlayer.current
     val addToPlaylist = LocalAddToPlaylist.current
     var showDetailsSheet by remember { mutableStateOf(false) }
+    var showEqualizerSheet by remember { mutableStateOf(false) }
     var showPlaybackSpeedDialog by remember { mutableStateOf(false) }
     var showStatsForNerdsDialog by remember { mutableStateOf(false) }
     var showTimerDialog by remember { mutableStateOf(false) }
@@ -318,6 +350,12 @@ fun TrackContextMenuSheet(
             },
         )
         return
+    }
+
+    if (showEqualizerSheet) {
+        EqualizerSheet(
+            onDismiss = { showEqualizerSheet = false },
+        )
     }
 
     if (showPlaybackSpeedDialog) {
@@ -480,6 +518,11 @@ fun TrackContextMenuSheet(
                     }
                     if (capabilities.showCopyActions) {
                         add { pos -> MenuActionRow(Icons.Filled.ContentCopy, "Copy Song", position = pos) { clipboard.setText(AnnotatedString("${t.name} \u2014 ${t.artist}")); onDismiss() } }
+                    }
+                    add { pos ->
+                        MenuActionRow(Icons.Filled.GraphicEq, "Equalizer & Sound FX", position = pos) {
+                            showEqualizerSheet = true
+                        }
                     }
                     add { pos ->
                         MenuActionRow(Icons.Filled.Speed, "Playback Speed", position = pos) {
@@ -1331,4 +1374,178 @@ private fun PlaybackSpeedDialog(
             }
         },
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EqualizerSheet(
+    equalizerViewModel: EqualizerMenuViewModel = hiltViewModel(),
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val eqSettings by equalizerViewModel.settings.collectAsStateWithLifecycle(
+        initialValue = com.lastwave.app.data.local.EqualizerSettings()
+    )
+
+    val avgBassGain = eqSettings.gainsDb.take(5).average().toFloat().coerceIn(0f, 6f)
+    var bassBoostPercent by remember(eqSettings.gainsDb) {
+        mutableFloatStateOf(((avgBassGain / 6.0f) * 100f).coerceIn(0f, 100f))
+    }
+
+    val presets = listOf(
+        com.lastwave.app.data.local.EqualizerPresets.FLAT,
+        com.lastwave.app.data.local.EqualizerPresets.byName("Deep Bass Clean")
+            ?: com.lastwave.app.data.local.EqPreset("Bass Boost", listOf(6f, 5.5f, 4.5f, 3f, 1.5f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
+        com.lastwave.app.data.local.EqualizerPresets.byName("Vocal Clarity")
+            ?: com.lastwave.app.data.local.EqPreset("Vocal Enhancer", listOf(-1.5f, -1f, -0.5f, 0f, 0.5f, 1f, 2f, 3f, 3.5f, 3f, 2.5f, 2f, 1.5f, 1.5f, 1f)),
+        com.lastwave.app.data.local.EqualizerPresets.byName("Rock")
+            ?: com.lastwave.app.data.local.EqPreset("Rock", listOf(4f, 3.5f, 3f, 1.5f, 0f, -1f, -1f, -0.5f, 0.5f, 1.5f, 2.5f, 3f, 3.5f, 4f, 4f)),
+        com.lastwave.app.data.local.EqualizerPresets.byName("Pop")
+            ?: com.lastwave.app.data.local.EqPreset("Pop", listOf(-1f, -0.5f, 0f, 1f, 1.5f, 2f, 2f, 1.5f, 1f, 0.5f, 0.5f, 1f, 1.5f, 2f, 2.5f)),
+        com.lastwave.app.data.local.EqualizerPresets.byName("Electronic")
+            ?: com.lastwave.app.data.local.EqPreset("Electronic", listOf(4.5f, 4f, 3f, 2f, 0.5f, -0.5f, 0f, 1f, 2f, 2.5f, 2.5f, 2.5f, 3f, 3.5f, 4f)),
+    )
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        modifier = Modifier.liquidGlassChrome(
+            RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            LocalLiquidGlass.current,
+            LiquidGlassPreset.ContextMenu,
+            LocalLiquidGlassOverlayBackdrop.current,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.GraphicEq,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp),
+                    )
+                    Column {
+                        Text(
+                            text = "Equalizer & Sound FX",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = if (eqSettings.enabled) "Active • Live Gain Processing" else "Disabled",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (eqSettings.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                Switch(
+                    checked = eqSettings.enabled,
+                    onCheckedChange = { equalizerViewModel.setEnabled(it) },
+                )
+            }
+
+            HorizontalDivider()
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Bass Boost",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "${bassBoostPercent.roundToInt()}%",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+                Slider(
+                    value = bassBoostPercent,
+                    onValueChange = { percent ->
+                        bassBoostPercent = percent
+                        equalizerViewModel.setBassBoost(percent)
+                    },
+                    valueRange = 0f..100f,
+                    enabled = eqSettings.enabled,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            HorizontalDivider()
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "Quick Presets",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    presets.chunked(3).forEach { rowPresets ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            rowPresets.forEach { preset ->
+                                val isSelected = eqSettings.presetName.equals(preset.name, ignoreCase = true) ||
+                                    (preset.name == "Bass Boost" && eqSettings.presetName.equals("Deep Bass Clean", ignoreCase = true)) ||
+                                    (preset.name == "Vocal Enhancer" && eqSettings.presetName.equals("Vocal Clarity", ignoreCase = true))
+
+                                Surface(
+                                    onClick = {
+                                        equalizerViewModel.applyPreset(preset)
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isSelected && eqSettings.enabled) {
+                                        MaterialTheme.colorScheme.primaryContainer
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceContainerHigh
+                                    },
+                                    contentColor = if (isSelected && eqSettings.enabled) {
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
+                                    ) {
+                                        Text(
+                                            text = preset.name,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+        }
+    }
 }
