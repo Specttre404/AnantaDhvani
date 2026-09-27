@@ -94,6 +94,10 @@ fun ModernLyricsPanel(
     lyricsState: LyricsUiState,
     progressState: StateFlow<PlaybackProgressState>? = null,
     wavySeekbarEnabled: Boolean = true,
+    showTranslation: Boolean = true,
+    showPhonetic: Boolean = true,
+    onToggleTranslation: (() -> Unit)? = null,
+    onTogglePhonetic: (() -> Unit)? = null,
     onToggleFullscreen: (() -> Unit)? = null,
     isFullscreen: Boolean = false,
     onRetry: () -> Unit = {},
@@ -237,6 +241,7 @@ fun ModernLyricsPanel(
                                         .fillMaxWidth()
                                         .padding(bottom = 6.dp),
                                     horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Surface(
                                         shape = CircleShape,
@@ -252,12 +257,50 @@ fun ModernLyricsPanel(
                                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
                                         )
                                     }
+
+                                    if (onToggleTranslation != null) {
+                                        Spacer(Modifier.width(8.dp))
+                                        Surface(
+                                            onClick = onToggleTranslation,
+                                            shape = CircleShape,
+                                            color = if (showTranslation) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                                            contentColor = if (showTranslation) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        ) {
+                                            Text(
+                                                text = "Translate",
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    letterSpacing = 0.5.sp,
+                                                    fontWeight = if (showTranslation) FontWeight.Bold else FontWeight.Medium,
+                                                ),
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                            )
+                                        }
+                                    }
+
+                                    if (onTogglePhonetic != null) {
+                                        Spacer(Modifier.width(6.dp))
+                                        Surface(
+                                            onClick = onTogglePhonetic,
+                                            shape = CircleShape,
+                                            color = if (showPhonetic) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                                            contentColor = if (showPhonetic) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        ) {
+                                            Text(
+                                                text = "Phonetic",
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    letterSpacing = 0.5.sp,
+                                                    fontWeight = if (showPhonetic) FontWeight.Bold else FontWeight.Medium,
+                                                ),
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                            )
+                                        }
+                                    }
                                 }
                             KaraokeLyricsView(
                                 listState = listState,
                                 lyrics = syncedLyrics,
-                                showTranslation = true,
-                                showPhonetic = true,
+                                showTranslation = showTranslation,
+                                showPhonetic = showPhonetic,
                                 currentPosition = { smoothedPositionMs.toInt() },
                                 onLineClicked = { line ->
                                     player.seekTo(line.start.toLong())
