@@ -143,6 +143,8 @@ data class MiscSettings(
     val skipMusicVideoIntros: Boolean = true,
     /** Share current track, artist & progress status on Discord. */
     val discordRpcEnabled: Boolean = false,
+    /** Shake device to skip to next track during playback. */
+    val shakeToSkipEnabled: Boolean = false,
     /** Player Now Playing artwork style (Square Cover or Rotating Vinyl). */
     val playerCoverStyle: PlayerCoverStyle = PlayerCoverStyle.SQUARE_COVER,
     /** Player UI layout style architecture (9 options). */
@@ -265,6 +267,7 @@ class SettingsPreferences @Inject constructor(
         val SPONSOR_BLOCK_ENABLED = booleanPreferencesKey("lw_sponsor_block_enabled")
         val SKIP_MUSIC_VIDEO_INTROS = booleanPreferencesKey("lw_skip_music_video_intros")
         val DISCORD_RPC_ENABLED = booleanPreferencesKey("lw_discord_rpc_enabled")
+        val SHAKE_TO_SKIP_ENABLED = booleanPreferencesKey("lw_shake_to_skip_enabled")
         val PLAYER_COVER_STYLE = stringPreferencesKey("lw_player_cover_style")
         val PLAYER_STYLE = stringPreferencesKey("lw_player_style")
         val PLAYER_BACKGROUND_STYLE = stringPreferencesKey("lw_player_background_style")
@@ -307,6 +310,7 @@ class SettingsPreferences @Inject constructor(
                 sponsorBlockEnabled = p.readSafely(Keys.SPONSOR_BLOCK_ENABLED) ?: true,
                 skipMusicVideoIntros = p.readSafely(Keys.SKIP_MUSIC_VIDEO_INTROS) ?: true,
                 discordRpcEnabled = p.readSafely(Keys.DISCORD_RPC_ENABLED) ?: false,
+                shakeToSkipEnabled = p.readSafely(Keys.SHAKE_TO_SKIP_ENABLED) ?: false,
                 playerCoverStyle = PlayerCoverStyle.fromId(p.readSafely(Keys.PLAYER_COVER_STYLE)),
                 playerStyle = PlayerStyle.fromId(p.readSafely(Keys.PLAYER_STYLE)),
                 playerBackgroundStyle = p.readSafely(Keys.BACKGROUND_STYLE_INDEX)?.let { PlayerBackgroundStyle.entries.getOrNull(it) }
@@ -436,6 +440,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setDiscordRpcEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.DISCORD_RPC_ENABLED] = enabled }
+    }
+
+    suspend fun setShakeToSkipEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.SHAKE_TO_SKIP_ENABLED] = enabled }
     }
 
     suspend fun setPlayerCoverStyle(style: PlayerCoverStyle) {

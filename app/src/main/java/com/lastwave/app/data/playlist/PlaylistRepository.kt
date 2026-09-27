@@ -239,6 +239,23 @@ class PlaylistRepository @Inject constructor(
         return updated.toDomain()
     }
 
+    suspend fun updateMetadata(id: Long, title: String, description: String, customCoverUri: String?): SavedPlaylist? {
+        awaitStartupSync()
+        val entity = dao.getById(id) ?: return null
+        val cleanTitle = title.trim().ifBlank { entity.title }
+        val cleanDesc = description.trim()
+        val cleanCover = customCoverUri?.trim()?.takeIf { it.isNotBlank() }
+        val updated = entity.copy(
+            title = if (entity.mode == LIKED_SONGS_MODE) entity.title else cleanTitle,
+            subtitle = if (cleanDesc.isNotBlank()) cleanDesc else entity.subtitle,
+            customCoverUri = cleanCover,
+        )
+        dao.upsert(updated)
+        syncPublicMirror()
+        _changes.tryEmit(Unit)
+        return updated.toDomain()
+    }
+
     suspend fun setPinned(id: Long, pinned: Boolean): SavedPlaylist? {
         awaitStartupSync()
         val entity = dao.getById(id) ?: return null

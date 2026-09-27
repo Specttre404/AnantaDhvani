@@ -344,6 +344,19 @@ class PlaylistViewModel @Inject constructor(
         }
     }
 
+    fun updatePlaylistMetadata(id: Long, title: String, description: String, customCoverUri: String?) {
+        viewModelScope.launch {
+            playlistRepository.updateMetadata(id, title, description, customCoverUri)
+            _uiState.update {
+                it.copy(
+                    toastMessage = "Playlist details updated",
+                    renamePlaylistId = null,
+                )
+            }
+            load(justGeneratedId = id)
+        }
+    }
+
     fun togglePinned(id: Long) {
         val playlist = _uiState.value.playlists.firstOrNull { it.id == id }
             ?: _uiState.value.detailPlaylist?.takeIf { it.id == id }

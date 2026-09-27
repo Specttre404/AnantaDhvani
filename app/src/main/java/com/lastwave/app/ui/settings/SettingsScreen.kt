@@ -77,6 +77,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
@@ -969,7 +970,7 @@ fun SettingsScreen(
                         else -> "Max (24-bit / 192 kHz FLAC)"
                     }
 
-                    val totalAudioRows = if (misc.crossfadeEnabled) 10 else 9
+                    val totalAudioRows = if (misc.crossfadeEnabled) 11 else 10
                     SettingsGroup(rowCount = totalAudioRows) { index, position ->
                         when (index) {
                             0 -> SettingsActionCard(
@@ -1152,6 +1153,38 @@ fun SettingsScreen(
                                 )
                             } else {
                                 val isIgnored = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
+                                SettingsToggleCard(
+                                    icon = Icons.Filled.Vibration,
+                                    iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
+                                    iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    title = "Shake to Skip / Motion Gesture",
+                                    subtitle = if (misc.shakeToSkipEnabled) {
+                                        "Active \u2022 Shake device to skip to next track during playback"
+                                    } else {
+                                        "Shake your phone to skip to the next track"
+                                    },
+                                    checked = misc.shakeToSkipEnabled,
+                                    onCheckedChange = viewModel::setShakeToSkipEnabled,
+                                    position = position,
+                                )
+                            }
+                            9 -> if (misc.crossfadeEnabled) {
+                                SettingsToggleCard(
+                                    icon = Icons.Filled.Vibration,
+                                    iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
+                                    iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    title = "Shake to Skip / Motion Gesture",
+                                    subtitle = if (misc.shakeToSkipEnabled) {
+                                        "Active \u2022 Shake device to skip to next track during playback"
+                                    } else {
+                                        "Shake your phone to skip to the next track"
+                                    },
+                                    checked = misc.shakeToSkipEnabled,
+                                    onCheckedChange = viewModel::setShakeToSkipEnabled,
+                                    position = position,
+                                )
+                            } else {
+                                val isIgnored = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
                                 SettingsActionCard(
                                     icon = Icons.Filled.Bolt,
                                     iconContainer = if (isIgnored) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.errorContainer,
@@ -1166,7 +1199,7 @@ fun SettingsScreen(
                                     position = position,
                                 )
                             }
-                            9 -> {
+                            10 -> {
                                 val isIgnored = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
                                 SettingsActionCard(
                                     icon = Icons.Filled.Bolt,

@@ -130,6 +130,7 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     private var cleanedSourceArtist = ""
     private var cleanedMetadata = CleanTrackMetadata("", "")
     private var artworkJob: Job? = null
+    private var shakeDetector: ShakeDetector? = null
     private var artworkUrl: String? = null
     private var artworkBitmap: Bitmap? = null
     private var notificationSignature = ""
@@ -233,6 +234,23 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                     notificationPalette = newPalette
                     notificationSignature = ""
                     publishNotification(musicPlayer.state.value, force = true)
+                }
+            }
+        }
+        scope.launch {
+            settingsPreferences.settings.collectLatest { miscSettings ->
+                if (miscSettings.shakeToSkipEnabled) {
+                    if (shakeDetector == null) {
+                        shakeDetector = ShakeDetector(this@MusicPlaybackService) {
+                            if (musicPlayer.state.value.isPlaying) {
+                                musicPlayer.next()
+                            }
+                        }
+                    }
+                    shakeDetector?.start()
+                } else {
+                    shakeDetector?.stop()
+                    shakeDetector = null
                 }
             }
         }
@@ -560,6 +578,8 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     }
 
     override fun onDestroy() {
+        shakeDetector?.stop()
+        shakeDetector = null
         runCatching { if (playbackWakeLock?.isHeld == true) playbackWakeLock?.release() }
         runCatching { if (playbackWifiLock?.isHeld == true) playbackWifiLock?.release() }
         detectorJob?.cancel()

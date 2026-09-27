@@ -889,7 +889,13 @@ class MusicPlayer @Inject constructor(
                     if (remaining != null && remaining <= 0) {
                         sleepTimerDeadlineMs = null
                         sleepTimerStep = 0
+                        if (playerDelegate.isInitialized()) player.volume = 1f
                         player.pause()
+                    } else if (remaining != null && remaining in 1..30_000L) {
+                        val fadeFactor = (remaining / 30_000f).coerceIn(0f, 1f)
+                        if (playerDelegate.isInitialized()) player.volume = fadeFactor
+                    } else if (remaining != null && remaining > 30_000L) {
+                        if (playerDelegate.isInitialized() && player.volume < 1f) player.volume = 1f
                     }
                     if (player.currentMediaItem?.mediaId != _state.value.current?.mediaIdKey()) {
                         _state.update { it.copy(sleepTimerRemainingMs = remaining?.coerceAtLeast(0), sleepTimerRemainingTracks = sleepTimerRemainingTracks) }
@@ -2045,6 +2051,7 @@ class MusicPlayer @Inject constructor(
         sleepTimerDeadlineMs = null
         sleepTimerStep = 0
         sleepTimerRemainingTracks = null
+        if (playerDelegate.isInitialized()) player.volume = 1f
         _state.update {
             it.copy(
                 sleepTimerRemainingMs = null,

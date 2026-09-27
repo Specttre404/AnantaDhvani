@@ -27,6 +27,8 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -963,25 +965,76 @@ fun PlaylistDetailScreen(
         )
     }
 
-    // Rename dialog
+    // Edit Playlist Details & Cover dialog
     state.renamePlaylistId?.let { id ->
         var title by remember(id) { mutableStateOf(playlist.title) }
+        var description by remember(id) { mutableStateOf(playlist.subtitle) }
+        var currentCoverUri by remember(id) { mutableStateOf(playlist.customCoverUri) }
+
         AlertDialog(
             onDismissRequest = viewModel::dismissRename,
-            title = { Text("Rename playlist") },
+            title = { Text("Edit playlist details") },
             text = {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Playlist name") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    PlaylistCover(playlist = playlist.copy(customCoverUri = currentCoverUri), modifier = Modifier.size(110.dp), cornerRadius = 22.dp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(
+                            onClick = {
+                                coverPickerPending = true
+                                coverPicker.launch(arrayOf("image/*"))
+                            },
+                        ) {
+                            Text("Choose image")
+                        }
+                        if (!currentCoverUri.isNullOrBlank()) {
+                            TextButton(
+                                onClick = {
+                                    currentCoverUri = null
+                                    viewModel.setCustomCover(id, null)
+                                },
+                            ) {
+                                Text("Clear image", color = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text("Playlist name") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text("Description") },
+                        singleLine = false,
+                        maxLines = 3,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             },
             confirmButton = {
-                TextButton(onClick = { viewModel.renamePlaylist(title) }, enabled = title.isNotBlank()) { Text("Save") }
+                TextButton(
+                    onClick = {
+                        viewModel.updatePlaylistMetadata(id, title, description, currentCoverUri)
+                    },
+                    enabled = title.isNotBlank(),
+                ) {
+                    Text("Save")
+                }
             },
-            dismissButton = { TextButton(onClick = viewModel::dismissRename) { Text("Cancel") } },
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissRename) { Text("Cancel") }
+            },
         )
     }
 

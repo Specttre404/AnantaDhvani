@@ -439,6 +439,9 @@ class SettingsViewModel @Inject constructor(
     fun setDiscordRpcEnabled(enabled: Boolean) = launchSettingsAction("update Discord RPC setting") {
         settingsPreferences.setDiscordRpcEnabled(enabled)
     }
+    fun setShakeToSkipEnabled(enabled: Boolean) = launchSettingsAction("update Shake to Skip setting") {
+        settingsPreferences.setShakeToSkipEnabled(enabled)
+    }
     fun setPlayerStyle(style: com.lastwave.app.data.local.PlayerStyle) = launchSettingsAction("update player layout style") {
         settingsPreferences.setPlayerStyle(style)
     }
