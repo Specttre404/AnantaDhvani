@@ -3107,6 +3107,20 @@ class MusicPlayer @Inject constructor(
         return null
     }
 
+    private fun getEffectiveStreamingQuality(misc: MiscSettings): Int {
+        if (!misc.autoDataSaverEnabled) return misc.losslessQuality
+        val isWifi = isConnectedToWifi(appContext)
+        return if (isWifi) misc.wifiStreamingQuality else misc.cellularStreamingQuality
+    }
+
+    private fun isConnectedToWifi(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager ?: return false
+        val network = cm.activeNetwork ?: return false
+        val caps = cm.getNetworkCapabilities(network) ?: return false
+        return caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+               caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET)
+    }
+
     private suspend fun resolveTrackAudioStream(
         track: PlayableTrack,
         videoId: String?,
@@ -3122,7 +3136,9 @@ class MusicPlayer @Inject constructor(
             }
         }
 
-        val misc = runCatching { settingsPreferences.settings.first() }.getOrDefault(MiscSettings())
+        val rawMisc = runCatching { settingsPreferences.settings.first() }.getOrDefault(MiscSettings())
+        val effectiveQuality = getEffectiveStreamingQuality(rawMisc)
+        val misc = rawMisc.copy(losslessQuality = effectiveQuality)
         val key = listOf(track.title, track.artist, track.album, videoId, allowLossless, misc.losslessQuality, misc.preferLosslessStreaming, excludedLosslessUrls, allowLocalDownloads)
         val now = SystemClock.elapsedRealtime()
         resolutionRequests.entries.removeIf { now - it.value.first > 60_000L }

@@ -403,6 +403,15 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+    fun setCellularStreamingQuality(quality: Int) = launchSettingsAction("update cellular quality") {
+        settingsPreferences.setCellularStreamingQuality(quality)
+    }
+    fun setWifiStreamingQuality(quality: Int) = launchSettingsAction("update Wi-Fi quality") {
+        settingsPreferences.setWifiStreamingQuality(quality)
+    }
+    fun setAutoDataSaverEnabled(enabled: Boolean) = launchSettingsAction("update Auto Data Saver setting") {
+        settingsPreferences.setAutoDataSaverEnabled(enabled)
+    }
     fun setLyricsUiVersion(version: LyricsUiVersion) = launchSettingsAction("update lyrics UI version") { settingsPreferences.setLyricsUiVersion(version) }
     fun setWordByWordLyrics(enabled: Boolean) = launchSettingsAction("update word-by-word lyrics") { settingsPreferences.setWordByWordLyrics(enabled) }
     fun setShowLyricsTranslation(enabled: Boolean) = launchSettingsAction("update lyrics translation setting") { settingsPreferences.setShowLyricsTranslation(enabled) }

@@ -100,6 +100,10 @@
     <string name="settings_show_translation_sub" tools:ignore="MissingTranslation">Display translated lyrics lines below synced text when available</string>
     <string name="settings_show_phonetic" tools:ignore="MissingTranslation">Phonetic Pronunciation</string>
     <string name="settings_show_phonetic_sub" tools:ignore="MissingTranslation">Display Romanized/Pinyin phonetic guide above non-Latin lyrics</string>
+    <string name="settings_auto_data_saver" tools:ignore="MissingTranslation">Auto Data Saver by Network</string>
+    <string name="settings_auto_data_saver_sub" tools:ignore="MissingTranslation">Automatically switch quality based on Wi-Fi or Mobile Data connection</string>
+    <string name="settings_wifi_quality" tools:ignore="MissingTranslation">Wi-Fi Streaming Quality</string>
+    <string name="settings_cellular_quality" tools:ignore="MissingTranslation">Mobile Data (Cellular) Quality</string>
     <string name="settings_download_lyrics_on">Save .lrc companion files &amp; embed lyrics in downloads</string>
     <string name="settings_download_lyrics_off">Do not fetch or save lyrics when downloading</string>
     <string name="settings_battery_title">Background Playback (Battery Optimization)</string>

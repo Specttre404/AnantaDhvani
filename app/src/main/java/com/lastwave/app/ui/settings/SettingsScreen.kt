@@ -917,13 +917,28 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_audio))
-                    val qualitySubtitle = when (misc.losslessQuality) {
-                        27 -> "Max (Up to 24-bit / 192 kHz)"
-                        7 -> "Hi-Res (24-bit / 96 kHz)"
-                        6 -> "CD Lossless (16-bit / 44.1 kHz FLAC)"
-                        5 -> "Standard (320 kbps MP3)"
-                        -1 -> "YouTube Music (AAC / Opus)"
-                        else -> "Max (Up to 24-bit / 192 kHz)"
+                    val qualitySubtitle = when {
+                        misc.autoDataSaverEnabled -> {
+                            val wifiLabel = when (misc.wifiStreamingQuality) {
+                                27 -> "Wi-Fi: Lossless 24/192"
+                                5 -> "Wi-Fi: 320k"
+                                else -> "Wi-Fi: Data Saver"
+                            }
+                            val cellLabel = when (misc.cellularStreamingQuality) {
+                                27 -> "Cellular: Lossless 24/192"
+                                5 -> "Cellular: 320k"
+                                else -> "Cellular: Data Saver 160k"
+                            }
+                            "$wifiLabel • $cellLabel"
+                        }
+                        else -> when (misc.losslessQuality) {
+                            27 -> "Max (Up to 24-bit / 192 kHz)"
+                            7 -> "Hi-Res (24-bit / 96 kHz)"
+                            6 -> "CD Lossless (16-bit / 44.1 kHz FLAC)"
+                            5 -> "Standard (320 kbps MP3)"
+                            -1 -> "YouTube Music (AAC / Opus)"
+                            else -> "Max (Up to 24-bit / 192 kHz)"
+                        }
                     }
                     val downloadQualitySubtitle = when (misc.downloadQuality) {
                         27 -> "Max (24-bit / 192 kHz FLAC)"
@@ -942,7 +957,7 @@ fun SettingsScreen(
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = stringResource(R.string.settings_streaming_quality),
-                                subtitle = if (misc.losslessQuality == -1) "YouTube Music • Native stream" else "$qualitySubtitle • YouTube Music fallback",
+                                subtitle = qualitySubtitle,
                                 onClick = { showQualityDialog = true },
                                 position = position,
                             )
@@ -1614,12 +1629,18 @@ fun SettingsScreen(
     }
 
     if (showQualityDialog) {
-        val tiers = listOf(
-            Triple(27, "Max Quality", "Up to 24-bit / 192 kHz • Lossless Studio FLAC" to "24-BIT / 192k"),
-            Triple(7, "Hi-Res Audio", "24-bit / 96 kHz • Lossless Studio FLAC" to "24-BIT / 96k"),
-            Triple(6, "CD Lossless", "16-bit / 44.1 kHz • Lossless CD FLAC" to "16-BIT / 44.1k"),
-            Triple(5, "Standard Quality", "320 kbps • MP3 (Data Saver)" to "320 kbps"),
-            Triple(-1, "YouTube Music", "128-256 kbps • YouTube Music AAC / Opus stream" to "YOUTUBE"),
+        val wifiTiers = listOf(
+            Triple(27, "Max Lossless", "24-bit / 192 kHz Studio FLAC" to "24-BIT"),
+            Triple(7, "Hi-Res FLAC", "24-bit / 96 kHz Studio FLAC" to "24-BIT"),
+            Triple(6, "CD Lossless", "16-bit / 44.1 kHz FLAC" to "16-BIT"),
+            Triple(5, "High Quality", "320 kbps MP3" to "320k"),
+            Triple(-1, "Data Saver", "YouTube Music 160k" to "160k"),
+        )
+        val cellTiers = listOf(
+            Triple(-1, "Data Saver / Standard", "YouTube Music 160k" to "160k"),
+            Triple(5, "High Quality", "320 kbps MP3" to "320k"),
+            Triple(6, "CD Lossless", "16-bit / 44.1 kHz FLAC" to "16-BIT"),
+            Triple(27, "Max Lossless", "24-bit / 192 kHz FLAC" to "24-BIT"),
         )
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
@@ -1669,88 +1690,116 @@ fun SettingsScreen(
                     Spacer(Modifier.width(14.dp))
                     Column {
                         Text(
-                            "Streaming Quality",
+                            "Streaming Quality & Data Saver",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            "Select preferred audio resolution & bit depth",
+                            "Configure Wi-Fi and Mobile Data qualities separately",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
 
-                Text(
-                    "Lossless streams provide bit-exact studio quality (FLAC/MP3). If your chosen quality is unavailable, LastWave automatically streams the higher quality tier above it (or falls back to YouTube Music if unavailable in lossless).",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline,
+                SettingsToggleCard(
+                    icon = Icons.Filled.AutoAwesome,
+                    iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
+                    iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
+                    title = stringResource(R.string.settings_auto_data_saver),
+                    subtitle = stringResource(R.string.settings_auto_data_saver_sub),
+                    checked = misc.autoDataSaverEnabled,
+                    onCheckedChange = viewModel::setAutoDataSaverEnabled,
                 )
 
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    tiers.forEach { (qualityId, title, meta) ->
+                Text(
+                    stringResource(R.string.settings_wifi_quality),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    wifiTiers.forEach { (qualityId, title, meta) ->
                         val (subtitle, badge) = meta
-                        val isSelected = misc.losslessQuality == qualityId
+                        val isSelected = if (misc.autoDataSaverEnabled) misc.wifiStreamingQuality == qualityId else misc.losslessQuality == qualityId
                         Surface(
                             onClick = {
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                viewModel.setWifiStreamingQuality(qualityId)
                                 viewModel.setLosslessQuality(qualityId)
-                                showQualityDialog = false
                             },
-                            shape = RoundedCornerShape(20.dp),
+                            shape = RoundedCornerShape(16.dp),
                             color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
                             border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null,
-                            shadowElevation = if (isSelected) 3.dp else 0.dp,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            title,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
-                                        )
-                                        Spacer(Modifier.width(8.dp))
-                                        Surface(
-                                            shape = RoundedCornerShape(6.dp),
-                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest,
-                                        ) {
-                                            Text(
-                                                badge,
-                                                style = MaterialTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                            )
-                                        }
-                                    }
-                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        title,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                                    )
                                     Text(
                                         subtitle,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
-
                                 if (isSelected) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(28.dp)
-                                            .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.primary),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.Check,
-                                            contentDescription = "Selected",
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            modifier = Modifier.size(18.dp),
+                                    Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (misc.autoDataSaverEnabled) {
+                    Text(
+                        stringResource(R.string.settings_cellular_quality),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        cellTiers.forEach { (qualityId, title, meta) ->
+                            val (subtitle, badge) = meta
+                            val isSelected = misc.cellularStreamingQuality == qualityId
+                            Surface(
+                                onClick = {
+                                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                    viewModel.setCellularStreamingQuality(qualityId)
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                                border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            title,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
                                         )
+                                        Text(
+                                            subtitle,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    if (isSelected) {
+                                        Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                                     }
                                 }
                             }

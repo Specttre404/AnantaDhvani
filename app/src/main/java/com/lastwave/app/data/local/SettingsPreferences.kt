@@ -77,6 +77,12 @@ data class MiscSettings(
     /** Preferred quality preset for lossless streaming (27: 24/192, 7: 24/96, 6: 16/44.1, 5: 320k).
      *  If a track does not support the requested quality, the worker automatically selects the highest available. */
     val losslessQuality: Int = 27,
+    /** Preferred quality preset for cellular data streaming (-1: Data Saver 160k, 5: High 320k, 6/27: Lossless). */
+    val cellularStreamingQuality: Int = -1,
+    /** Preferred quality preset for Wi-Fi streaming (27: 24/192 Lossless, 7: 24/96, 6: 16/44.1, 5: 320k). */
+    val wifiStreamingQuality: Int = 27,
+    /** When true (default), automatically switches quality presets based on active network connection. */
+    val autoDataSaverEnabled: Boolean = true,
     /** Preferred quality preset for downloads (27: 24/192, 7: 24/96, 6: 16/44.1, 5: 320k, -1: YouTube Music). */
     val downloadQuality: Int = 27,
     /** Optional studio-clarity curve. On by default; Bit-Perfect disables it. */
@@ -200,6 +206,9 @@ class SettingsPreferences @Inject constructor(
         val PREFER_LOSSLESS_STREAMING = booleanPreferencesKey("lw_prefer_lossless_streaming")
         val PREFER_PROVIDER_MODULES = booleanPreferencesKey("lw_prefer_provider_modules")
         val LOSSLESS_QUALITY = intPreferencesKey("lw_lossless_quality")
+        val CELLULAR_STREAMING_QUALITY = intPreferencesKey("lw_cellular_streaming_quality")
+        val WIFI_STREAMING_QUALITY = intPreferencesKey("lw_wifi_streaming_quality")
+        val AUTO_DATA_SAVER_ENABLED = booleanPreferencesKey("lw_auto_data_saver_enabled")
         val DOWNLOAD_QUALITY = intPreferencesKey("lw_download_quality")
         val MUSIC_ENHANCER = booleanPreferencesKey("lw_music_enhancer")
         val BIT_PERFECT_ENABLED = booleanPreferencesKey("lw_bit_perfect_enabled")
@@ -236,6 +245,9 @@ class SettingsPreferences @Inject constructor(
                 preferLosslessStreaming = p.readSafely(Keys.PREFER_LOSSLESS_STREAMING) ?: true,
                 preferProviderModules = p.readSafely(Keys.PREFER_PROVIDER_MODULES) ?: true,
                 losslessQuality = p.readSafely(Keys.LOSSLESS_QUALITY)?.takeIf { it in LOSSLESS_QUALITIES } ?: 27,
+                cellularStreamingQuality = p.readSafely(Keys.CELLULAR_STREAMING_QUALITY)?.takeIf { it in LOSSLESS_QUALITIES } ?: -1,
+                wifiStreamingQuality = p.readSafely(Keys.WIFI_STREAMING_QUALITY)?.takeIf { it in LOSSLESS_QUALITIES } ?: 27,
+                autoDataSaverEnabled = p.readSafely(Keys.AUTO_DATA_SAVER_ENABLED) ?: true,
                 downloadQuality = p.readSafely(Keys.DOWNLOAD_QUALITY)?.takeIf { it in DOWNLOAD_QUALITIES } ?: 27,
                 isStudioMasterClarityEnabled = p.readSafely(Keys.MUSIC_ENHANCER) ?: true,
                 isBitPerfectEnabled = p.readSafely(Keys.BIT_PERFECT_ENABLED) ?: false,
@@ -289,6 +301,26 @@ class SettingsPreferences @Inject constructor(
         dataStore.edit {
             val q = quality.takeIf { it in LOSSLESS_QUALITIES } ?: 27
             it[Keys.LOSSLESS_QUALITY] = q
+        }
+    }
+
+    suspend fun setCellularStreamingQuality(quality: Int) {
+        dataStore.edit {
+            val q = quality.takeIf { it in LOSSLESS_QUALITIES } ?: -1
+            it[Keys.CELLULAR_STREAMING_QUALITY] = q
+        }
+    }
+
+    suspend fun setWifiStreamingQuality(quality: Int) {
+        dataStore.edit {
+            val q = quality.takeIf { it in LOSSLESS_QUALITIES } ?: 27
+            it[Keys.WIFI_STREAMING_QUALITY] = q
+        }
+    }
+
+    suspend fun setAutoDataSaverEnabled(enabled: Boolean) {
+        dataStore.edit {
+            it[Keys.AUTO_DATA_SAVER_ENABLED] = enabled
         }
     }
 
