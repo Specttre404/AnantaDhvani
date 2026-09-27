@@ -425,6 +425,9 @@ class SettingsViewModel @Inject constructor(
     fun setDiscordRpcEnabled(enabled: Boolean) = launchSettingsAction("update Discord RPC setting") {
         settingsPreferences.setDiscordRpcEnabled(enabled)
     }
+    fun setPlayerCoverStyle(style: com.lastwave.app.data.local.PlayerCoverStyle) = launchSettingsAction("update player cover style") {
+        settingsPreferences.setPlayerCoverStyle(style)
+    }
     fun setWavySeekbarEnabled(enabled: Boolean) = launchSettingsAction("update seekbar style") {
         settingsPreferences.setWavySeekbarEnabled(enabled)
     }

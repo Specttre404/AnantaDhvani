@@ -34,12 +34,18 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -207,6 +213,7 @@ import com.lastwave.app.playback.MusicPlayerState
 import com.lastwave.app.playback.PlaybackChromeState
 import com.lastwave.app.playback.PlaybackProgressState
 import com.lastwave.app.playback.PlayableTrack
+import kotlinx.coroutines.isActive
 import com.lastwave.app.ui.common.ArtworkImage
 import com.lastwave.app.ui.common.ExpressiveInlineLoadingIndicator
 import com.lastwave.app.ui.common.ExpressiveMotion
@@ -643,6 +650,7 @@ private fun ExpandedPlayer(
         lyricsUiVersion = settings.lyricsUiVersion,
         lyricsAnimation = settings.lyricsAnimation,
         wavySeekbarEnabled = settings.wavySeekbarEnabled,
+        playerCoverStyle = settings.playerCoverStyle,
         currentTab = currentTab,
         onTabChange = onTabChange,
         onRetryLyrics = onRetryLyrics,
@@ -1402,6 +1410,7 @@ private fun FullPlayer(
     lyricsUiVersion: LyricsUiVersion = LyricsUiVersion.MODERN,
     lyricsAnimation: LyricsAnimation = LyricsAnimation.APPLE_FLUID,
     wavySeekbarEnabled: Boolean = true,
+    playerCoverStyle: com.lastwave.app.data.local.PlayerCoverStyle = com.lastwave.app.data.local.PlayerCoverStyle.SQUARE_COVER,
     currentTab: FullPlayerTab,
     onTabChange: (FullPlayerTab) -> Unit,
     onRetryLyrics: () -> Unit,
@@ -1973,7 +1982,13 @@ private fun FullPlayer(
                                                 },
                                         ) {
                                             Box(Modifier.fillMaxSize()) {
-                                                PlayerArtwork(track, Modifier.fillMaxSize(), 32.dp)
+                                                PlayerArtwork(
+                                                    track = track,
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    corner = 32.dp,
+                                                    coverStyle = playerCoverStyle,
+                                                    isPlaying = state.isPlaying,
+                                                )
 
                                                 androidx.compose.animation.AnimatedVisibility(
                                                     visible = seekOverlayDirection == SeekDirection.REWIND,
@@ -3031,15 +3046,98 @@ private fun PlayerArtwork(
     modifier: Modifier,
     corner: androidx.compose.ui.unit.Dp,
     decodeSizePx: Int? = null,
+    coverStyle: com.lastwave.app.data.local.PlayerCoverStyle = com.lastwave.app.data.local.PlayerCoverStyle.SQUARE_COVER,
+    isPlaying: Boolean = false,
 ) {
-    Box(modifier.clip(RoundedCornerShape(corner)).background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
-        ArtworkImage(
-            name = track.title,
-            artist = track.artist,
-            embeddedUrl = track.artworkUrl,
-            fallbackIcon = Icons.Filled.MusicNote,
+    if (coverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL) {
+        RotatingVinylArtwork(
+            track = track,
+            isPlaying = isPlaying,
+            modifier = modifier,
+        )
+    } else {
+        Box(modifier.clip(RoundedCornerShape(corner)).background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
+            ArtworkImage(
+                name = track.title,
+                artist = track.artist,
+                embeddedUrl = track.artworkUrl,
+                fallbackIcon = Icons.Filled.MusicNote,
+                modifier = Modifier.fillMaxSize(),
+                decodeSizePx = decodeSizePx,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RotatingVinylArtwork(
+    track: PlayableTrack,
+    isPlaying: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var rotationAngle by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(isPlaying) {
+        if (!isPlaying) return@LaunchedEffect
+        var lastTimeNanos = withFrameNanos { it }
+        while (isActive && isPlaying) {
+            withFrameNanos { currentTimeNanos ->
+                val deltaSeconds = (currentTimeNanos - lastTimeNanos) / 1_000_000_000f
+                lastTimeNanos = currentTimeNanos
+                rotationAngle = (rotationAngle + deltaSeconds * 200f) % 360f
+            }
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .graphicsLayer { rotationZ = rotationAngle },
+        contentAlignment = Alignment.Center,
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = Color(0xFF121212),
+            border = BorderStroke(1.dp, Color(0xFF2E2E2E)),
+            shadowElevation = 8.dp,
             modifier = Modifier.fillMaxSize(),
-            decodeSizePx = decodeSizePx,
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val radius = size.minDimension / 2f
+                val center = Offset(size.width / 2f, size.height / 2f)
+                for (r in listOf(0.92f, 0.84f, 0.76f, 0.68f, 0.60f, 0.52f)) {
+                    drawCircle(
+                        color = Color.White.copy(alpha = 0.08f),
+                        radius = radius * r,
+                        center = center,
+                        style = Stroke(width = 1.5.dp.toPx()),
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize(0.48f)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+            contentAlignment = Alignment.Center,
+        ) {
+            ArtworkImage(
+                name = track.title,
+                artist = track.artist,
+                embeddedUrl = track.artworkUrl,
+                fallbackIcon = Icons.Filled.MusicNote,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize(0.08f)
+                .clip(CircleShape)
+                .background(Color.Black)
+                .border(1.dp, Color(0xFF3D3D3D), CircleShape),
         )
     }
 }

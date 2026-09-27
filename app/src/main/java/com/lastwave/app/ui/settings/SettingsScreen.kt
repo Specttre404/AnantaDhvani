@@ -728,7 +728,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_appearance))
-                    SettingsGroup(rowCount = 6) { index, position ->
+                    SettingsGroup(rowCount = 7) { index, position ->
                         when (index) {
                             0 -> ThemeModeSelectorCard(
                                 currentThemeMode = theme?.themeMode ?: ThemeMode.SYSTEM,
@@ -769,6 +769,25 @@ fun SettingsScreen(
                                 position = position,
                             )
                             4 -> SettingsToggleCard(
+                                icon = Icons.Filled.Album,
+                                iconContainer = MaterialTheme.colorScheme.secondaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                title = stringResource(R.string.settings_cover_style),
+                                subtitle = if (misc.playerCoverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL) {
+                                    "Circular vinyl disc with grooved record rings & live rotation"
+                                } else {
+                                    stringResource(R.string.settings_cover_style_sub)
+                                },
+                                checked = misc.playerCoverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL,
+                                onCheckedChange = { isVinyl ->
+                                    viewModel.setPlayerCoverStyle(
+                                        if (isVinyl) com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL
+                                        else com.lastwave.app.data.local.PlayerCoverStyle.SQUARE_COVER
+                                    )
+                                },
+                                position = position,
+                            )
+                            5 -> SettingsToggleCard(
                                 icon = Icons.Filled.TextFields,
                                 iconContainer = MaterialTheme.colorScheme.secondaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -778,7 +797,7 @@ fun SettingsScreen(
                                 onCheckedChange = viewModel::setUseCustomFont,
                                 position = position,
                             )
-                            5 -> SettingsActionCard(
+                            6 -> SettingsActionCard(
                                 icon = Icons.Filled.Dashboard,
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,

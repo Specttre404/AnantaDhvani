@@ -90,6 +90,8 @@
     <string name="settings_skip_intros" tools:ignore="MissingTranslation">Skip Music Video Intros &amp; Outros</string>
     <string name="settings_skip_intros_sub" tools:ignore="MissingTranslation">Skip non-music commentary at the start and end of tracks</string>
     <string name="settings_section_integrations" tools:ignore="MissingTranslation">Integrations &amp; External Services</string>
+    <string name="settings_cover_style" tools:ignore="MissingTranslation">Rotating Vinyl Record Player</string>
+    <string name="settings_cover_style_sub" tools:ignore="MissingTranslation">Circular vinyl disc with grooved record rings and live rotation</string>
     <string name="settings_discord_rpc" tools:ignore="MissingTranslation">Discord Rich Presence</string>
     <string name="settings_discord_rpc_sub" tools:ignore="MissingTranslation">Display current track, artist, album art &amp; live progress in Discord</string>
     <string name="settings_download_lyrics">Download Synced Lyrics</string>
