@@ -234,12 +234,48 @@ class SettingsViewModel @Inject constructor(
                     _uiState.update { it.copy(recommendationExclusionCount = exclusions.size) }
                 }
         }
+        calculateCacheSize()
     }
 
     fun refreshRecommendationExclusionCount() {
         launchSettingsAction("refresh exclusions") {
             val count = generateRepository.recommendationExclusionCount()
             _uiState.update { it.copy(recommendationExclusionCount = count) }
+        }
+    }
+
+    private val _cacheSizeText = MutableStateFlow("0.0 MB")
+    val cacheSizeText: StateFlow<String> = _cacheSizeText.asStateFlow()
+
+    fun calculateCacheSize() {
+        viewModelScope.launch(Dispatchers.IO) {
+            var totalBytes = 0L
+            runCatching {
+                context.cacheDir?.walkTopDown()?.forEach { file ->
+                    if (file.isFile && !file.absolutePath.contains("download", ignoreCase = true)) {
+                        totalBytes += file.length()
+                    }
+                }
+            }
+            val mb = totalBytes / (1024.0 * 1024.0)
+            val formatted = if (mb < 0.1) "0.0 MB" else String.format(java.util.Locale.US, "%.1f MB", mb)
+            _cacheSizeText.value = formatted
+        }
+    }
+
+    fun clearCache() {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                context.cacheDir?.listFiles()?.forEach { file: java.io.File ->
+                    if (file.isDirectory && !file.name.contains("download", ignoreCase = true)) {
+                        file.deleteRecursively()
+                    } else if (file.isFile) {
+                        file.delete()
+                    }
+                }
+            }
+            calculateCacheSize()
+            _uiState.update { it.copy(toastMessage = "Temporary audio & image cache cleared") }
         }
     }
 

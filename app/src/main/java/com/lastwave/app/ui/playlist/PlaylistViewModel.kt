@@ -74,6 +74,7 @@ class PlaylistViewModel @Inject constructor(
     private val ytMusicPreferences: com.lastwave.app.data.ytmusic.YtMusicPreferences,
     private val ytMusicSyncManager: com.lastwave.app.data.ytmusic.YtMusicSyncManager,
     private val ytMusicLibraryManager: com.lastwave.app.data.ytmusic.YtMusicLibraryManager,
+    private val localAudioScanner: com.lastwave.app.data.local.LocalAudioScanner,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlaylistUiState())
@@ -354,6 +355,42 @@ class PlaylistViewModel @Inject constructor(
                 )
             }
             load(justGeneratedId = id)
+        }
+    }
+
+    fun scanLocalDeviceAudio() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val tracks = localAudioScanner.scanLocalTracks()
+            if (tracks.isNotEmpty()) {
+                val playlist = playlistRepository.save(
+                    title = "Local Device Audio",
+                    subtitle = "${tracks.size} scanned local MP3/FLAC tracks",
+                    mode = "custom",
+                    tracks = tracks.map { track ->
+                        com.lastwave.app.data.generate.GeneratedTrack(
+                            name = track.title,
+                            artist = track.artist,
+                            album = track.album,
+                            url = track.playbackUrl ?: "",
+                        )
+                    },
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        toastMessage = "Imported ${tracks.size} local tracks to '${playlist.title}'",
+                    )
+                }
+                load(justGeneratedId = playlist.id)
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        toastMessage = "No local audio files found on device storage",
+                    )
+                }
+            }
         }
     }
 

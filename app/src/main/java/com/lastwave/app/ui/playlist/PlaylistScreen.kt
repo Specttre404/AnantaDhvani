@@ -43,6 +43,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Delete
@@ -164,6 +165,12 @@ fun PlaylistScreen(
                     "${state.playlists.size} Playlists \u00b7 ${state.playlists.sumOf { it.remoteTrackCount ?: it.tracks.size }} Tracks"
                 },
                 actions = {
+                    IconButton(
+                        onClick = viewModel::scanLocalDeviceAudio,
+                        modifier = Modifier.size(40.dp),
+                    ) {
+                        Icon(Icons.Filled.AudioFile, contentDescription = "Scan local device audio", tint = MaterialTheme.colorScheme.primary)
+                    }
                     IconButton(
                         onClick = viewModel::openCreateDialog,
                         modifier = Modifier.size(40.dp),

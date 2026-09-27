@@ -289,6 +289,7 @@ fun SettingsScreen(
     val isLastFmConnected by viewModel.isLastFmConnected.collectAsStateWithLifecycle()
     val updateInfo by viewModel.updateInfo.collectAsStateWithLifecycle()
     val hasApiKey by viewModel.hasApiKey.collectAsStateWithLifecycle()
+    val cacheSizeText by viewModel.cacheSizeText.collectAsStateWithLifecycle()
     val lastFmAuthUrl by viewModel.lastFmAuthUrl.collectAsStateWithLifecycle()
     val lastFmConnecting by viewModel.lastFmConnecting.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -1348,7 +1349,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_data))
-                    SettingsGroup(rowCount = 3) { index, position ->
+                    SettingsGroup(rowCount = 4) { index, position ->
                         when (index) {
                             0 -> SettingsActionCard(
                                 icon = Icons.Filled.RestartAlt,
@@ -1369,6 +1370,15 @@ fun SettingsScreen(
                                 position = position,
                             )
                             2 -> SettingsActionCard(
+                                icon = Icons.Filled.Delete,
+                                iconContainer = MaterialTheme.colorScheme.secondaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                title = "Clear Temporary Cache",
+                                subtitle = "Cached audio chunks & images: $cacheSizeText • Tap to clear",
+                                onClick = viewModel::clearCache,
+                                position = position,
+                            )
+                            3 -> SettingsActionCard(
                                 icon = Icons.Filled.Delete,
                                 iconContainer = MaterialTheme.colorScheme.errorContainer,
                                 iconTint = MaterialTheme.colorScheme.onErrorContainer,

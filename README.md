@@ -1,29 +1,30 @@
 <div align="center">
 
-<img src="app/src/main/res/drawable/ic_launcher_logo.xml" alt="LastWaveX Logo" width="128" height="128" />
+<img src="docs/assets/logo.svg" alt="LastWaveX Logo" width="128" height="128" />
 
 # LASTWAVEX
 
-**Next-Gen Android Music Client & Universal Audiophile Player**  
-*Bit-Perfect Fidelity • Synced Word-by-Word Lyrics • Native C++ DSP • Zero Bloat*
+**High-Fidelity Online Streaming Music Client & Universal Audiophile Player for Android**  
+*Bit-Perfect USB DAC • Synced Word-by-Word Lyrics • C++ Native DSP • SponsorBlock • Zero Bloat*
 
 [![Build Status](https://img.shields.io/badge/Build-Passing%20(28%2F28%20Tests)-success?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026%2B)-blue?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-purple?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-purple?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
 [![UI](https://img.shields.io/badge/UI-Jetpack%20Compose%20M3-deepskyblue?style=for-the-badge&logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
 [![License](https://img.shields.io/badge/License-GPLv3-orange?style=for-the-badge)](LICENSE)
 
-[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features) • [Architecture](#-technical-foundation) • [Build from Source](#-building-from-source)
+[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [Visual Mockups](#-ui--visual-architecture-mockups) • [Architecture](#-technical-foundation) • [Build from Source](#%EF%B8%8F-building-from-source)
 
 </div>
 
 ---
 
-## 📖 Product Overview
+## 📖 Product Overview & Positioning
 
-**LASTWAVEX** is an open-source, offline-first streaming audio player engineered for listeners who prioritize uncompromised sound fidelity, responsive Material 3 aesthetics, and granular playback controls.
+> [!IMPORTANT]
+> **LASTWAVEX is a high-fidelity Online Streaming Music Client**, powered by the YouTube Music catalog and Lossless Qobuz/FLAC CDN streams, paired with optional local caching, downloads, and local device audio scanning. It is engineered for audiophiles and power listeners who want cloud streaming flexibility without compression artifacts, advertisement tracking, or proprietary app bloat.
 
-Powered by the YouTube Music catalog and integrated with public audiophile sources, LASTWAVEX marries seamless cloud streaming with studio-grade audio processing. Every tier of the audio pipeline—from raw PCM processing in native C++ to millisecond-accurate synchronized karaoke typography—has been built from scratch to eliminate playback lag, audio distortion, and battery drain.
+Every tier of the audio pipeline—from raw PCM processing in native C++ to millisecond-accurate synchronized karaoke typography—has been built from scratch to eliminate playback lag, audio distortion, and battery drain.
 
 ---
 
@@ -36,14 +37,93 @@ Powered by the YouTube Music catalog and integrated with public audiophile sourc
 | **Spoken Intros & Long Music Video Sketches** | **Integrated SponsorBlock** automatically seeking past filler, intros, and dead air |
 | **Static Square Covers** | **Rotating Vinyl Record Mode** with physical spin deceleration and grooved rings |
 | **Basic Unsynced Text** | **Word-by-Word Karaoke Motion**, Romaji/Pinyin phonetics, and real-time translations |
-| **Bloated Social Feeds & Ad Tracking** | **100% Offline-First**, privacy-respecting, zero telemetry, zero advertisements |
+| **Bloated Social Feeds & Ad Tracking** | **100% Open-Source (GPLv3)**, privacy-respecting, zero telemetry, zero advertisements |
 
 ---
 
-## ✨ Implemented Features
+## 🎨 UI & Visual Architecture Mockups
+
+### 1. Now Playing Player (Rotating Vinyl & Wavy Seekbar)
+```text
+┌──────────────────────────────────────────────────────────┐
+│  ▼ LASTWAVEX NOW PLAYING                          ⋮  🤖  │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│                     .─────────────.                      │
+│                  .─'   .───────.   '─.                   │
+│                 ╱    .╱   (●)   ╲.    ╲                  │
+│                │    │   ARTWORK  │    │                  │
+│                 ╲    '╲         ╱'    ╱                  │
+│                  '─.   '───────'   .─'                   │
+│                     '─────────────'                      │
+│               [ 33⅓ RPM Rotating Vinyl ]                 │
+│                                                          │
+│              Starboy — The Weeknd ft. Daft Punk          │
+│              Starboy (Deluxe) • 24-BIT / 96 kHz          │
+│                                                          │
+│         01:42 ~~~~~~~〜〜〜〜〜∿∿∿∿∿~~~~~~~ 03:50       │
+│                                                          │
+│              ⏮    ⏮️    ██    ⏭️    ⏭                │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 2. Dual Home Screen Widgets (Full 4x2 Card & Compact 4x1 Pill)
+```text
+┌──────────────────────────────────────────────────────────┐
+│  [4x2 Audiophile Card Widget]                            │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ ┌───────┐  Starboy                                 │  │
+│  │ │ ART   │  The Weeknd ft. Daft Punk                │  │
+│  │ │ COVER │  FLAC 24-bit / 96.0 kHz                    │  │
+│  │ └───────┘  ⏮️    PAUSE [ || ]    ⏭️   🔀   🔁       │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  [4x1 Compact Pill Widget]                               │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ (ART)  Starboy — The Weeknd     [ || ]   ⏭️        │  │
+│  └────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 3. Synced Word-by-Word Karaoke Lyrics & Quote Generator
+```text
+┌──────────────────────────────────────────────────────────┐
+│  WORD SYNC • LRCLIB                        Translate  Phonetic│
+├──────────────────────────────────────────────────────────┤
+│  I'm tryna put you in the worst mood, ah                 │
+│  P1 clean of  【S T A R B O Y】  A V I A T O R           │
+│  Look what you've done, I'm a motherfuckin' starboy      │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │  "Look what you've done, I'm a starboy"           │  │
+│  │  — Starboy by The Weeknd                           │  │
+│  │  [ 🎨 Export Lyric Quote Card (1080x1350 PNG) ]     │  │
+│  └────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 4. System Diagnostics & Signal Path Stats for Nerds HUD
+```text
+┌──────────────────────────────────────────────────────────┐
+│  ⚙️ SYSTEM & AUDIO DIAGNOSTICS                            │
+├──────────────────────────────────────────────────────────┤
+│  Audio Codec:        HI-RES FLAC (Lossless)              │
+│  Sampling Rate:      96.0 kHz                            │
+│  Bit Depth:          24-bit                              │
+│  Bitrate:            3210 kbps                           │
+│  Signal Path:        Bit-Perfect USB Direct Passthrough  │
+│  Output Clock:       Hardware Sync (0.0 ms jitter)       │
+│  Buffer State:       Healthy (30.0s pre-cached)          │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ✨ Implemented Features Matrix
 
 ### 🎛️ Studio-Grade Audio Engine & DSP
-* **Bit-Perfect Mode:** Routes raw bit-exact streams directly to external USB DACs, bypassing the Android system resampler and all software EQ.
+* **Bit-Perfect Mode:** Routes raw bit-exact streams directly to external USB DACs, bypassing the Android system resampler and software EQ.
 * **15-Band Graphic Equalizer:** Precision frequency contouring with instant zero-stutter gain switching.
 * **Dynamic Bass Boost:** Real-time low-frequency harmonics amplification (25 Hz to 160 Hz) with soft-knee limiting.
 * **Loudness Normalization:** Employs Android's hardware `LoudnessEnhancer` to eliminate sudden volume jumps between tracks.
@@ -55,22 +135,21 @@ Powered by the YouTube Music catalog and integrated with public audiophile sourc
 ### 🎙️ Advanced Lyrics & Card Generator
 * **Synchronized & Word-by-Word Lyrics:** Millisecond-accurate vocal highlighting powered by LRCLIB, Kugou, and TTML engines.
 * **Dual Translation & Phonetics Toggles:** One-tap header controls to display English translations and Romanized (Romaji/Pinyin) guides for non-Latin songs.
-* **Lyric Card / Quote Image Generator:** Highlight 1–4 lines of lyrics and export as high-resolution (1080×1350) shareable cards in three designs:
-  1. *Minimalist Dark*
-  2. *Dynamic Theme Gradient*
-  3. *Frosted Glassmorphic*
+* **Lyric Card / Quote Image Generator:** Highlight 1–4 lines of lyrics and export as high-resolution (1080×1350) shareable cards in three designs: *Minimalist Dark*, *Dynamic Theme Gradient*, and *Frosted Glassmorphic*.
 
 ### 🎨 Visual Architecture & Customization
 * **Rotating Vinyl Record Mode:** Transforms standard album covers into a spinning vinyl record with grooved micro-rings and realistic momentum physics.
-* **Dynamic Backdrop Engines:** 8 customizable player background renderers including Fluid Blur, Specular Glow, and Pure AMOLED Black.
-* **Material 3 Desktop Widget:** Interactive 3×2 home screen widget showing live track info, album art thumbnail, and transport controls.
+* **8 Dynamic Backdrop Engines:** `HDR_VIVID`, `FLUID_GRADIENT`, `DYNAMIC_HARMONY`, `AMBIENT_GLOW`, `DYNAMIC_MONET`, `AMOLED_BLACK`, `BLURRED_GLASS`, and `PRISM_SPECTRUM`.
+* **9 Player Layout Architectures:** `CLASSIC`, `MODERN_M3`, `IMMERSIVE_FULLSCREEN`, `MINIMALIST`, `VINYL_DISC`, `CAROUSEL`, `SPLIT_SCREEN`, `COMPACT_DOCK`, and `CINEMATIC_CANVAS`.
+* **Dual Material 3 Home Screen Widgets:** Full Audiophile Card Widget (4×2) and Compact Pill Widget (4×1).
 
 ### 🧠 Smart Automation & Discovery
 * **In-App Song Recognizer:** Shazam-style audio identifier that captures 5 seconds of ambient sound via `AudioRecord` and identifies the song in real time.
 * **Per-Network Quality & Data Saver:** Automatically switches between Hi-Res Lossless (24-bit/192 kHz) on Wi-Fi and Data Saver (160 kbps Opus/AAC) on cellular data.
 * **Sleep Timer with Volume Fade-Out:** Stops playback after a set time or number of tracks; gently fades the volume to zero over the final 30 seconds.
 * **Shake to Skip:** Accelerometer-based gesture recognition to skip tracks with a single shake.
-* **Discord Rich Presence:** Real-time desktop Discord activity showing current track, artist, album thumbnail, and elapsed/remaining timestamps.
+* **Discord Mobile Rich Presence:** Gateway WebSocket connection displaying live listening status on Discord mobile profiles.
+* **Local Audio Device Scanner:** Queries MediaStore to scan, import, and play local MP3/FLAC files alongside online streams.
 * **Playlist Editor & Exporter:** Custom cover art image picker, description editor, and bidirectional CSV/M3U/M3U8 playlist imports and exports.
 
 ---
@@ -126,7 +205,7 @@ To keep LASTWAVEX fast, focused, and battery-efficient, the following items are 
 * **Hardware:** Minimum 2 GB RAM (4 GB+ recommended for Hi-Res FLAC decoding).
 
 ### Sideloading the APK
-1. Download the latest `app-debug.apk` from the [Releases tab](https://github.com/Specttre404/LastWaveX/releases).
+1. Download the latest `app-debug.apk` or `app-release.apk` from the [Releases tab](https://github.com/Specttre404/LastWaveX/releases).
 2. On your Android phone, enable **Install unknown apps** for your browser or file manager.
 3. Tap the APK file and select **Install**.
 
@@ -151,9 +230,13 @@ cd LastWaveX
 # Compile and package the debug APK
 ./gradlew assembleDebug
 
-# Output APK location:
-# app/build/outputs/apk/debug/app-debug.apk
+# Compile and package the minified release APK
+./gradlew assembleRelease
 ```
+
+Build Output Artifacts:
+- **Debug APK:** `app/build/outputs/apk/debug/app-debug.apk`
+- **Release APK:** `app/build/outputs/apk/release/app-release.apk`
 
 ---
 
