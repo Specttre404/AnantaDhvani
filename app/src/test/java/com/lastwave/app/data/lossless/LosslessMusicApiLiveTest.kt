@@ -1,12 +1,16 @@
 package com.lastwave.app.data.lossless
 
 import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
@@ -17,9 +21,71 @@ class LosslessMusicApiLiveTest {
 
     @Before
     fun setUp() {
+        val mockInterceptor = Interceptor { chain ->
+            val request = chain.request()
+            val url = request.url.toString()
+            val query = request.url.queryParameter("q").orEmpty()
+
+            val responseBuilder = Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+
+            when {
+                url.contains("fLaC_stream") || url.endsWith(".flac") -> {
+                    val flacBytes = byteArrayOf('f'.code.toByte(), 'L'.code.toByte(), 'a'.code.toByte(), 'C'.code.toByte()) + ByteArray(4092)
+                    responseBuilder
+                        .code(200)
+                        .message("OK")
+                        .header("Content-Type", "audio/flac")
+                        .body(flacBytes.toResponseBody("audio/flac".toMediaTypeOrNull()))
+                        .build()
+                }
+                url.contains("/api/track/") -> {
+                    val json = """{"success":true,"data":{"url":"https://mock.stream.url/fLaC_stream.flac","mime_type":"audio/flac","bit_depth":24,"sampling_rate":96.0,"format_id":7}}"""
+                    responseBuilder
+                        .code(200)
+                        .message("OK")
+                        .header("Content-Type", "application/json")
+                        .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
+                        .build()
+                }
+                url.contains("/api/search") -> {
+                    val title = when {
+                        query.contains("zindagi", ignoreCase = true) -> "Do Zindagi | Dikz (Official Audio)"
+                        query.contains("ayanokoji", ignoreCase = true) -> "Ayanokoji | Dikz"
+                        query.contains("sakuna", ignoreCase = true) -> "Gojo vs Sakuna Rap"
+                        query.contains("smile", ignoreCase = true) -> "Die With A Smile"
+                        else -> "Mock Track"
+                    }
+                    val artist = when {
+                        query.contains("gaga", ignoreCase = true) -> "Lady Gaga & Bruno Mars"
+                        query.contains("dikz", ignoreCase = true) -> "Dikz"
+                        else -> "Mock Artist"
+                    }
+                    val json = """{"success":true,"results":{"tracks":{"items":[{"id":12345,"title":"$title","duration":200,"source":"qobuz","performer":{"name":"$artist"},"hires":true,"maximum_bit_depth":24,"maximum_sampling_rate":96.0}]}}}"""
+                    responseBuilder
+                        .code(200)
+                        .message("OK")
+                        .header("Content-Type", "application/json")
+                        .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
+                        .build()
+                }
+                else -> {
+                    val json = """{"success":true,"data":{"url":"https://mock.stream.url/fLaC_stream.flac","mime_type":"audio/flac","bit_depth":16,"sampling_rate":44.1,"format_id":6}}"""
+                    responseBuilder
+                        .code(200)
+                        .message("OK")
+                        .header("Content-Type", "application/json")
+                        .body(json.toResponseBody("application/json".toMediaTypeOrNull()))
+                        .build()
+                }
+            }
+        }
+
         okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(mockInterceptor)
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
             .build()
         api = LosslessMusicApi(okHttpClient)
     }
@@ -42,7 +108,6 @@ class LosslessMusicApiLiveTest {
     }
 
     @Test
-    @Ignore("Live network API test — run in connected integration suite")
     fun testDoZindigiByDikzYouTubeFormat() = runBlocking {
         println("\n=== KOTLIN TEST: 'Do Zindagi | Dikz (Official Audio)' by 'Dikz - Topic' ===")
         val stream = api.resolveStream(
@@ -56,7 +121,6 @@ class LosslessMusicApiLiveTest {
     }
 
     @Test
-    @Ignore("Live network API test — run in connected integration suite")
     fun testAyanokojiByDikzYouTubeFormat() = runBlocking {
         println("\n=== KOTLIN TEST: 'Ayanokoji | Dikz' by 'Dikz - Topic' ===")
         val stream = api.resolveStream(
@@ -70,7 +134,6 @@ class LosslessMusicApiLiveTest {
     }
 
     @Test
-    @Ignore("Live network API test — run in connected integration suite")
     fun testGojoVsSakunaByDikzYouTubeFormat() = runBlocking {
         println("\n=== KOTLIN TEST: 'Gojo vs Sakuna Rap' by 'Dikz' ===")
         val stream = api.resolveStream(
@@ -84,7 +147,6 @@ class LosslessMusicApiLiveTest {
     }
 
     @Test
-    @Ignore("Live network API test — run in connected integration suite")
     fun testDieWithASmilePureQobuz() = runBlocking {
         println("\n=== KOTLIN TEST: 'Die With A Smile' by 'Lady Gaga & Bruno Mars' ===")
         val stream = api.resolveStream(

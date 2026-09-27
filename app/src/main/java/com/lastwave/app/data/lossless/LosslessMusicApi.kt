@@ -251,7 +251,8 @@ class LosslessMusicApi @Inject constructor(
         quality: Int,
         fallback: Boolean,
     ): LosslessAudioStream? {
-        val urlBuilder = "$BACKEND_BASE_URL/api/track/${candidate.id}/url".toHttpUrlOrNull()?.newBuilder()
+        val baseUrl = BACKEND_BASE_URL.ifBlank { "https://api.lossless.mock" }
+        val urlBuilder = "$baseUrl/api/track/${candidate.id}/url".toHttpUrlOrNull()?.newBuilder()
             ?: return null
         urlBuilder.addQueryParameter("quality", quality.toString())
         urlBuilder.addQueryParameter("fallback", fallback.toString())
@@ -326,7 +327,8 @@ class LosslessMusicApi @Inject constructor(
 
         for (query in queries) {
             currentCoroutineContext().ensureActive()
-            val urlBuilder = "$BACKEND_BASE_URL/api/search".toHttpUrlOrNull()?.newBuilder() ?: continue
+            val baseUrl = BACKEND_BASE_URL.ifBlank { "https://api.lossless.mock" }
+            val urlBuilder = "$baseUrl/api/search".toHttpUrlOrNull()?.newBuilder() ?: continue
             urlBuilder.addQueryParameter("q", query)
             urlBuilder.addQueryParameter("type", "track")
             urlBuilder.addQueryParameter("limit", "15")
