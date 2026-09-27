@@ -412,6 +412,9 @@ class SettingsViewModel @Inject constructor(
     fun setAutoDataSaverEnabled(enabled: Boolean) = launchSettingsAction("update Auto Data Saver setting") {
         settingsPreferences.setAutoDataSaverEnabled(enabled)
     }
+    fun setCellularQuality(quality: Int) = setCellularStreamingQuality(quality)
+    fun setWifiQuality(quality: Int) = setWifiStreamingQuality(quality)
+    fun setAutoNetworkQualityEnabled(enabled: Boolean) = setAutoDataSaverEnabled(enabled)
     fun setLyricsUiVersion(version: LyricsUiVersion) = launchSettingsAction("update lyrics UI version") { settingsPreferences.setLyricsUiVersion(version) }
     fun setWordByWordLyrics(enabled: Boolean) = launchSettingsAction("update word-by-word lyrics") { settingsPreferences.setWordByWordLyrics(enabled) }
     fun setShowLyricsTranslation(enabled: Boolean) = launchSettingsAction("update lyrics translation setting") { settingsPreferences.setShowLyricsTranslation(enabled) }
@@ -435,6 +438,15 @@ class SettingsViewModel @Inject constructor(
     }
     fun setDiscordRpcEnabled(enabled: Boolean) = launchSettingsAction("update Discord RPC setting") {
         settingsPreferences.setDiscordRpcEnabled(enabled)
+    }
+    fun setPlayerStyle(style: com.lastwave.app.data.local.PlayerStyle) = launchSettingsAction("update player layout style") {
+        settingsPreferences.setPlayerStyle(style)
+    }
+    fun setPlayerBackgroundStyle(style: com.lastwave.app.data.local.PlayerBackgroundStyle) = launchSettingsAction("update player background style") {
+        settingsPreferences.setPlayerBackgroundStyle(style)
+    }
+    fun updateBackgroundStyle(index: Int) = launchSettingsAction("update background style index") {
+        settingsPreferences.setBackgroundStyleIndex(index)
     }
     fun setPlayerCoverStyle(style: com.lastwave.app.data.local.PlayerCoverStyle) = launchSettingsAction("update player cover style") {
         settingsPreferences.setPlayerCoverStyle(style)

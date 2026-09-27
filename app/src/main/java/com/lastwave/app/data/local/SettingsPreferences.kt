@@ -36,6 +36,39 @@ enum class PlayerCoverStyle(val id: String, val title: String) {
     }
 }
 
+enum class PlayerStyle(val id: String, val title: String, val description: String) {
+    CLASSIC("classic", "Classic", "Traditional centered album art frame with standard linear controllers"),
+    MODERN_M3("modern_m3", "Modern M3 Expressive", "M3 Expressive container tokens & asymmetrical radius blocks"),
+    IMMERSIVE_FULLSCREEN("immersive_fullscreen", "Immersive Fullscreen", "Edge-to-edge artwork with floating translucent action bars"),
+    MINIMALIST("minimalist", "Editorial Minimalist", "Striking editorial typography focus with ultra-thin progress indicators"),
+    VINYL_DISC("vinyl_disc", "Rotating Vinyl", "Animated vinyl record art window with vintage tonearm physics"),
+    CAROUSEL("carousel", "Card Carousel", "Swipeable card layout enabling quick horizontal queue scrubbing"),
+    SPLIT_SCREEN("split_screen", "Split Screen Dual-Pane", "Dual-pane arrangement keeping lyrics or queue directly beside controls"),
+    COMPACT_DOCK("compact_dock", "Compact One-Handed Dock", "Minimized control deck optimized for one-handed reachability"),
+    CINEMATIC_CANVAS("cinematic_canvas", "Cinematic Canvas", "Motion-backed layout prioritizing animated artist loops");
+
+    companion object {
+        fun fromId(id: String?): PlayerStyle =
+            entries.firstOrNull { it.id == id } ?: MODERN_M3
+    }
+}
+
+enum class PlayerBackgroundStyle(val id: String, val title: String, val description: String) {
+    HDR_VIVID("hdr_vivid", "HDR High-Contrast", "Pushes luminance boundaries for ultra-vivid peaks and deep blacks."),
+    FLUID_GRADIENT("fluid_gradient", "Mesh Gradient Flow", "Multi-stop organic color mesh that subtly shifts with audio transients."),
+    DYNAMIC_HARMONY("dynamic_harmony", "Dynamic Material You", "Real-time palette extraction adapting to album artwork."),
+    AMBIENT_GLOW("ambient_glow", "Ambient Aura Bloom", "Soft diffused color bleeding casting an atmospheric halo."),
+    DYNAMIC_MONET("dynamic_monet", "Monet System", "Classic harmonious adaptation to system-wide colors."),
+    AMOLED_BLACK("amoled_black", "Pure AMOLED", "Absolute zero-pixel emission for battery conservation."),
+    BLURRED_GLASS("blurred_glass", "Liquid Glass Blur", "Frosted glass refraction stacked over backdrop elements."),
+    PRISM_SPECTRUM("prism_spectrum", "Prism Spectrum", "Full-spectrum iridescent chromatic dispersion.");
+
+    companion object {
+        fun fromId(id: String?): PlayerBackgroundStyle =
+            entries.firstOrNull { it.id == id } ?: BLURRED_GLASS
+    }
+}
+
 enum class LyricsAnimation(val id: String, val title: String, val description: String) {
     APPLE_FLUID("apple_fluid", "Apple Fluid", "Smooth spring scaling with dynamic focal tracking"),
     KARAOKE_PULSE("karaoke_pulse", "Karaoke Pulse", "Rhythmic scale pop with energetic spring bounce"),
@@ -112,6 +145,10 @@ data class MiscSettings(
     val discordRpcEnabled: Boolean = false,
     /** Player Now Playing artwork style (Square Cover or Rotating Vinyl). */
     val playerCoverStyle: PlayerCoverStyle = PlayerCoverStyle.SQUARE_COVER,
+    /** Player UI layout style architecture (9 options). */
+    val playerStyle: PlayerStyle = PlayerStyle.MODERN_M3,
+    /** Player backdrop canvas rendering style (8 options). */
+    val playerBackgroundStyle: PlayerBackgroundStyle = PlayerBackgroundStyle.BLURRED_GLASS,
     /** When true (default), uses the multi-layer dynamic wavy seekbar.
      *  When false, uses the classic standard progress slider in the player tab. */
     val wavySeekbarEnabled: Boolean = true,
@@ -132,7 +169,11 @@ data class MiscSettings(
     /** Ids of Home tab sections the user hid ([HomeSection.id]).
      *  Empty = everything visible. Unknown ids are dropped on read. */
     val hiddenHomeSections: Set<String> = emptySet(),
-)
+) {
+    val cellularQuality: Int get() = cellularStreamingQuality
+    val wifiQuality: Int get() = wifiStreamingQuality
+    val autoNetworkQualityEnabled: Boolean get() = autoDataSaverEnabled
+}
 
 /** Toggleable sections of the Home tab (see FeedScreen). Hero greeting and
  *  footer are structural; everything listed here can be hidden by the user.
@@ -225,6 +266,9 @@ class SettingsPreferences @Inject constructor(
         val SKIP_MUSIC_VIDEO_INTROS = booleanPreferencesKey("lw_skip_music_video_intros")
         val DISCORD_RPC_ENABLED = booleanPreferencesKey("lw_discord_rpc_enabled")
         val PLAYER_COVER_STYLE = stringPreferencesKey("lw_player_cover_style")
+        val PLAYER_STYLE = stringPreferencesKey("lw_player_style")
+        val PLAYER_BACKGROUND_STYLE = stringPreferencesKey("lw_player_background_style")
+        val BACKGROUND_STYLE_INDEX = intPreferencesKey("background_style_index")
         val WAVY_SEEKBAR_ENABLED = booleanPreferencesKey("lw_wavy_seekbar_enabled")
         val DOWNLOAD_LYRICS = booleanPreferencesKey("lw_download_lyrics")
         val APP_LANGUAGE = stringPreferencesKey("lw_app_language")
@@ -264,6 +308,9 @@ class SettingsPreferences @Inject constructor(
                 skipMusicVideoIntros = p.readSafely(Keys.SKIP_MUSIC_VIDEO_INTROS) ?: true,
                 discordRpcEnabled = p.readSafely(Keys.DISCORD_RPC_ENABLED) ?: false,
                 playerCoverStyle = PlayerCoverStyle.fromId(p.readSafely(Keys.PLAYER_COVER_STYLE)),
+                playerStyle = PlayerStyle.fromId(p.readSafely(Keys.PLAYER_STYLE)),
+                playerBackgroundStyle = p.readSafely(Keys.BACKGROUND_STYLE_INDEX)?.let { PlayerBackgroundStyle.entries.getOrNull(it) }
+                    ?: PlayerBackgroundStyle.fromId(p.readSafely(Keys.PLAYER_BACKGROUND_STYLE)),
                 wavySeekbarEnabled = p.readSafely(Keys.WAVY_SEEKBAR_ENABLED) ?: true,
                 downloadLyrics = p.readSafely(Keys.DOWNLOAD_LYRICS) ?: true,
                 appLanguageTag = AppLanguage.fromTag(p.readSafely(Keys.APP_LANGUAGE)).tag,
@@ -323,6 +370,10 @@ class SettingsPreferences @Inject constructor(
             it[Keys.AUTO_DATA_SAVER_ENABLED] = enabled
         }
     }
+
+    suspend fun setCellularQuality(quality: Int) = setCellularStreamingQuality(quality)
+    suspend fun setWifiQuality(quality: Int) = setWifiStreamingQuality(quality)
+    suspend fun setAutoNetworkQualityEnabled(enabled: Boolean) = setAutoDataSaverEnabled(enabled)
 
     suspend fun setDownloadQuality(quality: Int) {
         dataStore.edit {
@@ -389,6 +440,27 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setPlayerCoverStyle(style: PlayerCoverStyle) {
         dataStore.edit { it[Keys.PLAYER_COVER_STYLE] = style.id }
+    }
+
+    suspend fun setPlayerStyle(style: PlayerStyle) {
+        dataStore.edit { it[Keys.PLAYER_STYLE] = style.id }
+    }
+
+    suspend fun setPlayerBackgroundStyle(style: PlayerBackgroundStyle) {
+        dataStore.edit {
+            it[Keys.PLAYER_BACKGROUND_STYLE] = style.id
+            it[Keys.BACKGROUND_STYLE_INDEX] = PlayerBackgroundStyle.entries.indexOf(style)
+        }
+    }
+
+    suspend fun setBackgroundStyleIndex(index: Int) {
+        dataStore.edit {
+            val idx = index.coerceIn(PlayerBackgroundStyle.entries.indices)
+            it[Keys.BACKGROUND_STYLE_INDEX] = idx
+            PlayerBackgroundStyle.entries.getOrNull(idx)?.let { style ->
+                it[Keys.PLAYER_BACKGROUND_STYLE] = style.id
+            }
+        }
     }
 
     suspend fun setWavySeekbarEnabled(enabled: Boolean) {

@@ -41,10 +41,37 @@ class SearchViewModel @Inject constructor(
     private val repository: SearchRepository,
     private val historyRepository: SearchHistoryRepository,
     private val musicPlayer: MusicPlayer,
+    private val audioRecognitionManager: com.lastwave.app.data.recognition.AudioRecognitionManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+
+    private val _isListeningAudio = MutableStateFlow(false)
+    val isListeningAudio: StateFlow<Boolean> = _isListeningAudio.asStateFlow()
+
+    private val _recognitionError = MutableStateFlow<String?>(null)
+    val recognitionError: StateFlow<String?> = _recognitionError.asStateFlow()
+
+    fun startAudioRecognition() {
+        if (_isListeningAudio.value) return
+        _isListeningAudio.value = true
+        _recognitionError.value = null
+
+        viewModelScope.launch {
+            val result = audioRecognitionManager.recognizeAudio()
+            _isListeningAudio.value = false
+            result.onSuccess { song ->
+                setQuery(song.query)
+            }.onFailure { error ->
+                _recognitionError.value = error.message ?: "Failed to recognize audio"
+            }
+        }
+    }
+
+    fun dismissRecognitionError() {
+        _recognitionError.value = null
+    }
 
     private var debounceJob: Job? = null
     private var suggestionsJob: Job? = null

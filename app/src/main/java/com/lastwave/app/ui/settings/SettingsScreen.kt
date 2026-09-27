@@ -308,6 +308,8 @@ fun SettingsScreen(
     var showDownloadQualityDialog by remember { mutableStateOf(false) }
     var showEqSheet by remember { mutableStateOf(false) }
     var showLyricsAnimationSheet by remember { mutableStateOf(false) }
+    var showPlayerStyleSheet by remember { mutableStateOf(false) }
+    var showPlayerBgStyleSheet by remember { mutableStateOf(false) }
     var showSyncPlaylistsSheet by remember { mutableStateOf(false) }
     var showYtLibraryVisibilitySheet by remember { mutableStateOf(false) }
     var showYtDisconnectConfirm by remember { mutableStateOf(false) }
@@ -728,7 +730,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_appearance))
-                    SettingsGroup(rowCount = 7) { index, position ->
+                    SettingsGroup(rowCount = 9) { index, position ->
                         when (index) {
                             0 -> ThemeModeSelectorCard(
                                 currentThemeMode = theme?.themeMode ?: ThemeMode.SYSTEM,
@@ -768,7 +770,25 @@ fun SettingsScreen(
                                 onCheckedChange = viewModel::setDynamicNowPlaying,
                                 position = position,
                             )
-                            4 -> SettingsToggleCard(
+                            4 -> SettingsActionCard(
+                                icon = Icons.Filled.Dashboard,
+                                iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                title = "Player Layout Architecture",
+                                subtitle = "${misc.playerStyle.title} • ${misc.playerStyle.description}",
+                                onClick = { showPlayerStyleSheet = true },
+                                position = position,
+                            )
+                            5 -> SettingsActionCard(
+                                icon = Icons.Filled.Image,
+                                iconContainer = MaterialTheme.colorScheme.secondaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                title = "Player Background Canvas",
+                                subtitle = "${misc.playerBackgroundStyle.title} • ${misc.playerBackgroundStyle.description}",
+                                onClick = { showPlayerBgStyleSheet = true },
+                                position = position,
+                            )
+                            6 -> SettingsToggleCard(
                                 icon = Icons.Filled.Album,
                                 iconContainer = MaterialTheme.colorScheme.secondaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -787,7 +807,7 @@ fun SettingsScreen(
                                 },
                                 position = position,
                             )
-                            5 -> SettingsToggleCard(
+                            7 -> SettingsToggleCard(
                                 icon = Icons.Filled.TextFields,
                                 iconContainer = MaterialTheme.colorScheme.secondaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -797,7 +817,7 @@ fun SettingsScreen(
                                 onCheckedChange = viewModel::setUseCustomFont,
                                 position = position,
                             )
-                            6 -> SettingsActionCard(
+                            8 -> SettingsActionCard(
                                 icon = Icons.Filled.Dashboard,
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -1605,6 +1625,126 @@ fun SettingsScreen(
             },
             onDismiss = { showLyricsAnimationSheet = false },
         )
+    }
+
+    // -- Player Layout Style Sheet --
+    if (showPlayerStyleSheet) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+        ModalBottomSheet(
+            onDismissRequest = { showPlayerStyleSheet = false },
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .adaptiveContentWidth(maxWidth = 640.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 24.dp + safeDrawingBottomPadding()),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    "Player Layout Architecture",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    "Select M3 Expressive layout structure for Now Playing",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                com.lastwave.app.data.local.PlayerStyle.entries.forEach { style ->
+                    val isSelected = misc.playerStyle == style
+                    Surface(
+                        onClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            viewModel.setPlayerStyle(style)
+                            showPlayerStyleSheet = false
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(style.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                Text(style.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            if (isSelected) {
+                                Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // -- Player Background Style Sheet --
+    if (showPlayerBgStyleSheet) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+        ModalBottomSheet(
+            onDismissRequest = { showPlayerBgStyleSheet = false },
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .adaptiveContentWidth(maxWidth = 640.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 24.dp + safeDrawingBottomPadding()),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    "Player Background Canvas",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    "Select iOS Liquid Glass or M3 canvas backdrop renderer",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                com.lastwave.app.data.local.PlayerBackgroundStyle.entries.forEach { bgStyle ->
+                    val isSelected = misc.playerBackgroundStyle == bgStyle
+                    Surface(
+                        onClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            viewModel.setPlayerBackgroundStyle(bgStyle)
+                            showPlayerBgStyleSheet = false
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(bgStyle.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                Text(bgStyle.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            if (isSelected) {
+                                Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // -- Selective Playlist Sync sheet --

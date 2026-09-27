@@ -114,6 +114,7 @@ import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -663,6 +664,8 @@ private fun ExpandedPlayer(
         lyricsAnimation = settings.lyricsAnimation,
         wavySeekbarEnabled = settings.wavySeekbarEnabled,
         playerCoverStyle = settings.playerCoverStyle,
+        playerStyle = settings.playerStyle,
+        playerBackgroundStyle = settings.playerBackgroundStyle,
         showLyricsTranslation = settings.showLyricsTranslation,
         showLyricsPhonetic = settings.showLyricsPhonetic,
         onToggleTranslation = viewModel::toggleLyricsTranslation,
@@ -1427,6 +1430,8 @@ private fun FullPlayer(
     lyricsAnimation: LyricsAnimation = LyricsAnimation.APPLE_FLUID,
     wavySeekbarEnabled: Boolean = true,
     playerCoverStyle: com.lastwave.app.data.local.PlayerCoverStyle = com.lastwave.app.data.local.PlayerCoverStyle.SQUARE_COVER,
+    playerStyle: com.lastwave.app.data.local.PlayerStyle = com.lastwave.app.data.local.PlayerStyle.MODERN_M3,
+    playerBackgroundStyle: com.lastwave.app.data.local.PlayerBackgroundStyle = com.lastwave.app.data.local.PlayerBackgroundStyle.BLURRED_GLASS,
     showLyricsTranslation: Boolean = true,
     showLyricsPhonetic: Boolean = true,
     onToggleTranslation: (() -> Unit)? = null,
@@ -1572,12 +1577,19 @@ private fun FullPlayer(
             }
             .playerVerticalSwipe(enabled = currentTab == FullPlayerTab.NOW_PLAYING),
     ) {
-        BoxWithConstraints(Modifier.fillMaxSize()) {
-            val bgWidth = constraints.maxWidth.toFloat()
-            val bgHeight = constraints.maxHeight.toFloat()
-            val bgMaxDimension = maxOf(bgWidth, bgHeight, 1f)
+        LastWaveXPlayerRoot(
+            backgroundStyle = playerBackgroundStyle,
+            dominantColor = ambientColor,
+            accentColor = ambientCompanion,
+            track = track,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            BoxWithConstraints(Modifier.fillMaxSize()) {
+                val bgWidth = constraints.maxWidth.toFloat()
+                val bgHeight = constraints.maxHeight.toFloat()
+                val bgMaxDimension = maxOf(bgWidth, bgHeight, 1f)
 
-            Box(Modifier.matchParentSize().liquidGlassSource(playerBackdrop)) {
+                Box(Modifier.matchParentSize().liquidGlassSource(playerBackdrop)) {
             // Apple Music: Full-bleed scaled & deeply blurred artwork
             BackdropBlur(radius = 36.dp, modifier = Modifier.fillMaxSize()) {
                 PlayerArtwork(
@@ -1749,6 +1761,7 @@ private fun FullPlayer(
                         IconButton(
                             onClick = { showAiSheet = true },
                             modifier = Modifier
+                                .padding(start = 4.dp)
                                 .size(44.dp)
                                 .clip(CircleShape)
                                 .liquidGlassChrome(CircleShape, LocalLiquidGlass.current, LiquidGlassPreset.FloatingControls)
@@ -1757,8 +1770,8 @@ private fun FullPlayer(
                                 ),
                         ) {
                             Icon(
-                                Icons.Filled.AutoAwesome,
-                                "Ask LASTWAVEX AI",
+                                Icons.Filled.SmartToy,
+                                "AI Assistant",
                                 modifier = Modifier.size(20.dp),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
@@ -2352,6 +2365,7 @@ private fun FullPlayer(
                 trackSummary = "'${track.title}' by '${track.artist}'",
             ),
         )
+    }
     }
 }
 
