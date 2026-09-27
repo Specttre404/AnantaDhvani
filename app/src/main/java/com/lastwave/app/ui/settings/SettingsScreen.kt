@@ -1218,6 +1218,30 @@ fun SettingsScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionLabel(stringResource(R.string.settings_section_integrations))
+                    SettingsGroup(rowCount = 1) { index, position ->
+                        when (index) {
+                            0 -> SettingsToggleCard(
+                                icon = Icons.Filled.CloudSync,
+                                iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                title = stringResource(R.string.settings_discord_rpc),
+                                subtitle = if (misc.discordRpcEnabled) {
+                                    "Sharing current track, artist & live progress in Discord"
+                                } else {
+                                    stringResource(R.string.settings_discord_rpc_sub)
+                                },
+                                checked = misc.discordRpcEnabled,
+                                onCheckedChange = viewModel::setDiscordRpcEnabled,
+                                position = position,
+                            )
+                        }
+                    }
+                }
+            }
+
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_data))
                     SettingsGroup(rowCount = 3) { index, position ->
                         when (index) {

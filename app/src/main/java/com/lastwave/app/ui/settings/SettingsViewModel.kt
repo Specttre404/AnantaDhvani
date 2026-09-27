@@ -422,6 +422,9 @@ class SettingsViewModel @Inject constructor(
     fun setSkipMusicVideoIntros(enabled: Boolean) = launchSettingsAction("update skip intros setting") {
         settingsPreferences.setSkipMusicVideoIntros(enabled)
     }
+    fun setDiscordRpcEnabled(enabled: Boolean) = launchSettingsAction("update Discord RPC setting") {
+        settingsPreferences.setDiscordRpcEnabled(enabled)
+    }
     fun setWavySeekbarEnabled(enabled: Boolean) = launchSettingsAction("update seekbar style") {
         settingsPreferences.setWavySeekbarEnabled(enabled)
     }

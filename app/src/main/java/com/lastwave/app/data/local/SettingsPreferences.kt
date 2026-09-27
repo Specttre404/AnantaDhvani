@@ -90,6 +90,8 @@ data class MiscSettings(
     val sponsorBlockEnabled: Boolean = true,
     /** Skip music video intro commentary and non-music segments. */
     val skipMusicVideoIntros: Boolean = true,
+    /** Share current track, artist & progress status on Discord. */
+    val discordRpcEnabled: Boolean = false,
     /** When true (default), uses the multi-layer dynamic wavy seekbar.
      *  When false, uses the classic standard progress slider in the player tab. */
     val wavySeekbarEnabled: Boolean = true,
@@ -196,6 +198,7 @@ class SettingsPreferences @Inject constructor(
         val LOUDNESS_NORMALIZATION_ENABLED = booleanPreferencesKey("lw_loudness_normalization_enabled")
         val SPONSOR_BLOCK_ENABLED = booleanPreferencesKey("lw_sponsor_block_enabled")
         val SKIP_MUSIC_VIDEO_INTROS = booleanPreferencesKey("lw_skip_music_video_intros")
+        val DISCORD_RPC_ENABLED = booleanPreferencesKey("lw_discord_rpc_enabled")
         val WAVY_SEEKBAR_ENABLED = booleanPreferencesKey("lw_wavy_seekbar_enabled")
         val DOWNLOAD_LYRICS = booleanPreferencesKey("lw_download_lyrics")
         val APP_LANGUAGE = stringPreferencesKey("lw_app_language")
@@ -228,6 +231,7 @@ class SettingsPreferences @Inject constructor(
                 loudnessNormalizationEnabled = p.readSafely(Keys.LOUDNESS_NORMALIZATION_ENABLED) ?: true,
                 sponsorBlockEnabled = p.readSafely(Keys.SPONSOR_BLOCK_ENABLED) ?: true,
                 skipMusicVideoIntros = p.readSafely(Keys.SKIP_MUSIC_VIDEO_INTROS) ?: true,
+                discordRpcEnabled = p.readSafely(Keys.DISCORD_RPC_ENABLED) ?: false,
                 wavySeekbarEnabled = p.readSafely(Keys.WAVY_SEEKBAR_ENABLED) ?: true,
                 downloadLyrics = p.readSafely(Keys.DOWNLOAD_LYRICS) ?: true,
                 appLanguageTag = AppLanguage.fromTag(p.readSafely(Keys.APP_LANGUAGE)).tag,
@@ -317,6 +321,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setSkipMusicVideoIntros(enabled: Boolean) {
         dataStore.edit { it[Keys.SKIP_MUSIC_VIDEO_INTROS] = enabled }
+    }
+
+    suspend fun setDiscordRpcEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.DISCORD_RPC_ENABLED] = enabled }
     }
 
     suspend fun setWavySeekbarEnabled(enabled: Boolean) {

@@ -193,6 +193,7 @@ class MusicPlayer @Inject constructor(
     private val usbDacMonitor: UsbDacMonitor,
     private val songPlayStatsRepository: dagger.Lazy<com.lastwave.app.data.repository.SongPlayStatsRepository>,
     private val sponsorBlockRepository: com.lastwave.app.data.sponsorblock.SponsorBlockRepository,
+    private val discordRpcManager: com.lastwave.app.data.discord.DiscordRpcManager,
 ) {
     private val appContext = context.applicationContext
     private val streamResolutionWakeLock by lazy {
@@ -859,6 +860,7 @@ class MusicPlayer @Inject constructor(
         get() = activePlayer ?: playerDelegate.value
 
     init {
+        discordRpcManager.start(state)
         runCatching { restorePlaybackSession() }.getOrElse { error ->
             // A corrupt session or OEM media-stack failure must not become a
             // permanent launch-crash loop. Discard only the resumable session.
