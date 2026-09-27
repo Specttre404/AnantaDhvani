@@ -36,6 +36,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Lyrics
@@ -233,6 +234,23 @@ fun LyricsPanel(
         }
 
         // Transparent playback controls; no separate player-bar container.
+        var showLyricCardSheet by remember { mutableStateOf(false) }
+
+        if (showLyricCardSheet) {
+            val (lines, plain) = when (lyricsState) {
+                is LyricsUiState.Success -> lyricsState.lines to lyricsState.plainLyrics
+                else -> emptyList<LyricLine>() to null
+            }
+            LyricCardSheet(
+                lyricsLines = lines,
+                plainLyrics = plain,
+                songTitle = track.title,
+                artistName = track.artist,
+                artworkUrl = track.artworkUrl,
+                onDismiss = { showLyricCardSheet = false },
+            )
+        }
+
         LyricsPlaybackControls(
             state = state,
             currentPositionMs = smoothedPositionMs,
@@ -240,6 +258,7 @@ fun LyricsPanel(
             player = player,
             wavySeekbarEnabled = wavySeekbarEnabled,
             onToggleFullscreen = onToggleFullscreen,
+            onOpenLyricCard = { showLyricCardSheet = true },
             isFullscreen = isFullscreen,
             modifier = Modifier
                 .fillMaxWidth()
@@ -875,6 +894,7 @@ private fun LyricsPlaybackControls(
     player: MusicPlayer,
     wavySeekbarEnabled: Boolean = true,
     onToggleFullscreen: (() -> Unit)? = null,
+    onOpenLyricCard: (() -> Unit)? = null,
     isFullscreen: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -885,7 +905,7 @@ private fun LyricsPlaybackControls(
             .padding(horizontal = 4.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        if (onToggleFullscreen != null) {
+        if (onToggleFullscreen != null || onOpenLyricCard != null) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -893,35 +913,72 @@ private fun LyricsPlaybackControls(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val playerInteraction = remember { MutableInteractionSource() }
-                val isPlayerPressed by playerInteraction.collectIsPressedAsState()
-                val playerScale by animateFloatAsState(
-                    targetValue = if (isPlayerPressed) 0.82f else 1.0f,
-                    animationSpec = ExpressiveMotion.spatialSpring(),
-                    label = "playerTabScale",
-                )
-                LiquidGlassSurface(
-                    glassModifier = Modifier.liquidGlassChrome(CircleShape, LocalLiquidGlass.current),
-                    onClick = onToggleFullscreen,
-                    interactionSource = playerInteraction,
-                    shape = CircleShape,
-                    color = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    tonalElevation = 0.dp,
-                    shadowElevation = 0.dp,
-                    modifier = Modifier
-                        .size(46.dp)
-                        .graphicsLayer {
-                            scaleX = playerScale
-                            scaleY = playerScale
-                        },
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            if (isFullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
-                            contentDescription = if (isFullscreen) "Exit fullscreen lyrics" else "Fullscreen lyrics",
-                            modifier = Modifier.size(24.dp),
-                        )
+                if (onOpenLyricCard != null) {
+                    val shareInteraction = remember { MutableInteractionSource() }
+                    val isSharePressed by shareInteraction.collectIsPressedAsState()
+                    val shareScale by animateFloatAsState(
+                        targetValue = if (isSharePressed) 0.82f else 1.0f,
+                        animationSpec = ExpressiveMotion.spatialSpring(),
+                        label = "shareCardScale",
+                    )
+                    LiquidGlassSurface(
+                        glassModifier = Modifier.liquidGlassChrome(CircleShape, LocalLiquidGlass.current),
+                        onClick = onOpenLyricCard,
+                        interactionSource = shareInteraction,
+                        shape = CircleShape,
+                        color = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        tonalElevation = 0.dp,
+                        shadowElevation = 0.dp,
+                        modifier = Modifier
+                            .size(46.dp)
+                            .graphicsLayer {
+                                scaleX = shareScale
+                                scaleY = shareScale
+                            },
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                Icons.Filled.FormatQuote,
+                                contentDescription = "Share Lyric Card",
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                }
+
+                if (onToggleFullscreen != null) {
+                    val playerInteraction = remember { MutableInteractionSource() }
+                    val isPlayerPressed by playerInteraction.collectIsPressedAsState()
+                    val playerScale by animateFloatAsState(
+                        targetValue = if (isPlayerPressed) 0.82f else 1.0f,
+                        animationSpec = ExpressiveMotion.spatialSpring(),
+                        label = "playerTabScale",
+                    )
+                    LiquidGlassSurface(
+                        glassModifier = Modifier.liquidGlassChrome(CircleShape, LocalLiquidGlass.current),
+                        onClick = onToggleFullscreen,
+                        interactionSource = playerInteraction,
+                        shape = CircleShape,
+                        color = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        tonalElevation = 0.dp,
+                        shadowElevation = 0.dp,
+                        modifier = Modifier
+                            .size(46.dp)
+                            .graphicsLayer {
+                                scaleX = playerScale
+                                scaleY = playerScale
+                            },
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                if (isFullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
+                                contentDescription = if (isFullscreen) "Exit fullscreen lyrics" else "Fullscreen lyrics",
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
                     }
                 }
             }

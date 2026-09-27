@@ -126,6 +126,23 @@ fun ModernLyricsPanel(
         }
     }
 
+    var showLyricCardSheet by remember { mutableStateOf(false) }
+
+    if (showLyricCardSheet) {
+        val (lines, plain) = when (val s = lyricsState) {
+            is LyricsUiState.Success -> s.lines to s.plainLyrics
+            else -> emptyList<LyricLine>() to null
+        }
+        LyricCardSheet(
+            lyricsLines = lines,
+            plainLyrics = plain,
+            songTitle = track.title,
+            artistName = track.artist,
+            artworkUrl = track.artworkUrl,
+            onDismiss = { showLyricCardSheet = false },
+        )
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         AnimatedContent(
             targetState = lyricsState,
@@ -245,7 +262,9 @@ fun ModernLyricsPanel(
                                 onLineClicked = { line ->
                                     player.seekTo(line.start.toLong())
                                 },
-                                onLinePressed = {},
+                                onLinePressed = {
+                                    showLyricCardSheet = true
+                                },
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxWidth(),

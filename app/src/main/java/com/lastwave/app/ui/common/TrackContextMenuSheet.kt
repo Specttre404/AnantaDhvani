@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
@@ -104,6 +105,7 @@ import com.lastwave.app.playback.MusicPlayer
 import com.lastwave.app.playback.PlayableTrack
 import com.lastwave.app.ui.navigation.ArtistAlbumNavigator
 import com.lastwave.app.ui.player.LocalMusicPlayer
+import com.lastwave.app.ui.player.LyricCardSheet
 import com.lastwave.app.ui.player.LocalAddToPlaylist
 import com.lastwave.app.ui.player.PlayerCastMenuRow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -305,6 +307,7 @@ fun TrackContextMenuSheet(
     val addToPlaylist = LocalAddToPlaylist.current
     var showDetailsSheet by remember { mutableStateOf(false) }
     var showEqualizerSheet by remember { mutableStateOf(false) }
+    var showLyricCardSheet by remember { mutableStateOf(false) }
     var showPlaybackSpeedDialog by remember { mutableStateOf(false) }
     var showStatsForNerdsDialog by remember { mutableStateOf(false) }
     var showTimerDialog by remember { mutableStateOf(false) }
@@ -355,6 +358,23 @@ fun TrackContextMenuSheet(
     if (showEqualizerSheet) {
         EqualizerSheet(
             onDismiss = { showEqualizerSheet = false },
+        )
+    }
+
+    if (showLyricCardSheet) {
+        val playerState by musicPlayer.state.collectAsStateWithLifecycle()
+        val currentTrack = playerState.current
+        val trackTitle = currentTrack?.title ?: (target as? TrackMenuTarget.Track)?.name ?: ""
+        val artistName = currentTrack?.artist ?: (target as? TrackMenuTarget.Track)?.artist ?: ""
+        val artworkUrl = currentTrack?.artworkUrl ?: playableTrack?.artworkUrl
+
+        LyricCardSheet(
+            lyricsLines = emptyList(),
+            plainLyrics = null,
+            songTitle = trackTitle,
+            artistName = artistName,
+            artworkUrl = artworkUrl,
+            onDismiss = { showLyricCardSheet = false },
         )
     }
 
