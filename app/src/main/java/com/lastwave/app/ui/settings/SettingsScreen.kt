@@ -1578,6 +1578,10 @@ fun SettingsScreen(
             version = misc.lyricsUiVersion,
             wordByWord = misc.wordByWordLyrics,
             onWordByWordChange = viewModel::setWordByWordLyrics,
+            showTranslation = misc.showLyricsTranslation,
+            onShowTranslationChange = viewModel::setShowLyricsTranslation,
+            showPhonetic = misc.showLyricsPhonetic,
+            onShowPhoneticChange = viewModel::setShowLyricsPhonetic,
             onSelectVersion = viewModel::setLyricsUiVersion,
             current = misc.lyricsAnimation,
             onSelect = {
@@ -3835,6 +3839,10 @@ private fun SyncPlaylistsSheet(
 private fun LyricsAnimationSheet(
     wordByWord: Boolean,
     onWordByWordChange: (Boolean) -> Unit,
+    showTranslation: Boolean,
+    onShowTranslationChange: (Boolean) -> Unit,
+    showPhonetic: Boolean,
+    onShowPhoneticChange: (Boolean) -> Unit,
     version: LyricsUiVersion,
     onSelectVersion: (LyricsUiVersion) -> Unit,
     current: LyricsAnimation,
@@ -3910,6 +3918,26 @@ private fun LyricsAnimationSheet(
                 subtitle = "Turn off to use LRCLIB line-by-line lyrics",
                 checked = wordByWord,
                 onCheckedChange = onWordByWordChange,
+            )
+
+            SettingsToggleCard(
+                icon = Icons.Filled.Language,
+                iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                title = stringResource(R.string.settings_show_translation),
+                subtitle = stringResource(R.string.settings_show_translation_sub),
+                checked = showTranslation,
+                onCheckedChange = onShowTranslationChange,
+            )
+
+            SettingsToggleCard(
+                icon = Icons.Filled.TextFields,
+                iconContainer = MaterialTheme.colorScheme.secondaryContainer,
+                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
+                title = stringResource(R.string.settings_show_phonetic),
+                subtitle = stringResource(R.string.settings_show_phonetic_sub),
+                checked = showPhonetic,
+                onCheckedChange = onShowPhoneticChange,
             )
 
             Row(

@@ -95,6 +95,10 @@
     <string name="settings_discord_rpc" tools:ignore="MissingTranslation">Discord Rich Presence</string>
     <string name="settings_discord_rpc_sub" tools:ignore="MissingTranslation">Display current track, artist, album art &amp; live progress in Discord</string>
     <string name="settings_download_lyrics">Download Synced Lyrics</string>
+    <string name="settings_show_translation" tools:ignore="MissingTranslation">Lyrics Translation</string>
+    <string name="settings_show_translation_sub" tools:ignore="MissingTranslation">Display translated lyrics lines below synced text when available</string>
+    <string name="settings_show_phonetic" tools:ignore="MissingTranslation">Phonetic Pronunciation</string>
+    <string name="settings_show_phonetic_sub" tools:ignore="MissingTranslation">Display Romanized/Pinyin phonetic guide above non-Latin lyrics</string>
     <string name="settings_download_lyrics_on">Save .lrc companion files &amp; embed lyrics in downloads</string>
     <string name="settings_download_lyrics_off">Do not fetch or save lyrics when downloading</string>
     <string name="settings_battery_title">Background Playback (Battery Optimization)</string>

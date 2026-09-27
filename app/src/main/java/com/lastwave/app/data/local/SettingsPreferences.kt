@@ -86,6 +86,8 @@ data class MiscSettings(
     /** Lyrics UI layout version (Classic or Modern). */
     val lyricsUiVersion: LyricsUiVersion = LyricsUiVersion.MODERN,
     val wordByWordLyrics: Boolean = true,
+    val showLyricsTranslation: Boolean = true,
+    val showLyricsPhonetic: Boolean = true,
     /** Experimental lyrics animation style (Settings -> Experimental -> Lyrics Animation). */
     val lyricsAnimation: LyricsAnimation = LyricsAnimation.APPLE_FLUID,
     /** Blend the end of one queued track into the beginning of the next. */
@@ -203,6 +205,8 @@ class SettingsPreferences @Inject constructor(
         val BIT_PERFECT_ENABLED = booleanPreferencesKey("lw_bit_perfect_enabled")
         val LYRICS_UI_VERSION = stringPreferencesKey("lw_lyrics_ui_version")
         val WORD_BY_WORD_LYRICS = booleanPreferencesKey("lw_word_by_word_lyrics")
+        val SHOW_LYRICS_TRANSLATION = booleanPreferencesKey("lw_show_lyrics_translation")
+        val SHOW_LYRICS_PHONETIC = booleanPreferencesKey("lw_show_lyrics_phonetic")
         val LYRICS_ANIMATION = stringPreferencesKey("lw_lyrics_animation")
         val CROSSFADE_ENABLED = booleanPreferencesKey("lw_crossfade_enabled")
         val CROSSFADE_SECONDS = intPreferencesKey("lw_crossfade_seconds")
@@ -237,6 +241,8 @@ class SettingsPreferences @Inject constructor(
                 isBitPerfectEnabled = p.readSafely(Keys.BIT_PERFECT_ENABLED) ?: false,
                 lyricsUiVersion = LyricsUiVersion.fromId(p.readSafely(Keys.LYRICS_UI_VERSION)),
                 wordByWordLyrics = p.readSafely(Keys.WORD_BY_WORD_LYRICS) ?: true,
+                showLyricsTranslation = p.readSafely(Keys.SHOW_LYRICS_TRANSLATION) ?: true,
+                showLyricsPhonetic = p.readSafely(Keys.SHOW_LYRICS_PHONETIC) ?: true,
                 lyricsAnimation = LyricsAnimation.fromId(p.readSafely(Keys.LYRICS_ANIMATION)),
                 crossfadeEnabled = p.readSafely(Keys.CROSSFADE_ENABLED) ?: false,
                 crossfadeSeconds = (p.readSafely(Keys.CROSSFADE_SECONDS) ?: 4).coerceIn(1, 12),
@@ -307,6 +313,14 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setWordByWordLyrics(enabled: Boolean) {
         dataStore.edit { it[Keys.WORD_BY_WORD_LYRICS] = enabled }
+    }
+
+    suspend fun setShowLyricsTranslation(enabled: Boolean) {
+        dataStore.edit { it[Keys.SHOW_LYRICS_TRANSLATION] = enabled }
+    }
+
+    suspend fun setShowLyricsPhonetic(enabled: Boolean) {
+        dataStore.edit { it[Keys.SHOW_LYRICS_PHONETIC] = enabled }
     }
 
     suspend fun setLyricsAnimation(animation: LyricsAnimation) {

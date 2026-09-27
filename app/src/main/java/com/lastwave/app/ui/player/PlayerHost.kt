@@ -294,6 +294,18 @@ class PlayerViewModel @Inject constructor(
         navigator.openAlbum(title, artist, browseId)
     }
 
+    fun toggleLyricsTranslation() {
+        viewModelScope.launch {
+            settingsPreferences.setShowLyricsTranslation(!settings.value.showLyricsTranslation)
+        }
+    }
+
+    fun toggleLyricsPhonetic() {
+        viewModelScope.launch {
+            settingsPreferences.setShowLyricsPhonetic(!settings.value.showLyricsPhonetic)
+        }
+    }
+
     private val _lyricsState = MutableStateFlow<LyricsUiState>(LyricsUiState.Idle)
     val lyricsState = _lyricsState.asStateFlow()
 
@@ -651,6 +663,10 @@ private fun ExpandedPlayer(
         lyricsAnimation = settings.lyricsAnimation,
         wavySeekbarEnabled = settings.wavySeekbarEnabled,
         playerCoverStyle = settings.playerCoverStyle,
+        showLyricsTranslation = settings.showLyricsTranslation,
+        showLyricsPhonetic = settings.showLyricsPhonetic,
+        onToggleTranslation = viewModel::toggleLyricsTranslation,
+        onTogglePhonetic = viewModel::toggleLyricsPhonetic,
         currentTab = currentTab,
         onTabChange = onTabChange,
         onRetryLyrics = onRetryLyrics,
@@ -1411,6 +1427,10 @@ private fun FullPlayer(
     lyricsAnimation: LyricsAnimation = LyricsAnimation.APPLE_FLUID,
     wavySeekbarEnabled: Boolean = true,
     playerCoverStyle: com.lastwave.app.data.local.PlayerCoverStyle = com.lastwave.app.data.local.PlayerCoverStyle.SQUARE_COVER,
+    showLyricsTranslation: Boolean = true,
+    showLyricsPhonetic: Boolean = true,
+    onToggleTranslation: (() -> Unit)? = null,
+    onTogglePhonetic: (() -> Unit)? = null,
     currentTab: FullPlayerTab,
     onTabChange: (FullPlayerTab) -> Unit,
     onRetryLyrics: () -> Unit,
@@ -1792,6 +1812,10 @@ private fun FullPlayer(
                                     lyricsState = lyricsState,
                                     progressState = progressState,
                                     wavySeekbarEnabled = wavySeekbarEnabled,
+                                    showTranslation = showLyricsTranslation,
+                                    showPhonetic = showLyricsPhonetic,
+                                    onToggleTranslation = onToggleTranslation,
+                                    onTogglePhonetic = onTogglePhonetic,
                                     onRetry = onRetryLyrics,
                                     onToggleFullscreen = { lyricsFullscreen = !lyricsFullscreen },
                                     isFullscreen = lyricsFullscreen,
