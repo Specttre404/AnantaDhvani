@@ -3130,6 +3130,7 @@ private fun RotatingVinylArtwork(
     Box(
         modifier = modifier
             .aspectRatio(1f)
+            .background(Color.Transparent)
             .graphicsLayer { rotationZ = rotationAngle },
         contentAlignment = Alignment.Center,
     ) {
@@ -3137,7 +3138,7 @@ private fun RotatingVinylArtwork(
             shape = CircleShape,
             color = Color(0xFF121212),
             border = BorderStroke(1.dp, Color(0xFF2E2E2E)),
-            shadowElevation = 8.dp,
+            shadowElevation = 0.dp,
             modifier = Modifier.fillMaxSize(),
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {

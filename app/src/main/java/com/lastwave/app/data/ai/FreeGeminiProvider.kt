@@ -11,13 +11,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FreeGeminiProvider @Inject constructor() {
+class FreeGeminiProvider @Inject constructor(
+    private val geminiByokProvider: GeminiByokProvider,
+) {
 
     fun generateStream(
         modelName: String,
         systemPrompt: String,
         userPrompt: String,
+        fallbackApiKey: String = "",
     ): Flow<AiResult> = flow {
+        var didEmitSuccess = false
         runCatching {
             val generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI())
                 .generativeModel(modelName = modelName.ifBlank { "gemini-2.5-flash" })
@@ -30,29 +34,28 @@ class FreeGeminiProvider @Inject constructor() {
                 val chunkText = chunk.text.orEmpty()
                 if (chunkText.isNotEmpty()) {
                     fullText.append(chunkText)
+                    didEmitSuccess = true
                     emit(AiResult.Streaming(chunk = chunkText, fullTextSoFar = fullText.toString()))
                 }
             }
 
             if (fullText.isNotEmpty()) {
                 emit(AiResult.Success(fullText.toString()))
+            } else if (!didEmitSuccess && fallbackApiKey.isNotBlank()) {
+                geminiByokProvider.generateStream(fallbackApiKey, modelName, systemPrompt, userPrompt).collect { emit(it) }
             } else {
                 emit(AiResult.Error("Free AI provider returned an empty response."))
             }
         }.getOrElse { e ->
-            val msg = e.localizedMessage ?: "Free AI Provider Error"
-            when {
-                msg.contains("429", ignoreCase = true) || msg.contains("quota", ignoreCase = true) || msg.contains("resource_exhausted", ignoreCase = true) -> {
-                    emit(AiResult.RateLimited)
-                }
-                msg.contains("AppCheck", ignoreCase = true) -> {
-                    emit(AiResult.AppCheckFailure(msg))
-                }
-                msg.contains("safety", ignoreCase = true) || msg.contains("blocked", ignoreCase = true) -> {
-                    emit(AiResult.SafetyRefusal)
-                }
-                else -> {
-                    emit(AiResult.Error(msg))
+            if (!didEmitSuccess && fallbackApiKey.isNotBlank()) {
+                geminiByokProvider.generateStream(fallbackApiKey, modelName, systemPrompt, userPrompt).collect { emit(it) }
+            } else {
+                val msg = e.localizedMessage ?: "Free AI Provider Error"
+                when {
+                    msg.contains("429", ignoreCase = true) || msg.contains("quota", ignoreCase = true) -> emit(AiResult.RateLimited)
+                    msg.contains("AppCheck", ignoreCase = true) -> emit(AiResult.AppCheckFailure("Firebase AppCheck required. Switch to BYOK in Settings -> AI to enter your own free Gemini API key."))
+                    msg.contains("safety", ignoreCase = true) || msg.contains("blocked", ignoreCase = true) -> emit(AiResult.SafetyRefusal)
+                    else -> emit(AiResult.Error(msg))
                 }
             }
         }

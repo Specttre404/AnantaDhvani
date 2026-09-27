@@ -439,6 +439,9 @@ class SettingsViewModel @Inject constructor(
     fun setDiscordRpcEnabled(enabled: Boolean) = launchSettingsAction("update Discord RPC setting") {
         settingsPreferences.setDiscordRpcEnabled(enabled)
     }
+    fun setDiscordUserToken(token: String) = launchSettingsAction("update Discord user token") {
+        settingsPreferences.setDiscordUserToken(token)
+    }
     fun setShakeToSkipEnabled(enabled: Boolean) = launchSettingsAction("update Shake to Skip setting") {
         settingsPreferences.setShakeToSkipEnabled(enabled)
     }

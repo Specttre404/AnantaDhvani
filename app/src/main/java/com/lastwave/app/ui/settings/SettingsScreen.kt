@@ -50,6 +50,7 @@ import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Check
 import com.lastwave.app.util.BatteryOptimizationHelper
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CloudDownload
@@ -314,6 +315,7 @@ fun SettingsScreen(
     var showSyncPlaylistsSheet by remember { mutableStateOf(false) }
     var showYtLibraryVisibilitySheet by remember { mutableStateOf(false) }
     var showYtDisconnectConfirm by remember { mutableStateOf(false) }
+    var showDiscordTokenDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     val currentLanguage = remember(misc.appLanguageTag) { AppLanguage.fromTag(misc.appLanguageTag) }
 
@@ -1306,7 +1308,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_integrations))
-                    SettingsGroup(rowCount = 1) { index, position ->
+                    SettingsGroup(rowCount = 2) { index, position ->
                         when (index) {
                             0 -> SettingsToggleCard(
                                 icon = Icons.Filled.CloudSync,
@@ -1314,12 +1316,28 @@ fun SettingsScreen(
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = stringResource(R.string.settings_discord_rpc),
                                 subtitle = if (misc.discordRpcEnabled) {
-                                    "Sharing current track, artist & live progress in Discord"
+                                    if (misc.discordConnectedUsername.isNotBlank()) "Connected as @${misc.discordConnectedUsername}"
+                                    else "Sharing current track, artist & live progress in Discord"
                                 } else {
                                     stringResource(R.string.settings_discord_rpc_sub)
                                 },
                                 checked = misc.discordRpcEnabled,
                                 onCheckedChange = viewModel::setDiscordRpcEnabled,
+                                position = position,
+                            )
+                            1 -> SettingsActionCard(
+                                icon = Icons.Filled.CloudSync,
+                                iconContainer = MaterialTheme.colorScheme.secondaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                title = "Discord Account Gateway Token",
+                                subtitle = if (misc.discordConnectedUsername.isNotBlank()) {
+                                    "Connected as @${misc.discordConnectedUsername} • Tap to update token"
+                                } else if (misc.discordUserToken.isNotBlank()) {
+                                    "Token configured • Tap to update"
+                                } else {
+                                    "Paste user token to enable Mobile Discord Rich Presence"
+                                },
+                                onClick = { showDiscordTokenDialog = true },
                                 position = position,
                             )
                         }
@@ -1788,6 +1806,46 @@ fun SettingsScreen(
             onToggleSync = viewModel::togglePlaylistSync,
             onSelectAll = viewModel::selectAllPlaylistsForSync,
             onDismiss = { showSyncPlaylistsSheet = false },
+        )
+    }
+
+    if (showDiscordTokenDialog) {
+        var tokenInput by remember { mutableStateOf(misc.discordUserToken) }
+        AlertDialog(
+            onDismissRequest = { showDiscordTokenDialog = false },
+            title = { Text("Discord Account Token") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Paste your Discord user authorization token to display live listening activity on your Discord mobile profile.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedTextField(
+                        value = tokenInput,
+                        onValueChange = { tokenInput = it },
+                        label = { Text("User Token") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.setDiscordUserToken(tokenInput)
+                        showDiscordTokenDialog = false
+                    },
+                ) {
+                    Text("Save & Connect")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscordTokenDialog = false }) {
+                    Text("Cancel")
+                }
+            },
         )
     }
 

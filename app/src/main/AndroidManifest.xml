@@ -201,11 +201,11 @@
             </intent-filter>
         </receiver>
 
-        <!-- Home Screen Music Widget -->
+        <!-- Home Screen Music Widgets -->
         <receiver
             android:name=".widget.MusicWidgetProvider"
             android:exported="true"
-            android:label="LastWave Music Widget">
+            android:label="LastWaveX Music Widget (Full)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.lastwave.app.widget.UPDATE_WIDGET" />
@@ -213,6 +213,19 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/app_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.MusicCompactWidgetProvider"
+            android:exported="true"
+            android:label="LastWaveX Music Widget (Compact Pill)">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.lastwave.app.widget.UPDATE_COMPACT_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_compact_info" />
         </receiver>
 
         <!-- Retained for the Playlist module's M3U export (SAF/legacy write) -->

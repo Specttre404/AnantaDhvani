@@ -718,7 +718,7 @@ private fun StatsCard(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            "LASTWAVEX INSIGHTS",
+                            "LastWaveX Insights",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,

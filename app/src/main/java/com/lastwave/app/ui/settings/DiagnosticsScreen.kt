@@ -47,10 +47,11 @@ fun DiagnosticsScreen(
     player: MusicPlayer,
     onBackClick: () -> Unit,
 ) {
-    val playerState by player.state.collectAsStateWithLifecycle()
-    val signalPath by player.signalPath.collectAsStateWithLifecycle()
+    val playerState by player.state.collectAsStateWithLifecycle(initialValue = com.lastwave.app.playback.MusicPlayerState())
+    val signalPath by player.signalPath.collectAsStateWithLifecycle(initialValue = com.lastwave.app.playback.SignalPathReport.initial())
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {

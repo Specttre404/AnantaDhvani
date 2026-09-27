@@ -109,7 +109,7 @@ fun LoginScreen(
                         )
                     }
                 }
-                Text("LASTWAVEX", style = MaterialTheme.typography.headlineMedium)
+                Text("LastWaveX", style = MaterialTheme.typography.headlineMedium)
                 Text(
                     "Your music, your way — powered by YouTube Music",
                     style = MaterialTheme.typography.bodyMedium,

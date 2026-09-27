@@ -143,6 +143,8 @@ data class MiscSettings(
     val skipMusicVideoIntros: Boolean = true,
     /** Share current track, artist & progress status on Discord. */
     val discordRpcEnabled: Boolean = false,
+    val discordUserToken: String = "",
+    val discordConnectedUsername: String = "",
     /** Shake device to skip to next track during playback. */
     val shakeToSkipEnabled: Boolean = false,
     /** Player Now Playing artwork style (Square Cover or Rotating Vinyl). */
@@ -267,6 +269,8 @@ class SettingsPreferences @Inject constructor(
         val SPONSOR_BLOCK_ENABLED = booleanPreferencesKey("lw_sponsor_block_enabled")
         val SKIP_MUSIC_VIDEO_INTROS = booleanPreferencesKey("lw_skip_music_video_intros")
         val DISCORD_RPC_ENABLED = booleanPreferencesKey("lw_discord_rpc_enabled")
+        val DISCORD_USER_TOKEN = stringPreferencesKey("lw_discord_user_token")
+        val DISCORD_CONNECTED_USERNAME = stringPreferencesKey("lw_discord_connected_username")
         val SHAKE_TO_SKIP_ENABLED = booleanPreferencesKey("lw_shake_to_skip_enabled")
         val PLAYER_COVER_STYLE = stringPreferencesKey("lw_player_cover_style")
         val PLAYER_STYLE = stringPreferencesKey("lw_player_style")
@@ -310,6 +314,8 @@ class SettingsPreferences @Inject constructor(
                 sponsorBlockEnabled = p.readSafely(Keys.SPONSOR_BLOCK_ENABLED) ?: true,
                 skipMusicVideoIntros = p.readSafely(Keys.SKIP_MUSIC_VIDEO_INTROS) ?: true,
                 discordRpcEnabled = p.readSafely(Keys.DISCORD_RPC_ENABLED) ?: false,
+                discordUserToken = p.readSafely(Keys.DISCORD_USER_TOKEN).orEmpty(),
+                discordConnectedUsername = p.readSafely(Keys.DISCORD_CONNECTED_USERNAME).orEmpty(),
                 shakeToSkipEnabled = p.readSafely(Keys.SHAKE_TO_SKIP_ENABLED) ?: false,
                 playerCoverStyle = PlayerCoverStyle.fromId(p.readSafely(Keys.PLAYER_COVER_STYLE)),
                 playerStyle = PlayerStyle.fromId(p.readSafely(Keys.PLAYER_STYLE)),
@@ -440,6 +446,14 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setDiscordRpcEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.DISCORD_RPC_ENABLED] = enabled }
+    }
+
+    suspend fun setDiscordUserToken(token: String) {
+        dataStore.edit { it[Keys.DISCORD_USER_TOKEN] = token.trim() }
+    }
+
+    suspend fun setDiscordConnectedUsername(username: String) {
+        dataStore.edit { it[Keys.DISCORD_CONNECTED_USERNAME] = username.trim() }
     }
 
     suspend fun setShakeToSkipEnabled(enabled: Boolean) {
