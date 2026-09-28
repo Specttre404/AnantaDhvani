@@ -3,6 +3,6 @@
     <!-- Splash screen background -->
     <color name="splash_background">#FF100F0F</color>
 
-    <!-- LASTWAVEX App Icon Background: Deep Obsidian Slate -->
-    <color name="ic_launcher_background">#FF090D16</color>
+    <!-- LastWaveX App Icon Background: Deep Obsidian Slate -->
+    <color name="ic_launcher_background">#0F1115</color>
 </resources>

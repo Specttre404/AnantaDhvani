@@ -1,19 +1,28 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <!-- LASTWAVEX In-App Emblem: Prism Signal Mark -->
-    <!-- Left Chevron (Electric Cyan) -->
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <!-- LastWaveX Standalone In-App Logo: Prism Waveform (72dp x 72dp) -->
     <path
-        android:fillColor="#FF00E5FF"
-        android:pathData="M 32,28 L 58,54 L 32,80 L 23,71 L 41,54 L 23,37 Z" />
-    <!-- Right Chevron (Indigo Neon) -->
-    <path
-        android:fillColor="#FF6366F1"
-        android:pathData="M 76,28 L 50,54 L 76,80 L 85,71 L 67,54 L 85,37 Z" />
-    <!-- Center Pulse Core (White) -->
+        android:pathData="M 15.75,36 C 20.25,36 22.5,23.625 27,23.625 C 31.5,23.625 33.75,48.375 38.25,48.375 C 42.75,48.375 45,28.125 49.5,28.125 C 52.875,28.125 55.125,36 58.5,36"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <gradient
+            android:startX="15.75"
+            android:startY="23.625"
+            android:endX="58.5"
+            android:endY="48.375"
+            android:type="linear">
+            <item android:offset="0.0" android:color="#FF00E5FF" />
+            <item android:offset="0.5" android:color="#FF7C4DFF" />
+            <item android:offset="1.0" android:color="#FFFF4081" />
+        </gradient>
+    </path>
+
+    <!-- Pulse Node -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M 54,42 L 66,54 L 54,66 L 42,54 Z" />
+        android:pathData="M 38.25,48.375 m -2,0 a 2,2 0 1,0 4,0 a 2,2 0 1,0 -4,0" />
 </vector>
