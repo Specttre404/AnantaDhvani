@@ -4,8 +4,8 @@
 
 # LastWaveX
 
-**Next-Gen YouTube Music Client with Algorithmic Smart Playlist Generator, Real-Time Synced Lyrics & Universal Last.fm Scrobbler for Android**  
-*Bit-Perfect USB DAC • 15-Band Studio Equalizer • Synced Word-by-Word Lyrics • C++ Native DSP • SponsorBlock • Zero Bloat*
+**Next-Gen YouTube Music Client & Universal Audiophile Player for Android**  
+*Bit-Perfect USB DAC • 15-Band Studio Equalizer • Algorithmic Smart Mixes • Real-Time Synced Lyrics • Universal Last.fm Scrobbler • Zero Bloat*
 
 [![Build Status](https://img.shields.io/badge/Build-Passing%20(24%2F24%20Tests)-success?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026%2B)-blue?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
@@ -14,10 +14,10 @@
 [![Client](https://img.shields.io/badge/Client-YouTube%20Music-red?style=for-the-badge&logo=youtubemusic)](https://music.youtube.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20MVVM%20+%20C++%20DSP-yellowgreen?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
 [![Design](https://img.shields.io/badge/Design-Material%203%20Expressive%20+%20LiquidGlass-critical?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
-[![VirusTotal Safe](https://img.shields.io/badge/VirusTotal-Safe%20(0%2F70)-success?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com)
+[![VirusTotal Safe](https://img.shields.io/badge/VirusTotal-Safe-success?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com/gui/file/98c2e016ca563d11e5bee81dcecf928cc55c1a47b3dff481e66834c06784c5f5/detection)
 [![License](https://img.shields.io/badge/License-GPLv3-orange?style=for-the-badge)](LICENSE)
 
-[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [Visual Mockups](#-priority-ordered-ascii-ui--visual-architecture-mockups) • [Roadmap](#-project-roadmap) • [Build from Source](#%EF%B8%8F-building-from-source) • [Contact (@Ishan____404)](https://x.com/Ishan____404)
+[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [In-App Gallery](#-in-app-screenshots-showcase) • [Roadmap](#-project-roadmap) • [Build from Source](#%EF%B8%8F-building-from-source) • [Contact (@Ishan____404)](https://x.com/Ishan____404)
 
 </div>
 
@@ -57,84 +57,14 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 
 ---
 
-## 🎨 Priority-Ordered ASCII UI & Visual Architecture Mockups
+## 📱 In-App Screenshots Showcase
 
-### Priority 1: Now Playing Screen (Rotating Vinyl & Wavy Seekbar)
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ▼ LASTWAVE X NOW PLAYING                         ⋮      │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│                     .─────────────.                      │
-│                  .─'   .───────.   '─.                   │
-│                 ╱    .╱   (●)   ╲.    ╲                  │
-│                │    │   ARTWORK  │    │                  │
-│                 ╲    '╲         ╱'    ╱                  │
-│                  '─.   '───────'   .─'                   │
-│                     '─────────────'                      │
-│               [ 33⅓ RPM Rotating Vinyl ]                 │
-│                                                          │
-│              Starboy — The Weeknd ft. Daft Punk          │
-│              Starboy (Deluxe) • 24-BIT / 96 kHz          │
-│                                                          │
-│         01:42 ~~~~~~~〜〜〜〜〜∿∿∿∿∿~~~~~~~ 03:50       │
-│                                                          │
-│              ⏮    ⏮️    ██    ⏭️    ⏭                │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Priority 2: Studio 15-Band Equalizer & Bézier Frequency Curve
-```text
-┌──────────────────────────────────────────────────────────┐
-│  🎛️ STUDIO EQUALIZER & SOUND FX                   [✕]  │
-├──────────────────────────────────────────────────────────┤
-│  [ Preset: Studio Master ]                  [ Reset ]    │
-│  Enable Equalizer:                                 [ON]  │
-│                                                          │
-│  Preamp Gain:  [████████████░░░░░░] +2.4 dB              │
-│                                                          │
-│     +12dB ┌──────────────────────────────────────┐       │
-│      0dB ─┼ - - - - - - - - - - - - - - - - - - -│       │
-│     -12dB └──────────────────────────────────────┘       │
-│           32  64  125  250  500  1K  2K  4K  8K  16K    │
-│                                                          │
-│   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️     │
-│  +2.6 +2.8 +2.2 +0.6 -1.8 -2.6 -1.2  0.0 +1.2 +2.4 +3.6 +4.0 +4.2 +4.5 +4.8 │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Priority 3: Synced Word-by-Word Lyrics & Quote Card Generator
-```text
-┌──────────────────────────────────────────────────────────┐
-│  WORD SYNC • LRCLIB                        Translate  Phonetic│
-├──────────────────────────────────────────────────────────┤
-│  I'm tryna put you in the worst mood, ah                 │
-│  P1 clean of  【S T A R B O Y】  A V I A T O R           │
-│  Look what you've done, I'm a motherfuckin' starboy      │
-│                                                          │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │  "Look what you've done, I'm a starboy"           │  │
-│  │  — Starboy by The Weeknd                           │  │
-│  │  [ 🎨 Export Lyric Quote Card (1080x1350 PNG) ]     │  │
-│  └────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Priority 4: Real-Time Hardware Signal Path & Diagnostics HUD
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ⚙️ SYSTEM & AUDIO DIAGNOSTICS                            │
-├──────────────────────────────────────────────────────────┤
-│  Audio Codec:        HI-RES FLAC (Lossless)              │
-│  Sampling Rate:      96.0 kHz                            │
-│  Bit Depth:          24-bit                              │
-│  Bitrate:            3210 kbps                           │
-│  Signal Path:        Bit-Perfect USB Direct Passthrough  │
-│  Output Clock:       Hardware Sync (0.0 ms jitter)       │
-│  Buffer State:       Healthy (30.0s pre-cached)          │
-└──────────────────────────────────────────────────────────┘
-```
+<div align="center">
+  <img src="docs/assets/screenshots/feed.png" width="23%" alt="Feed & Discovery" />
+  <img src="docs/assets/screenshots/player_vinyl.png" width="23%" alt="Rotating Vinyl Player" />
+  <img src="docs/assets/screenshots/equalizer.png" width="23%" alt="15-Band Studio Equalizer" />
+  <img src="docs/assets/screenshots/diagnostics.png" width="23%" alt="Hardware Diagnostics" />
+</div>
 
 ---
 
@@ -167,7 +97,7 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 * **Shake to Skip:** Accelerometer-based gesture recognition to skip tracks with a single shake.
 * **Discord Mobile Rich Presence:** Gateway WebSocket connection displaying live listening status on Discord mobile profiles.
 * **Local Audio Device Scanner:** Queries MediaStore to scan, import, and play local MP3/FLAC files alongside online streams.
-* **Playlist Editor & Exporter:** Custom cover art image picker, description editor, and bidirectional CSV/M3U/M3U8 playlist imports and exports.
+* **Playlist Editor & Exporter:** Custom cover art image picker, description editor, and bidirectional CSV/M3U8 playlist imports and exports.
 
 ---
 
@@ -302,13 +232,8 @@ Build Output Artifacts:
 
 We stand on the shoulders of giants in the open-source Android audio community:
 * **[LastWave](https://github.com/Specttre404/LastWaveX)** — Original foundational architecture, baseline playback service, and UI inspiration.
-* **[ArchiveTune Nightly](https://github.com/Specttre404/LastWaveX)** — Inspiration for audiophile tuning, clean design language, and transparent security/VirusTotal audit practices.
-* **[VIVI Music](https://github.com/vivi-music/vivi)** — Foundational open-source YouTube Music client architecture, stream resolution patterns, and queue management.
-* **[Media3 ExoPlayer](https://developer.android.com/media/media3)** — Android audio playback foundation.
-* **[LRCLIB](https://lrclib.net)** — Public community synchronized lyrics database.
-* **[SponsorBlock](https://sponsor.ajay.app)** — Community-driven database for skipping non-music segments.
-* **[AudD](https://audd.io)** — Music recognition infrastructure.
-* **[Last.fm](https://last.fm)** — Metadata search and scrobbling protocol.
+* **[ArchiveTune Nightly](https://github.com/ArchiveTune)** — Inspiration for audiophile tuning, clean design language, and transparent security/VirusTotal audit practices.
+* **[VIVI Music](https://github.com/vivi-music/vivi)** — Foundational open-source music client architecture, stream resolution patterns, and queue management.
 
 ---
 

@@ -1421,7 +1421,7 @@ fun SettingsScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_about))
-                    SettingsGroup(rowCount = 3) { index, position ->
+                    SettingsGroup(rowCount = 4) { index, position ->
                         when (index) {
                             0 -> SettingsActionCard(
                                 icon = Icons.Filled.Refresh,
@@ -1457,6 +1457,20 @@ fun SettingsScreen(
                                 position = position,
                             )
                             2 -> SettingsActionCard(
+                                icon = Icons.AutoMirrored.Filled.Send,
+                                iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
+                                iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                title = "Developer & Community (@Ishan____404)",
+                                subtitle = "Follow updates and connect on X (Twitter)",
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://x.com/Ishan____404"))
+                                    if (!startActivitySafely(context, intent)) {
+                                        viewModel.showToast("No browser is available")
+                                    }
+                                },
+                                position = position,
+                            )
+                            3 -> SettingsActionCard(
                                 icon = Icons.Filled.Code,
                                 iconContainer = MaterialTheme.colorScheme.secondaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -3117,6 +3131,7 @@ private fun ColorTile(
 
 @Composable
 private fun AboutCard(versionName: String) {
+    val context = LocalContext.current
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -3130,27 +3145,18 @@ private fun AboutCard(versionName: String) {
                 Modifier
                     .size(72.dp)
                     .clip(CircleShape)
-                    // The launcher icon is an <adaptive-icon> XML on API 26+
-                    // (mipmap-anydpi-v26/ic_launcher_round.xml) — Compose's
-                    // painterResource() can only parse plain bitmap/vector
-                    // drawables, not that root element, and throws the
-                    // instant this composable enters composition. Rebuilding
-                    // the same mark from its two real layers (the lime
-                    // background color + the bars vector, both plain
-                    // resources) reproduces it exactly without touching the
-                    // adaptive icon resource at all.
                     .background(colorResource(R.color.ic_launcher_background)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_launcher_logo),
-                    contentDescription = "LastWave",
+                    contentDescription = "LastWaveX",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(72.dp),
                 )
             }
             Spacer(Modifier.height(14.dp))
-            Text("LASTWAVEX", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text("LastWaveX", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             Surface(
                 shape = ExpressivePillShape,
@@ -3164,9 +3170,19 @@ private fun AboutCard(versionName: String) {
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                 )
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(14.dp))
+            OutlinedButton(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://x.com/Ishan____404"))
+                    startActivitySafely(context, intent)
+                },
+                shape = ExpressivePillShape,
+            ) {
+                Text("@Ishan____404 on X (Twitter)", style = MaterialTheme.typography.labelMedium)
+            }
+            Spacer(Modifier.height(8.dp))
             Text(
-                "LASTWAVEX",
+                "High-Fidelity Audiophile Player for Android",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
