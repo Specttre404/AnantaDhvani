@@ -32,7 +32,7 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 
 ---
 
-## 🚀 Major Release Highlights: v1.2.1 Audiophile Studio Edition
+## 🚀 Major Release Highlights: v1.0.0 Audiophile Studio Edition
 
 * **31-Band Studio Graphic Equalizer:** Full professional ISO 1/3-octave center frequencies (20 Hz to 20 kHz) with ±12.0 dB range and 0.1 dB precision.
 * **Master Preamp Gain Staging:** Dedicated -10.0 dB to +10.0 dB master preamp control to prevent digital clipping when boosting equalizer bands.
