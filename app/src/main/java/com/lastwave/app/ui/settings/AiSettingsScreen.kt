@@ -67,7 +67,7 @@ import com.lastwave.app.ui.player.LocalMiniPlayerScrollClearance
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AiSettingsScreen(
-    onBack: () -> Unit,
+    onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     viewModel: AiSettingsViewModel = hiltViewModel(),
 ) {
@@ -77,28 +77,30 @@ fun AiSettingsScreen(
     var apiKeyInput by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+    Surface(
         modifier = modifier.fillMaxSize(),
-    ) { paddingValues ->
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .adaptiveContentWidth(maxWidth = 860.dp),
         ) {
-        ExpressiveHeader(title = "LASTWAVEX AI Assistant", onBack = onBack)
+            if (onBack != null) {
+                ExpressiveHeader(title = "LastWaveX AI Assistant", onBack = onBack)
+            }
 
-        LazyColumn(
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 8.dp,
-                bottom = 32.dp + LocalMiniPlayerScrollClearance.current,
-            ),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize().safeHorizontalContentPadding(),
-        ) {
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 8.dp,
+                    bottom = 32.dp + LocalMiniPlayerScrollClearance.current,
+                ),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize().safeHorizontalContentPadding(),
+            ) {
             // Master Toggle Card
             item {
                 Surface(

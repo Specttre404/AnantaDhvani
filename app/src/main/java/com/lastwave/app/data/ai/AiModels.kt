@@ -17,6 +17,11 @@ enum class AiProviderType(val displayName: String, val defaultModel: String, val
     val isByok: Boolean get() = this != FREE_FIREBASE_GEMINI
 }
 
+object AiSupportedModels {
+    val GEMINI_MODELS = listOf("gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash", "gemini-2.0-flash-thinking-exp")
+    val OPENAI_MODELS = listOf("gpt-4o", "gpt-4o-mini", "o3-mini")
+}
+
 enum class AiUserProfile(val displayName: String, val description: String) {
     BEGINNER("Beginner", "Simple analogies and everyday language. Avoids technical jargon."),
     CASUAL("Casual", "Friendly, clear explanations with practical tips."),

@@ -216,16 +216,29 @@
         </receiver>
 
         <receiver
-            android:name=".widget.MusicCompactWidgetProvider"
+            android:name=".widget.MusicCanaryWidgetProvider"
             android:exported="true"
-            android:label="LastWaveX Music Widget (Compact Pill)">
+            android:label="ArchiveTune Canary Pill Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.lastwave.app.widget.UPDATE_COMPACT_WIDGET" />
+                <action android:name="com.lastwave.app.widget.UPDATE_CANARY_WIDGET" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/app_widget_compact_info" />
+                android:resource="@xml/app_widget_canary_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.MusicStableWidgetProvider"
+            android:exported="true"
+            android:label="ArchiveTune Stable Card Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.lastwave.app.widget.UPDATE_STABLE_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_stable_info" />
         </receiver>
 
         <!-- Retained for the Playlist module's M3U export (SAF/legacy write) -->

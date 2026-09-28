@@ -808,6 +808,8 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         broadcastLegacyState(state)
         com.lastwave.app.widget.MusicWidgetProvider.updateWidget(this@MusicPlaybackService, state)
         com.lastwave.app.widget.MusicCompactWidgetProvider.updateWidget(this@MusicPlaybackService, state)
+        com.lastwave.app.widget.MusicCanaryWidgetProvider.updateWidget(this@MusicPlaybackService, state)
+        com.lastwave.app.widget.MusicStableWidgetProvider.updateWidget(this@MusicPlaybackService, state)
         val session = mediaSession ?: return
         publishSessionQueue(session, state)
         val signature = buildString {

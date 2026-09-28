@@ -117,7 +117,7 @@ fun LastWaveAiSheet(
                     Spacer(Modifier.width(10.dp))
                     Column {
                         Text(
-                            "LASTWAVEX AI Assistant",
+                            "LastWaveX AI Assistant",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                         )
@@ -187,7 +187,7 @@ fun LastWaveAiSheet(
                                     CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
                                     Spacer(Modifier.width(8.dp))
                                     Text(
-                                        "LASTWAVEX AI is thinking...",
+                                        "LastWaveX AI is thinking...",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary,
@@ -251,7 +251,7 @@ fun LastWaveAiSheet(
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    placeholder = { Text("Ask LASTWAVEX AI...") },
+                    placeholder = { Text("Ask LastWaveX AI...") },
                     singleLine = false,
                     maxLines = 3,
                     shape = RoundedCornerShape(24.dp),

@@ -21,6 +21,11 @@ class FreeGeminiProvider @Inject constructor(
         userPrompt: String,
         fallbackApiKey: String = "",
     ): Flow<AiResult> = flow {
+        if (fallbackApiKey.isNotBlank()) {
+            geminiByokProvider.generateStream(fallbackApiKey, modelName, systemPrompt, userPrompt).collect { emit(it) }
+            return@flow
+        }
+
         var didEmitSuccess = false
         runCatching {
             val generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI())
@@ -41,10 +46,8 @@ class FreeGeminiProvider @Inject constructor(
 
             if (fullText.isNotEmpty()) {
                 emit(AiResult.Success(fullText.toString()))
-            } else if (!didEmitSuccess && fallbackApiKey.isNotBlank()) {
-                geminiByokProvider.generateStream(fallbackApiKey, modelName, systemPrompt, userPrompt).collect { emit(it) }
             } else {
-                emit(AiResult.Error("Free AI provider returned an empty response."))
+                emit(AiResult.Error("Default Firebase key expired. Please enter your free Gemini API key in Settings → AI to continue."))
             }
         }.getOrElse { e ->
             if (!didEmitSuccess && fallbackApiKey.isNotBlank()) {
@@ -52,10 +55,15 @@ class FreeGeminiProvider @Inject constructor(
             } else {
                 val msg = e.localizedMessage ?: "Free AI Provider Error"
                 when {
+                    msg.contains("API key expired", ignoreCase = true) ||
+                    msg.contains("API_KEY_EXPIRED", ignoreCase = true) ||
+                    msg.contains("AppCheck", ignoreCase = true) ||
+                    msg.contains("expired", ignoreCase = true) -> {
+                        emit(AiResult.Error("Default Firebase key expired. Please enter your free Gemini API key in Settings → AI to continue."))
+                    }
                     msg.contains("429", ignoreCase = true) || msg.contains("quota", ignoreCase = true) -> emit(AiResult.RateLimited)
-                    msg.contains("AppCheck", ignoreCase = true) -> emit(AiResult.AppCheckFailure("Firebase AppCheck required. Switch to BYOK in Settings -> AI to enter your own free Gemini API key."))
                     msg.contains("safety", ignoreCase = true) || msg.contains("blocked", ignoreCase = true) -> emit(AiResult.SafetyRefusal)
-                    else -> emit(AiResult.Error(msg))
+                    else -> emit(AiResult.Error("Default Firebase key expired. Please enter your free Gemini API key in Settings → AI to continue."))
                 }
             }
         }

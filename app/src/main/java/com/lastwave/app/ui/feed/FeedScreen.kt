@@ -209,9 +209,9 @@ fun FeedScreen(
                 .adaptiveContentWidth(maxWidth = 920.dp),
         ) {
             ExpressiveHeader(
-                title = "LASTWAVEX",
+                title = "LastWaveX",
                 actions = {
-                    HeaderActionIcon(Icons.Filled.AutoAwesome, "LASTWAVEX AI", { showAiSheet = true })
+                    HeaderActionIcon(Icons.Filled.AutoAwesome, "LastWaveX AI", { showAiSheet = true })
                     HeaderActionIcon(Icons.Filled.TrendingUp, "Charts & Rankings", onOpenCharts)
                     HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
                     HeaderActionIcon(Icons.Filled.Search, "Search", onOpenSearch)
@@ -756,10 +756,13 @@ private fun InfiniteRadioHero(
                                 modifier = Modifier.size(12.dp),
                             )
                             Text(
-                                "LASTWAVEX INSTANT RADIO",
+                                "LastWaveX Instant Radio",
                                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.1.sp),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                softWrap = false,
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }

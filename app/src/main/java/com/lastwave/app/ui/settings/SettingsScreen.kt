@@ -267,6 +267,7 @@ fun SettingsScreen(
     onOpenYouTubeLogin: () -> Unit = {},
     onOpenExternalImport: () -> Unit = {},
     onOpenAiSettings: () -> Unit = {},
+    playerViewModel: com.lastwave.app.ui.player.PlayerViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val session by viewModel.session.collectAsStateWithLifecycle()
@@ -406,16 +407,29 @@ fun SettingsScreen(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
-            LazyColumn(
-                contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
-                    bottom = 32.dp + LocalMiniPlayerScrollClearance.current + safeDrawingBottomPadding()
-                ),
-                verticalArrangement = Arrangement.spacedBy(28.dp),
-                modifier = Modifier.fillMaxSize().safeHorizontalContentPadding(),
-            ) {
+            when (page) {
+                4 -> {
+                    AiSettingsScreen(
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                5 -> {
+                    DiagnosticsScreen(
+                        player = playerViewModel.player,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 32.dp + LocalMiniPlayerScrollClearance.current + safeDrawingBottomPadding()
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(28.dp),
+                        modifier = Modifier.fillMaxSize().safeHorizontalContentPadding(),
+                    ) {
 
 
             if (page == 0) {
@@ -1482,7 +1496,9 @@ fun SettingsScreen(
                 }
             }
         }
+        }
     }
+}
 }
 }
 

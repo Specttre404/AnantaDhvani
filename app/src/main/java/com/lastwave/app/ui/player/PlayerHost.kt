@@ -1589,103 +1589,111 @@ private fun FullPlayer(
                 val bgHeight = constraints.maxHeight.toFloat()
                 val bgMaxDimension = maxOf(bgWidth, bgHeight, 1f)
 
-                Box(Modifier.matchParentSize().liquidGlassSource(playerBackdrop)) {
-            // Apple Music: Full-bleed scaled & deeply blurred artwork
-            BackdropBlur(radius = 36.dp, modifier = Modifier.fillMaxSize()) {
-                PlayerArtwork(
-                    track = track,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = 1.35f
-                            scaleY = 1.35f
-                            alpha = 0.72f
-                        },
-                    corner = 0.dp,
-                    decodeSizePx = 200,
-                )
-            }
+                if (playerBackgroundStyle == com.lastwave.app.data.local.PlayerBackgroundStyle.BLURRED_GLASS) {
+                    Box(Modifier.matchParentSize().liquidGlassSource(playerBackdrop)) {
+                        BackdropBlur(radius = 36.dp, modifier = Modifier.fillMaxSize()) {
+                            PlayerArtwork(
+                                track = track,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer {
+                                        scaleX = 1.35f
+                                        scaleY = 1.35f
+                                        alpha = 0.72f
+                                    },
+                                corner = 0.dp,
+                                decodeSizePx = 200,
+                            )
+                        }
+                    }
+                }
 
-            // Apple Music: Vibrant chromatic ambient mesh blobs
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.radialGradient(
-                            0f to ambientColor.copy(alpha = 0.58f),
-                            0.45f to ambientColor.copy(alpha = 0.22f),
-                            1f to Color.Transparent,
-                            center = androidx.compose.ui.geometry.Offset(
-                                bgWidth * 0.25f,
-                                bgHeight * 0.20f,
-                            ),
-                            radius = bgMaxDimension * 0.85f,
-                        ),
-                    ),
-            )
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.radialGradient(
-                            0f to ambientCompanion.copy(alpha = 0.52f),
-                            0.50f to ambientCompanion.copy(alpha = 0.20f),
-                            1f to Color.Transparent,
-                            center = androidx.compose.ui.geometry.Offset(
-                                bgWidth * 0.88f,
-                                bgHeight * 0.65f,
-                            ),
-                            radius = bgMaxDimension * 0.78f,
-                        ),
-                    ),
-            )
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.radialGradient(
-                            0f to ambientDeep.copy(alpha = 0.42f),
-                            0.55f to ambientDeep.copy(alpha = 0.14f),
-                            1f to Color.Transparent,
-                            center = androidx.compose.ui.geometry.Offset(
-                                bgWidth * 0.15f,
-                                bgHeight * 0.82f,
-                            ),
-                            radius = bgMaxDimension * 0.70f,
-                        ),
-                    ),
-            )
+                val renderMeshBlobs = playerBackgroundStyle != com.lastwave.app.data.local.PlayerBackgroundStyle.AMOLED_BLACK &&
+                        playerBackgroundStyle != com.lastwave.app.data.local.PlayerBackgroundStyle.PRISM_SPECTRUM &&
+                        playerBackgroundStyle != com.lastwave.app.data.local.PlayerBackgroundStyle.DYNAMIC_MONET
 
-            // Apple Music: Contrast scrim gradient (ensures text & controls are clear while preserving vibrant colors)
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0.00f to Color.Black.copy(alpha = 0.35f),
-                            0.28f to Color.Black.copy(alpha = 0.15f),
-                            0.65f to Color.Black.copy(alpha = 0.40f),
-                            1.00f to Color.Black.copy(alpha = 0.72f),
-                        ),
-                    ),
-            )
-            // Subtle edge vignette
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.radialGradient(
-                            0f to Color.Transparent,
-                            0.65f to Color.Transparent,
-                            1f to Color.Black.copy(alpha = 0.30f),
-                            center = androidx.compose.ui.geometry.Offset(
-                                bgWidth * 0.50f,
-                                bgHeight * 0.40f,
+                if (renderMeshBlobs) {
+                    // Apple Music: Vibrant chromatic ambient mesh blobs
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    0f to ambientColor.copy(alpha = 0.58f),
+                                    0.45f to ambientColor.copy(alpha = 0.22f),
+                                    1f to Color.Transparent,
+                                    center = androidx.compose.ui.geometry.Offset(
+                                        bgWidth * 0.25f,
+                                        bgHeight * 0.20f,
+                                    ),
+                                    radius = bgMaxDimension * 0.85f,
+                                ),
                             ),
-                            radius = bgMaxDimension * 0.80f,
-                        ),
-                    ),
-            )
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    0f to ambientCompanion.copy(alpha = 0.52f),
+                                    0.50f to ambientCompanion.copy(alpha = 0.20f),
+                                    1f to Color.Transparent,
+                                    center = androidx.compose.ui.geometry.Offset(
+                                        bgWidth * 0.88f,
+                                        bgHeight * 0.65f,
+                                    ),
+                                    radius = bgMaxDimension * 0.78f,
+                                ),
+                            ),
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    0f to ambientDeep.copy(alpha = 0.42f),
+                                    0.55f to ambientDeep.copy(alpha = 0.14f),
+                                    1f to Color.Transparent,
+                                    center = androidx.compose.ui.geometry.Offset(
+                                        bgWidth * 0.15f,
+                                        bgHeight * 0.82f,
+                                    ),
+                                    radius = bgMaxDimension * 0.70f,
+                                ),
+                            ),
+                    )
+
+                    // Apple Music: Contrast scrim gradient (ensures text & controls are clear while preserving vibrant colors)
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    0.00f to Color.Black.copy(alpha = 0.35f),
+                                    0.28f to Color.Black.copy(alpha = 0.15f),
+                                    0.65f to Color.Black.copy(alpha = 0.40f),
+                                    1.00f to Color.Black.copy(alpha = 0.72f),
+                                ),
+                            ),
+                    )
+                    // Subtle edge vignette
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    0f to Color.Transparent,
+                                    0.65f to Color.Transparent,
+                                    1f to Color.Black.copy(alpha = 0.30f),
+                                    center = androidx.compose.ui.geometry.Offset(
+                                        bgWidth * 0.50f,
+                                        bgHeight * 0.40f,
+                                    ),
+                                    radius = bgMaxDimension * 0.80f,
+                                ),
+                            ),
+                    )
+                }
             }
             Column(
                 Modifier
@@ -1776,6 +1784,7 @@ private fun FullPlayer(
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
+                        Spacer(Modifier.width(12.dp))
                         IconButton(
                             onClick = { showTrackMenu = true },
                             modifier = Modifier
@@ -1911,11 +1920,14 @@ private fun FullPlayer(
                                             label = "artworkPlayingScale",
                                         )
 
+                                        val isVinylMode = playerCoverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL || playerStyle == com.lastwave.app.data.local.PlayerStyle.VINYL_DISC
+                                        val effectiveCoverStyle = if (isVinylMode) com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL else playerCoverStyle
+
                                         Surface(
-                                            shape = RoundedCornerShape(32.dp),
-                                            color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),
-                                            tonalElevation = 6.dp,
-                                            shadowElevation = if (state.isPlaying) 28.dp else 12.dp,
+                                            shape = if (isVinylMode) RoundedCornerShape(0.dp) else RoundedCornerShape(32.dp),
+                                            color = if (isVinylMode) Color.Transparent else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),
+                                            tonalElevation = if (isVinylMode) 0.dp else 6.dp,
+                                            shadowElevation = if (isVinylMode) 0.dp else (if (state.isPlaying) 28.dp else 12.dp),
                                             modifier = Modifier
                                                 .size(artworkSize)
                                                 .graphicsLayer {
@@ -2022,8 +2034,8 @@ private fun FullPlayer(
                                                 PlayerArtwork(
                                                     track = track,
                                                     modifier = Modifier.fillMaxSize(),
-                                                    corner = 32.dp,
-                                                    coverStyle = playerCoverStyle,
+                                                    corner = if (isVinylMode) 0.dp else 32.dp,
+                                                    coverStyle = effectiveCoverStyle,
                                                     isPlaying = state.isPlaying,
                                                 )
 
@@ -2299,7 +2311,9 @@ private fun FullPlayer(
                                     Spacer(Modifier.height(16.dp))
 
                                     // 5. Secondary Satellite Actions Dock
-                                    PlayerUtilityControls(state, player, isTranslucent = false)
+                                    if (playerStyle != com.lastwave.app.data.local.PlayerStyle.MINIMALIST) {
+                                        PlayerUtilityControls(state, player, isTranslucent = false)
+                                    }
                                 }
                         }
                         }
@@ -2365,7 +2379,6 @@ private fun FullPlayer(
                 trackSummary = "'${track.title}' by '${track.artist}'",
             ),
         )
-    }
     }
 }
 
