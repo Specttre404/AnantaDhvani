@@ -806,10 +806,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         // still listen for. Sent even when the OEM media stack is broken
         // (session == null) so the fallback path keeps working.
         broadcastLegacyState(state)
-        com.lastwave.app.widget.MusicWidgetProvider.updateWidget(this@MusicPlaybackService, state)
-        com.lastwave.app.widget.MusicCompactWidgetProvider.updateWidget(this@MusicPlaybackService, state)
-        com.lastwave.app.widget.MusicCanaryWidgetProvider.updateWidget(this@MusicPlaybackService, state)
-        com.lastwave.app.widget.MusicStableWidgetProvider.updateWidget(this@MusicPlaybackService, state)
         val session = mediaSession ?: return
         publishSessionQueue(session, state)
         val signature = buildString {

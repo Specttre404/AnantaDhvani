@@ -1467,7 +1467,6 @@ private fun FullPlayer(
         }
     }
     var showTrackMenu by remember(track.videoId, track.title) { mutableStateOf(false) }
-    var showAiSheet by remember { mutableStateOf(false) }
     var artworkDragX by remember(track.videoId, track.title) { mutableFloatStateOf(0f) }
     var dismissDragY by remember(track.videoId, track.title) { mutableFloatStateOf(0f) }
     var isDismissDragging by remember { mutableStateOf(false) }
@@ -1766,25 +1765,6 @@ private fun FullPlayer(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        IconButton(
-                            onClick = { showAiSheet = true },
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .liquidGlassChrome(CircleShape, LocalLiquidGlass.current, LiquidGlassPreset.FloatingControls)
-                                .background(
-                                    liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
-                                ),
-                        ) {
-                            Icon(
-                                Icons.Filled.SmartToy,
-                                "AI Assistant",
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
                         IconButton(
                             onClick = { showTrackMenu = true },
                             modifier = Modifier
@@ -2368,16 +2348,6 @@ private fun FullPlayer(
             playableTrack = track,
             onDismiss = { showTrackMenu = false },
             onPlayInLastWave = { player.play(track, sourceLabel = state.sourceLabel) },
-        )
-    }
-
-    if (showAiSheet) {
-        com.lastwave.app.ui.ai.LastWaveAiSheet(
-            onDismiss = { showAiSheet = false },
-            initialContext = com.lastwave.app.data.ai.AiContextInfo(
-                currentScreen = "Player",
-                trackSummary = "'${track.title}' by '${track.artist}'",
-            ),
         )
     }
 }

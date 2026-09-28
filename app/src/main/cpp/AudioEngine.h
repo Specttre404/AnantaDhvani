@@ -61,7 +61,7 @@ public:
     // actually bypass. Lets the signal-path verdict distinguish
     // bitPerfectRequested from bitPerfectActuallyActive.
     [[nodiscard]] bool isBitPerfect() const noexcept;
-    void setEqualizer(bool enabled, const float* gainsDb, std::size_t gainCount) noexcept;
+    void setEqualizer(bool enabled, float preampDb, const float* gainsDb, std::size_t gainCount) noexcept;
 
     [[nodiscard]] bool configureMediaProcessor(
         std::int32_t inputSampleRate,

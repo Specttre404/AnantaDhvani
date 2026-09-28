@@ -22,13 +22,11 @@ sealed class Screen(val route: String) {
     data object Genres : Screen("genres")
     data object Search : Screen("search")
     object Settings : Screen("settings") {
-        data object AiAssistant : Screen("settings/ai_assistant")
         data object Diagnostics : Screen("settings/diagnostics")
     }
     data object ScrobblerApps : Screen("scrobbler_apps")
     data object Friends : Screen("friends")
     data object Downloads : Screen("downloads")
-    data object AiSettings : Screen("ai_settings")
     data object ProviderModules : Screen("provider_modules")
     data object HomeSections : Screen("home_sections")
     data object ExcludedSongs : Screen("excluded_songs")

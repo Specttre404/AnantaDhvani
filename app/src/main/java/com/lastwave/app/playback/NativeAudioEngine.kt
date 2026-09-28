@@ -58,7 +58,7 @@ class NativeAudioEngine @Inject constructor(
             }
             applicationScope.launch(Dispatchers.Default) {
                 equalizerPreferences.settings.collect { settings ->
-                    setEqualizer(settings.enabled, settings.gainsDb.toFloatArray())
+                    setEqualizer(settings.enabled, settings.preampDb, settings.gainsDb.toFloatArray())
                 }
             }
         }
@@ -112,13 +112,14 @@ class NativeAudioEngine @Inject constructor(
         withHandle(false, ::nativeIsBitPerfect)
 
     /** Updates the native 15-band EQ; its gains are smoothed in C++. */
-    fun setEqualizer(enabled: Boolean, gainsDb: FloatArray) {
+    fun setEqualizer(enabled: Boolean, preampDb: Float, gainsDb: FloatArray) {
         require(gainsDb.size == EQUALIZER_BAND_COUNT) { "Expected 15 equalizer bands" }
+        val safePreamp = if (preampDb.isFinite()) preampDb.coerceIn(-10f, 10f) else 0f
         val safeGains = FloatArray(gainsDb.size) { index ->
             val gain = gainsDb[index]
             if (gain.isFinite()) gain.coerceIn(-EQ_MAX_GAIN_DB, EQ_MAX_GAIN_DB) else 0f
         }
-        withHandle(Unit) { nativeSetEqualizer(it, enabled, safeGains) }
+        withHandle(Unit) { nativeSetEqualizer(it, enabled, safePreamp, safeGains) }
     }
 
     internal fun configureMediaProcessor(
@@ -319,7 +320,7 @@ class NativeAudioEngine @Inject constructor(
     private external fun nativeSetStudioMasterClarity(handle: Long, enabled: Boolean)
     private external fun nativeSetBitPerfect(handle: Long, enabled: Boolean)
     private external fun nativeIsBitPerfect(handle: Long): Boolean
-    private external fun nativeSetEqualizer(handle: Long, enabled: Boolean, gainsDb: FloatArray)
+    private external fun nativeSetEqualizer(handle: Long, enabled: Boolean, preampDb: Float, gainsDb: FloatArray)
     private external fun nativeConfigureMediaProcessor(
         handle: Long,
         inputSampleRate: Int,

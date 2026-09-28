@@ -266,7 +266,6 @@ fun SettingsScreen(
     onOpenYouTubeImport: () -> Unit = {},
     onOpenYouTubeLogin: () -> Unit = {},
     onOpenExternalImport: () -> Unit = {},
-    onOpenAiSettings: () -> Unit = {},
     playerViewModel: com.lastwave.app.ui.player.PlayerViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -373,7 +372,7 @@ fun SettingsScreen(
         ) {
         ExpressiveHeader(title = stringResource(R.string.settings), onBack = onBack)
 
-        val categoryTitles = listOf("Everyday", "Audio & Engine", "Integrations", "Personalization", "AI Assistant", "Diagnostics")
+        val categoryTitles = listOf("Everyday", "Audio & Engine", "Integrations", "Personalization", "Diagnostics")
         val pagerState = rememberPagerState(pageCount = { categoryTitles.size })
         val scope = rememberCoroutineScope()
 
@@ -409,11 +408,6 @@ fun SettingsScreen(
         ) { page ->
             when (page) {
                 4 -> {
-                    AiSettingsScreen(
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-                5 -> {
                     DiagnosticsScreen(
                         player = playerViewModel.player,
                         modifier = Modifier.fillMaxSize(),
@@ -459,23 +453,6 @@ fun SettingsScreen(
                             }
                         },
                     )
-                }
-            }
-
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SectionLabel("LASTWAVEX AI Assistant")
-                    SettingsGroup(rowCount = 1) { _, position ->
-                        SettingsActionCard(
-                            icon = Icons.Filled.AutoAwesome,
-                            iconContainer = MaterialTheme.colorScheme.primaryContainer,
-                            iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            title = "LASTWAVEX AI Settings & Assistant",
-                            subtitle = "Configure Free / BYOK modes, expertise level & credentials",
-                            onClick = onOpenAiSettings,
-                            position = position,
-                        )
-                    }
                 }
             }
 
@@ -1681,6 +1658,8 @@ fun SettingsScreen(
             onPickPreset = viewModel::applyEqPreset,
             onBandPreview = viewModel::previewEqBandGain,
             onBandChange = viewModel::setEqBandGain,
+            onPreampPreview = viewModel::previewPreampDb,
+            onPreampChange = viewModel::setPreampDb,
         )
     }
 
@@ -3426,6 +3405,8 @@ private fun EqualizerSheet(
     onPickPreset: (String) -> Unit,
     onBandPreview: (Int, Float) -> Unit,
     onBandChange: (Int, Float) -> Unit,
+    onPreampPreview: (Float) -> Unit,
+    onPreampChange: (Float) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
@@ -3439,6 +3420,10 @@ private fun EqualizerSheet(
                     ?: 0f
             },
         )
+    }
+
+    var preampDb by androidx.compose.runtime.remember(eq.preampDb) {
+        androidx.compose.runtime.mutableFloatStateOf(eq.preampDb.coerceIn(-10f, 10f))
     }
 
     ModalBottomSheet(
@@ -3543,6 +3528,53 @@ private fun EqualizerSheet(
                             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                             onSetEnabled(enabled)
                         },
+                    )
+                }
+            }
+
+            // Preamp Gain Slider (-10 dB to +10 dB)
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                tonalElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp).fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Preamp Gain", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                            Text("Master gain staging to prevent clipping", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                        ) {
+                            Text(
+                                text = if (preampDb > 0f) "+${"%.1f".format(preampDb)} dB" else "${"%.1f".format(preampDb)} dB",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            )
+                        }
+                    }
+                    Slider(
+                        value = preampDb,
+                        onValueChange = { value ->
+                            preampDb = value
+                            onPreampPreview(value)
+                        },
+                        valueRange = -10f..10f,
+                        enabled = eq.enabled,
+                        modifier = Modifier.fillMaxWidth(),
+                        onValueChangeFinished = { onPreampChange(preampDb) },
                     )
                 }
             }

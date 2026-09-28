@@ -22,6 +22,7 @@ public:
     void setPeakProtectionEnabled(bool enabled) noexcept;
     void setEqualizer(
         bool enabled,
+        float preampDb,
         const float* gainsDb,
         std::size_t gainCount) noexcept;
     void process(
@@ -128,6 +129,7 @@ private:
     std::atomic<bool> bitPerfectEnabled_{false};
     std::atomic<bool> peakProtectionEnabled_{false};
     std::atomic<bool> targetEqualizerEnabled_{false};
+    std::atomic<float> targetPreampDb_{0.0F};
     std::atomic<std::uint32_t> targetEqualizerRevision_{0};
     std::array<std::atomic<float>, kEqualizerBandCount> targetEqGainsDb_{};
     std::array<float, kEqualizerBandCount> currentEqGainsDb_{};

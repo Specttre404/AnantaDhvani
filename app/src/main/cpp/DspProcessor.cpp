@@ -146,16 +146,18 @@ void DspProcessor::setPeakProtectionEnabled(bool enabled) noexcept {
 
 void DspProcessor::setEqualizer(
     bool enabled,
+    float preampDb,
     const float* gainsDb,
     std::size_t gainCount) noexcept {
     if (gainsDb != nullptr && gainCount == kEqualizerBandCount) {
         for (std::size_t band = 0; band < kEqualizerBandCount; ++band) {
             const float safeGain = std::isfinite(gainsDb[band]) ? gainsDb[band] : 0.0F;
             targetEqGainsDb_[band].store(
-                std::clamp(safeGain, -8.0F, 8.0F),
+                std::clamp(safeGain, -12.0F, 12.0F),
                 std::memory_order_release);
         }
     }
+    targetPreampDb_.store(std::clamp(preampDb, -10.0F, 10.0F), std::memory_order_release);
     targetEqualizerEnabled_.store(enabled, std::memory_order_release);
     targetEqualizerRevision_.fetch_add(1, std::memory_order_release);
 }
@@ -273,11 +275,12 @@ void DspProcessor::process(
             } else {
                 equalizerHeadroomCountdown_ -= kEqCoefficientIntervalFrames;
             }
+            const float userPreamp = targetPreampDb_.load(std::memory_order_acquire);
             const float targetPreampDb = activeEqualizerBands_ != 0U
-                ? -std::max(
+                ? userPreamp - std::max(
                     0.0F,
                     equalizerMaximumBoostDb_ - kEqualizerPreLimiterBoostDb)
-                : 0.0F;
+                : userPreamp;
             const float preampDelta = targetPreampDb - currentPreampDb_;
             // pow() is relatively expensive on 32-bit ARM. Once the smooth
             // transition has converged, retain the exact gain instead of

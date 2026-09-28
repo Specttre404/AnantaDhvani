@@ -413,7 +413,6 @@ fun LastWaveNavHost(
                     onOpenExcludedSongs = { navController.navigate(Screen.ExcludedSongs.route) },
                     onOpenYouTubeImport = { navController.navigate(Screen.YouTubeImport.route) },
                     onOpenYouTubeLogin = { navController.navigate(Screen.YouTubeLogin.route) },
-                    onOpenAiSettings = { navController.navigate(Screen.AiSettings.route) },
                     onOpenExternalImport = { navController.navigate(Screen.ExternalPlaylistImport.route) },
                 )
             }
@@ -477,22 +476,6 @@ fun LastWaveNavHost(
         composable(Screen.ScrobblerApps.route) {
             PredictiveBackScreen(onBack = { navController.popBackStack() }) {
                 com.lastwave.app.ui.settings.ScrobblerAppsScreen(onBack = { navController.popBackStack() })
-            }
-        }
-
-        composable(Screen.AiSettings.route) {
-            PredictiveBackScreen(onBack = { navController.popBackStack() }) {
-                com.lastwave.app.ui.settings.AiSettingsScreen(onBack = { navController.popBackStack() })
-            }
-        }
-
-        composable(Screen.Settings.AiAssistant.route) {
-            val settingsViewModel: com.lastwave.app.ui.settings.SettingsViewModel = hiltViewModel()
-            PredictiveBackScreen(onBack = { navController.popBackStack() }) {
-                com.lastwave.app.ui.settings.AiAssistantSettingsScreen(
-                    viewModel = settingsViewModel,
-                    onBackClick = { navController.popBackStack() },
-                )
             }
         }
 

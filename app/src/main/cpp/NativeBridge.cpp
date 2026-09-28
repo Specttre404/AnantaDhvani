@@ -150,6 +150,7 @@ Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetEqualizer(
     jobject,
     jlong handle,
     jboolean enabled,
+    jfloat preampDb,
     jfloatArray gainsDb) {
     auto* engine = fromHandle(handle);
     if (engine == nullptr || gainsDb == nullptr ||
@@ -160,7 +161,7 @@ Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetEqualizer(
     std::array<float, lastwave::audio::DspProcessor::kEqualizerBandCount> gains{};
     env->GetFloatArrayRegion(gainsDb, 0, static_cast<jsize>(gains.size()), gains.data());
     if (env->ExceptionCheck()) return;
-    engine->setEqualizer(enabled == JNI_TRUE, gains.data(), gains.size());
+    engine->setEqualizer(enabled == JNI_TRUE, preampDb, gains.data(), gains.size());
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

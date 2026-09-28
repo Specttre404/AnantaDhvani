@@ -163,8 +163,9 @@ class SettingsViewModel @Inject constructor(
     val equalizer: StateFlow<EqualizerSettings> = equalizerPreferences.settings
         .withSettingsFallback("equalizer preferences", EqualizerSettings())
         .stateIn(viewModelScope, SettingsSharing, EqualizerSettings())
-    private var immediateEqGains = EqualizerSettings().gainsDb.toFloatArray()
     private var immediateEqEnabled = false
+    private var immediatePreampDb = 0f
+    private var immediateEqGains = EqualizerSettings().gainsDb.toFloatArray()
 
     val downloadCount: StateFlow<Int> = downloadedTrackDao.count()
         .withSettingsFallback("download count", 0)
@@ -200,16 +201,16 @@ class SettingsViewModel @Inject constructor(
             }
         }
 
-    private val eqPreviews = Channel<Pair<Boolean, FloatArray>>(Channel.CONFLATED)
+    private val eqPreviews = Channel<Triple<Boolean, Float, FloatArray>>(Channel.CONFLATED)
 
     private suspend fun applyNativeAudio(block: (NativeAudioEngine) -> Unit) =
         withContext(Dispatchers.Default) { block(audioEngine.get()) }
 
     init {
         viewModelScope.launch {
-            for ((enabled, gains) in eqPreviews) {
+            for ((enabled, preamp, gains) in eqPreviews) {
                 try {
-                    applyNativeAudio { it.setEqualizer(enabled, gains) }
+                    applyNativeAudio { it.setEqualizer(enabled, preamp, gains) }
                 } catch (error: CancellationException) {
                     throw error
                 } catch (error: Exception) {
@@ -224,6 +225,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             equalizer.collect {
                 immediateEqEnabled = it.enabled
+                immediatePreampDb = it.preampDb
                 immediateEqGains = it.gainsDb.toFloatArray()
             }
         }
@@ -509,8 +511,21 @@ class SettingsViewModel @Inject constructor(
 
     fun setEqualizerEnabled(enabled: Boolean) {
         immediateEqEnabled = enabled
-        eqPreviews.trySend(enabled to immediateEqGains.copyOf())
+        eqPreviews.trySend(Triple(enabled, immediatePreampDb, immediateEqGains.copyOf()))
         launchSettingsAction("update the equalizer") { equalizerPreferences.setEnabled(enabled) }
+    }
+
+    fun setPreampDb(db: Float) {
+        if (!db.isFinite()) return
+        immediatePreampDb = db.coerceIn(-10f, 10f)
+        eqPreviews.trySend(Triple(immediateEqEnabled, immediatePreampDb, immediateEqGains.copyOf()))
+        launchSettingsAction("update the preamp gain") { equalizerPreferences.setPreampDb(db) }
+    }
+
+    fun previewPreampDb(db: Float) {
+        if (!db.isFinite()) return
+        immediatePreampDb = db.coerceIn(-10f, 10f)
+        eqPreviews.trySend(Triple(immediateEqEnabled, immediatePreampDb, immediateEqGains.copyOf()))
     }
 
     /** Selecting a preset also switches the EQ on — an off equalizer with a
@@ -519,7 +534,7 @@ class SettingsViewModel @Inject constructor(
         com.lastwave.app.data.local.EqualizerPresets.byName(name)?.let { preset ->
             immediateEqEnabled = true
             immediateEqGains = preset.gainsDb.toFloatArray()
-            eqPreviews.trySend(true to immediateEqGains.copyOf())
+            eqPreviews.trySend(Triple(true, immediatePreampDb, immediateEqGains.copyOf()))
             launchSettingsAction("apply the equalizer preset") { equalizerPreferences.applyPreset(preset) }
         }
     }
@@ -533,7 +548,7 @@ class SettingsViewModel @Inject constructor(
                 com.lastwave.app.data.local.EQ_MAX_GAIN_DB,
             )
         }
-        eqPreviews.trySend(immediateEqEnabled to immediateEqGains.copyOf())
+        eqPreviews.trySend(Triple(immediateEqEnabled, immediatePreampDb, immediateEqGains.copyOf()))
     }
 
     /** Manual band drag → curve becomes Custom. */

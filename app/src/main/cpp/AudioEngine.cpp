@@ -407,10 +407,11 @@ bool AudioEngine::isBitPerfect() const noexcept {
 
 void AudioEngine::setEqualizer(
     bool enabled,
+    float preampDb,
     const float* gainsDb,
     std::size_t gainCount) noexcept {
-    oboeDsp_.setEqualizer(enabled, gainsDb, gainCount);
-    mediaDsp_.setEqualizer(enabled, gainsDb, gainCount);
+    oboeDsp_.setEqualizer(enabled, preampDb, gainsDb, gainCount);
+    mediaDsp_.setEqualizer(enabled, preampDb, gainsDb, gainCount);
 }
 
 bool AudioEngine::configureMediaProcessor(
