@@ -2,19 +2,22 @@
 
 <img src="docs/assets/logo.svg" alt="LastWaveX Logo" width="128" height="128" />
 
-# LASTWAVEX
+# LastWaveX
 
 **High-Fidelity Online Streaming Music Client & Universal Audiophile Player for Android**  
-*Bit-Perfect USB DAC • Synced Word-by-Word Lyrics • C++ Native DSP • SponsorBlock • Zero Bloat*
+*Bit-Perfect USB DAC • 15-Band Studio Equalizer • Synced Word-by-Word Lyrics • C++ Native DSP • SponsorBlock • Zero Bloat*
 
-[![Build Status](https://img.shields.io/badge/Build-Passing%20(28%2F28%20Tests)-success?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
+[![Build Status](https://img.shields.io/badge/Build-Passing%20(24%2F24%20Tests)-success?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026%2B)-blue?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-purple?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
-[![UI](https://img.shields.io/badge/UI-Jetpack%20Compose%20M3-deepskyblue?style=for-the-badge&logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
+[![Toolkit](https://img.shields.io/badge/Toolkit-Jetpack%20Compose%201.7.5-deepskyblue?style=for-the-badge&logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
+[![Client](https://img.shields.io/badge/Client-YouTube%20Music-red?style=for-the-badge&logo=youtubemusic)](https://music.youtube.com)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20MVVM%20+%20C++%20DSP-yellowgreen?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
+[![Design](https://img.shields.io/badge/Design-Material%203%20Expressive%20+%20LiquidGlass-critical?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
 [![VirusTotal Clean](https://img.shields.io/badge/VirusTotal-Clean%20(0%2F70)-success?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com)
 [![License](https://img.shields.io/badge/License-GPLv3-orange?style=for-the-badge)](LICENSE)
 
-[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [Visual Mockups](#-ui--visual-architecture-mockups) • [Architecture](#-technical-foundation) • [Build from Source](#%EF%B8%8F-building-from-source)
+[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [Visual Mockups](#-priority-ordered-ascii-ui--visual-architecture-mockups) • [Roadmap](#-project-roadmap) • [Build from Source](#%EF%B8%8F-building-from-source)
 
 </div>
 
@@ -23,15 +26,27 @@
 ## 📖 Product Overview & Positioning
 
 > [!IMPORTANT]
-> **LASTWAVEX is a high-fidelity Online Streaming Music Client**, powered by the YouTube Music catalog and Lossless Qobuz/FLAC CDN streams, paired with optional local caching, downloads, and local device audio scanning. It is engineered for audiophiles and power listeners who want cloud streaming flexibility without compression artifacts, advertisement tracking, or proprietary app bloat.
+> **LastWaveX is a high-fidelity Online Streaming Music Client**, powered by the YouTube Music catalog and Lossless Qobuz/FLAC CDN streams, paired with optional local caching, downloads, and local device audio scanning. It is engineered for audiophiles and power listeners who want cloud streaming flexibility without compression artifacts, advertisement tracking, or proprietary app bloat.
 
 Every tier of the audio pipeline—from raw PCM processing in native C++ to millisecond-accurate synchronized karaoke typography—has been built from scratch to eliminate playback lag, audio distortion, and battery drain.
 
 ---
 
-## ⚡ What Makes LASTWAVEX Different?
+## 🚀 Major Release Highlights: v1.2.0 Studio Audio Edition
 
-| Conventional Players | LASTWAVEX |
+* **15-Band Studio Equalizer:** Precision ISO center frequencies (32 Hz to 16 kHz) with ±12.0 dB range and 0.1 dB high-resolution precision.
+* **Master Preamp Gain Staging:** Dedicated -10.0 dB to +10.0 dB master preamp control to prevent digital clipping when boosting equalizer bands.
+* **Real-Time Bézier Frequency Curve:** Smooth interactive Bézier spline curve rendered on a Canvas with dynamic gradient fill reflecting active frequency contours.
+* **17 Comprehensive Studio Presets:** *Flat, Studio Master, Bass Boost, Bass Reducer, Treble Boost, Vocal Enhancer, Acoustic, Rock, Electronic / EDM, Hip-Hop, Classical, Jazz, Metal, Lounge, R&B, Club, Deep House* with a 1-tap reset.
+* **Total Bloat Removal:** 100% excised all AI dependencies and home screen widget background services for an optimized memory footprint and zero background battery drain.
+* **Storage Cache Cleaner & Local Audio Scanner:** Built-in storage manager and MediaStore FLAC/MP3 device music scanner.
+* **VirusTotal 0/70 Clean Security Verification:** Independently verified safe and clean across 70+ security engines.
+
+---
+
+## ⚡ What Makes LastWaveX Different?
+
+| Conventional Players | LastWaveX |
 | :--- | :--- |
 | **Resampled Android Audio** (48 kHz forced mixing) | **Bit-Perfect Direct Passthrough** bypassing Android's mixer for external USB DACs |
 | **Jarring Volume Differences** across tracks | **Hardware Loudness Normalization** (+2 dB target leveling) without clipping |
@@ -42,12 +57,12 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 
 ---
 
-## 🎨 UI & Visual Architecture Mockups
+## 🎨 Priority-Ordered ASCII UI & Visual Architecture Mockups
 
-### 1. Now Playing Player (Rotating Vinyl & Wavy Seekbar)
+### Priority 1: Now Playing Screen (Rotating Vinyl & Wavy Seekbar)
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│  ▼ LASTWAVEX NOW PLAYING                          ⋮  🤖  │
+│  ▼ LASTWAVE X NOW PLAYING                         ⋮      │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │                     .─────────────.                      │
@@ -69,25 +84,27 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 2. Dual Home Screen Widgets (Full 4x2 Card & Compact 4x1 Pill)
+### Priority 2: Studio 15-Band Equalizer & Bézier Frequency Curve
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│  [4x2 Audiophile Card Widget]                            │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ ┌───────┐  Starboy                                 │  │
-│  │ │ ART   │  The Weeknd ft. Daft Punk                │  │
-│  │ │ COVER │  FLAC 24-bit / 96.0 kHz                    │  │
-│  │ └───────┘  ⏮️    PAUSE [ || ]    ⏭️   🔀   🔁       │  │
-│  └────────────────────────────────────────────────────┘  │
+│  🎛️ STUDIO EQUALIZER & SOUND FX                   [✕]  │
+├──────────────────────────────────────────────────────────┤
+│  [ Preset: Studio Master ]                  [ Reset ]    │
+│  Enable Equalizer:                                 [ON]  │
 │                                                          │
-│  [4x1 Compact Pill Widget]                               │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │ (ART)  Starboy — The Weeknd     [ || ]   ⏭️        │  │
-│  └────────────────────────────────────────────────────┘  │
+│  Preamp Gain:  [████████████░░░░░░] +2.4 dB              │
+│                                                          │
+│     +12dB ┌──────────────────────────────────────┐       │
+│      0dB ─┼ - - - - - - - - - - - - - - - - - - -│       │
+│     -12dB └──────────────────────────────────────┘       │
+│           32  64  125  250  500  1K  2K  4K  8K  16K    │
+│                                                          │
+│   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️   🎚️     │
+│  +2.6 +2.8 +2.2 +0.6 -1.8 -2.6 -1.2  0.0 +1.2 +2.4 +3.6 +4.0 +4.2 +4.5 +4.8 │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 3. Synced Word-by-Word Karaoke Lyrics & Quote Generator
+### Priority 3: Synced Word-by-Word Lyrics & Quote Card Generator
 ```text
 ┌──────────────────────────────────────────────────────────┐
 │  WORD SYNC • LRCLIB                        Translate  Phonetic│
@@ -104,7 +121,7 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 4. System Diagnostics & Signal Path Stats for Nerds HUD
+### Priority 4: Real-Time Hardware Signal Path & Diagnostics HUD
 ```text
 ┌──────────────────────────────────────────────────────────┐
 │  ⚙️ SYSTEM & AUDIO DIAGNOSTICS                            │
@@ -125,12 +142,12 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 
 ### 🎛️ Studio-Grade Audio Engine & DSP
 * **Bit-Perfect Mode:** Routes raw bit-exact streams directly to external USB DACs, bypassing the Android system resampler and software EQ.
-* **15-Band Graphic Equalizer:** Precision frequency contouring with instant zero-stutter gain switching.
+* **15-Band Studio Equalizer:** Precision frequency contouring with instant zero-stutter gain switching and preamp gain staging.
 * **Dynamic Bass Boost:** Real-time low-frequency harmonics amplification (25 Hz to 160 Hz) with soft-knee limiting.
 * **Loudness Normalization:** Employs Android's hardware `LoudnessEnhancer` to eliminate sudden volume jumps between tracks.
 * **Configurable Crossfade:** Smooth 1 to 12-second dual-player overlapping transitions.
 * **Skip Silence:** Detects and skips dead air in audio tracks without clipping vocal tails.
-* **Playback Speed & Tempo Control:** 0.5× to 2.0× continuous slider with quick-preset chips (0.5×, 0.75×, 1.0×, 1.25×, 1.5×, 2.0×).
+* **Playback Speed & Tempo Control:** 0.5× to 2.0× continuous slider with quick-preset chips.
 * **Stats for Nerds HUD:** Real-time overlay displaying active audio codec, sample rate, bit depth, channel configuration, and DAC output clock drift.
 
 ### 🎙️ Advanced Lyrics & Card Generator
@@ -142,7 +159,6 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 * **Rotating Vinyl Record Mode:** Transforms standard album covers into a spinning vinyl record with grooved micro-rings and realistic momentum physics.
 * **8 Dynamic Backdrop Engines:** `HDR_VIVID`, `FLUID_GRADIENT`, `DYNAMIC_HARMONY`, `AMBIENT_GLOW`, `DYNAMIC_MONET`, `AMOLED_BLACK`, `BLURRED_GLASS`, and `PRISM_SPECTRUM`.
 * **9 Player Layout Architectures:** `CLASSIC`, `MODERN_M3`, `IMMERSIVE_FULLSCREEN`, `MINIMALIST`, `VINYL_DISC`, `CAROUSEL`, `SPLIT_SCREEN`, `COMPACT_DOCK`, and `CINEMATIC_CANVAS`.
-* **Dual Material 3 Home Screen Widgets:** Full Audiophile Card Widget (4×2) and Compact Pill Widget (4×1).
 
 ### 🧠 Smart Automation & Discovery
 * **In-App Song Recognizer:** Shazam-style audio identifier that captures 5 seconds of ambient sound via `AudioRecord` and identifies the song in real time.
@@ -157,12 +173,12 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 
 ## 🏛️ Technical Foundation
 
-LASTWAVEX is structured under **Clean Architecture** and reactive unidirectional data flow (UDF):
+LastWaveX is structured under **Clean Architecture** and reactive unidirectional data flow (UDF):
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
 │                   Jetpack Compose UI                     │
-│    (Screens • Animated Panels • LiquidGlass • Widgets)   │
+│    (Screens • Animated Panels • LiquidGlass • Sheets)    │
 └────────────────────────────┬─────────────────────────────┘
                              │ StateFlow / Events
 ┌────────────────────────────▼─────────────────────────────┐
@@ -184,19 +200,40 @@ LASTWAVEX is structured under **Clean Architecture** and reactive unidirectional
 * **Audio Stack:** ExoPlayer (Media3), Android AudioTrack, and C++ Oboe DSP bridge.
 * **Persistence:** Android Jetpack DataStore (Preferences) and Room Database with SQLite.
 * **Networking & Concurrency:** OkHttp 4.12, Retrofit 2, Kotlin Coroutines, and `StateFlow`.
-* **Image Loading:** Coil with asynchronous bitmap preloading for widgets and card exporters.
-* **Test Suite:** 28 Unit Tests verifying DSP math, offline LRC parsing, and mock streams with 0 skips and 0 failures.
+* **Image Loading:** Coil with asynchronous bitmap preloading for card exporters.
+* **Test Suite:** 24 Unit Tests verifying DSP math, offline LRC parsing, and mock streams with 0 skips and 0 failures.
+
+---
+
+## 🗺️ Project Roadmap
+
+### ✅ Completed
+* 15-Band Studio Equalizer (32 Hz – 16 kHz with 0.1 dB precision)
+* Master Preamp Gain Staging (-10 dB to +10 dB)
+* Real-time Bézier frequency curve canvas visualizer
+* MediaStore Local Audio Scanner (FLAC/MP3 import)
+* Storage Cache Cleaner & Storage Manager
+* VirusTotal 0/70 Clean security verification
+* Total AI & Home Widget Purge for lower memory footprint
+
+### 🔄 In Progress
+* ReplayGain 2.0 automated track-level normalization
+* Sleep timer volume curve customization (logarithmic fade-out)
+
+### 📋 Planned
+* Android Auto standalone car dashboard interface
+* Custom user EQ preset export/import (JSON format)
 
 ---
 
 ## 🛡️ Security & Safety Verification (VirusTotal Clean)
 
-LASTWAVEX is 100% Free and Open-Source Software (GPLv3). We prioritize user safety, auditability, and transparency:
+LastWaveX is 100% Free and Open-Source Software (GPLv3). We prioritize user safety, auditability, and transparency:
 
 * **VirusTotal Scanned:** Every compiled release APK (`app-release.apk`) is independently audited across 70+ leading antivirus and security engines (Kaspersky, Avast, BitDefender, Google Play Protect, Microsoft Defender, etc.) with **0/70 detections (Clean / Safe)**.
 * **Zero Telemetry & Spyware:** No commercial tracking SDKs, no Google AdMob, no behavioral analytics, and zero background data collection. All network requests query public endpoints directly without intermediate proxy servers.
 * **Hardware-Backed Keystore:** External credentials (e.g., Discord Gateway tokens, Last.fm sessions) are encrypted locally using Android Keystore AES-256-GCM. Plaintext tokens are never logged or stored in plain preferences.
-* **Self-Signed APK Notice (Google Play Protect):** Because LASTWAVEX is distributed directly via GitHub and signed with our open-source release key rather than distributed through Google Play Store, Android may display an "Unknown Developer" prompt during sideloading. You can verify the integrity of the downloaded APK by matching its SHA-256 checksum or submitting it to VirusTotal.
+* **Self-Signed APK Notice (Google Play Protect):** Because LastWaveX is distributed directly via GitHub and signed with our open-source release key rather than distributed through Google Play Store, Android may display an "Unknown Developer" prompt during sideloading. You can verify the integrity of the downloaded APK by matching its SHA-256 checksum or submitting it to VirusTotal.
 
 ### Verify Checksum Independently:
 ```bash
@@ -211,8 +248,8 @@ sha256sum app-release.apk
 
 ## 🚫 Features We Intentionally Do Not Pursue
 
-To keep LASTWAVEX fast, focused, and battery-efficient, the following items are permanently excluded:
-1. **Podcasts and Audiobooks:** LASTWAVEX is built exclusively for music.
+To keep LastWaveX fast, focused, and battery-efficient, the following items are permanently excluded:
+1. **Podcasts and Audiobooks:** LastWaveX is built exclusively for music.
 2. **TikTok-style Short Video Feeds:** No algorithmic video feeds or endless vertical carousels.
 3. **Advertisements & Trackers:** No Google AdMob, Facebook Analytics, or third-party tracking beacons.
 4. **Cloud Account Lock-in:** No proprietary cloud logins; your data, playlists, and cached tracks stay on your device.
@@ -245,7 +282,7 @@ To keep LASTWAVEX fast, focused, and battery-efficient, the following items are 
 git clone https://github.com/Specttre404/LastWaveX.git
 cd LastWaveX
 
-# Run the 100% offline unit test suite (28 tests)
+# Run the 100% offline unit test suite (24 tests)
 ./gradlew testDebugUnitTest
 
 # Compile and package the debug APK
@@ -261,22 +298,26 @@ Build Output Artifacts:
 
 ---
 
-## 📜 Credits & Acknowledgments
+## 📜 Credits & Upstream Acknowledgments
 
-- **[Media3 ExoPlayer](https://developer.android.com/media/media3)** — Android audio playback foundation.
-- **[LRCLIB](https://lrclib.net)** — Public community synchronized lyrics database.
-- **[SponsorBlock](https://sponsor.ajay.app)** — Community-driven database for skipping non-music segments.
-- **[AudD](https://audd.io)** — Music recognition infrastructure.
-- **[Last.fm](https://last.fm)** — Metadata search and scrobbling protocol.
+We stand on the shoulders of giants in the open-source Android audio community:
+* **[LastWave](https://github.com/Specttre404/LastWaveX)** — Original foundational architecture, baseline playback service, and UI inspiration.
+* **[ArchiveTune](https://github.com/Specttre404/LastWaveX)** — Inspiration for audiophile tuning, clean design language, and transparent security/VirusTotal audit practices.
+* **[ViMusic](https://github.com/vimusic/vimusic) / [VIVI Music](https://github.com/vivi-music/vivi)** — Foundational open-source YouTube Music client architecture, stream resolution patterns, and queue management.
+* **[Media3 ExoPlayer](https://developer.android.com/media/media3)** — Android audio playback foundation.
+* **[LRCLIB](https://lrclib.net)** — Public community synchronized lyrics database.
+* **[SponsorBlock](https://sponsor.ajay.app)** — Community-driven database for skipping non-music segments.
+* **[AudD](https://audd.io)** — Music recognition infrastructure.
+* **[Last.fm](https://last.fm)** — Metadata search and scrobbling protocol.
 
 ---
 
 ## ⚖️ Disclaimer & License
 
-LASTWAVEX is developed for educational, private, and research purposes. All music streaming content is accessed via publicly available network interfaces. All trademarks, track names, artist identities, and album covers belong to their respective copyright holders.
+LastWaveX is developed for educational, private, and research purposes. All music streaming content is accessed via publicly available network interfaces. All trademarks, track names, artist identities, and album covers belong to their respective copyright holders.
 
 Distributed under the **GNU General Public License v3.0 (GPLv3)**. See [`LICENSE`](LICENSE) for complete terms.
 
 <div align="center">
-  <p><b>LASTWAVEX</b> — Free &amp; Open Source Software for Android</p>
+  <p><b>LastWaveX</b> — Free &amp; Open Source Software for Android</p>
 </div>
