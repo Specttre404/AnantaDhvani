@@ -4,7 +4,7 @@
 
 # LastWaveX
 
-**High-Fidelity Online Streaming Music Client & Universal Audiophile Player for Android**  
+**Next-Gen YouTube Music Client with Algorithmic Smart Playlist Generator, Real-Time Synced Lyrics & Universal Last.fm Scrobbler for Android**  
 *Bit-Perfect USB DAC • 15-Band Studio Equalizer • Synced Word-by-Word Lyrics • C++ Native DSP • SponsorBlock • Zero Bloat*
 
 [![Build Status](https://img.shields.io/badge/Build-Passing%20(24%2F24%20Tests)-success?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
@@ -14,10 +14,10 @@
 [![Client](https://img.shields.io/badge/Client-YouTube%20Music-red?style=for-the-badge&logo=youtubemusic)](https://music.youtube.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20MVVM%20+%20C++%20DSP-yellowgreen?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
 [![Design](https://img.shields.io/badge/Design-Material%203%20Expressive%20+%20LiquidGlass-critical?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
-[![VirusTotal Clean](https://img.shields.io/badge/VirusTotal-Clean%20(0%2F70)-success?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com)
+[![VirusTotal Safe](https://img.shields.io/badge/VirusTotal-Safe%20(0%2F70)-success?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com)
 [![License](https://img.shields.io/badge/License-GPLv3-orange?style=for-the-badge)](LICENSE)
 
-[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [Visual Mockups](#-priority-ordered-ascii-ui--visual-architecture-mockups) • [Roadmap](#-project-roadmap) • [Build from Source](#%EF%B8%8F-building-from-source)
+[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [Visual Mockups](#-priority-ordered-ascii-ui--visual-architecture-mockups) • [Roadmap](#-project-roadmap) • [Build from Source](#%EF%B8%8F-building-from-source) • [Contact (@Ishan____404)](https://x.com/Ishan____404)
 
 </div>
 
@@ -40,7 +40,7 @@ Every tier of the audio pipeline—from raw PCM processing in native C++ to mill
 * **17 Comprehensive Studio Presets:** *Flat, Studio Master, Bass Boost, Bass Reducer, Treble Boost, Vocal Enhancer, Acoustic, Rock, Electronic / EDM, Hip-Hop, Classical, Jazz, Metal, Lounge, R&B, Club, Deep House* with a 1-tap reset.
 * **Total Bloat Removal:** 100% excised all AI dependencies and home screen widget background services for an optimized memory footprint and zero background battery drain.
 * **Storage Cache Cleaner & Local Audio Scanner:** Built-in storage manager and MediaStore FLAC/MP3 device music scanner.
-* **VirusTotal 0/70 Clean Security Verification:** Independently verified safe and clean across 70+ security engines.
+* **VirusTotal 0/70 Safe Security Verification:** Independently audited across 70+ security engines with zero detections, adhering to ArchiveTune Nightly safety standards.
 
 ---
 
@@ -213,7 +213,7 @@ LastWaveX is structured under **Clean Architecture** and reactive unidirectional
 * Real-time Bézier frequency curve canvas visualizer
 * MediaStore Local Audio Scanner (FLAC/MP3 import)
 * Storage Cache Cleaner & Storage Manager
-* VirusTotal 0/70 Clean security verification
+* VirusTotal 0/70 Safe security verification (ArchiveTune Nightly standard)
 * Total AI & Home Widget Purge for lower memory footprint
 
 ### 🔄 In Progress
@@ -226,11 +226,11 @@ LastWaveX is structured under **Clean Architecture** and reactive unidirectional
 
 ---
 
-## 🛡️ Security & Safety Verification (VirusTotal Clean)
+## 🛡️ Security & Safety Verification (VirusTotal Safe)
 
 LastWaveX is 100% Free and Open-Source Software (GPLv3). We prioritize user safety, auditability, and transparency:
 
-* **VirusTotal Scanned:** Every compiled release APK (`app-release.apk`) is independently audited across 70+ leading antivirus and security engines (Kaspersky, Avast, BitDefender, Google Play Protect, Microsoft Defender, etc.) with **0/70 detections (Clean / Safe)**.
+* **VirusTotal Scanned:** Every compiled release APK (`app-release.apk`) is independently audited across 70+ leading antivirus and security engines (Kaspersky, Avast, BitDefender, Google Play Protect, Microsoft Defender, etc.) with **0/70 detections (Safe / Clean)**, following ArchiveTune Nightly's verification standards.
 * **Zero Telemetry & Spyware:** No commercial tracking SDKs, no Google AdMob, no behavioral analytics, and zero background data collection. All network requests query public endpoints directly without intermediate proxy servers.
 * **Hardware-Backed Keystore:** External credentials (e.g., Discord Gateway tokens, Last.fm sessions) are encrypted locally using Android Keystore AES-256-GCM. Plaintext tokens are never logged or stored in plain preferences.
 * **Self-Signed APK Notice (Google Play Protect):** Because LastWaveX is distributed directly via GitHub and signed with our open-source release key rather than distributed through Google Play Store, Android may display an "Unknown Developer" prompt during sideloading. You can verify the integrity of the downloaded APK by matching its SHA-256 checksum or submitting it to VirusTotal.
@@ -302,13 +302,22 @@ Build Output Artifacts:
 
 We stand on the shoulders of giants in the open-source Android audio community:
 * **[LastWave](https://github.com/Specttre404/LastWaveX)** — Original foundational architecture, baseline playback service, and UI inspiration.
-* **[ArchiveTune](https://github.com/Specttre404/LastWaveX)** — Inspiration for audiophile tuning, clean design language, and transparent security/VirusTotal audit practices.
-* **[ViMusic](https://github.com/vimusic/vimusic) / [VIVI Music](https://github.com/vivi-music/vivi)** — Foundational open-source YouTube Music client architecture, stream resolution patterns, and queue management.
+* **[ArchiveTune Nightly](https://github.com/Specttre404/LastWaveX)** — Inspiration for audiophile tuning, clean design language, and transparent security/VirusTotal audit practices.
+* **[VIVI Music](https://github.com/vivi-music/vivi)** — Foundational open-source YouTube Music client architecture, stream resolution patterns, and queue management.
 * **[Media3 ExoPlayer](https://developer.android.com/media/media3)** — Android audio playback foundation.
 * **[LRCLIB](https://lrclib.net)** — Public community synchronized lyrics database.
 * **[SponsorBlock](https://sponsor.ajay.app)** — Community-driven database for skipping non-music segments.
 * **[AudD](https://audd.io)** — Music recognition infrastructure.
 * **[Last.fm](https://last.fm)** — Metadata search and scrobbling protocol.
+
+---
+
+## 💬 Community & Contact
+
+Connect with the developer and maintainer:
+* **X (formerly Twitter):** [@Ishan____404](https://x.com/Ishan____404)
+* **GitHub Discussions:** [LastWaveX Discussions](https://github.com/Specttre404/LastWaveX/discussions)
+* **Bug Reports & Feature Requests:** [LastWaveX Issues](https://github.com/Specttre404/LastWaveX/issues)
 
 ---
 
@@ -320,4 +329,5 @@ Distributed under the **GNU General Public License v3.0 (GPLv3)**. See [`LICENSE
 
 <div align="center">
   <p><b>LastWaveX</b> — Free &amp; Open Source Software for Android</p>
+  <p>Maintained by <a href="https://x.com/Ishan____404">@Ishan____404</a></p>
 </div>

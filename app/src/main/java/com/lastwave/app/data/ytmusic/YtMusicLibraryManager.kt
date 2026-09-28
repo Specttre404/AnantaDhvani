@@ -164,7 +164,7 @@ class YtMusicLibraryManager @Inject constructor(
             if (!auth.connection.value.isConnected) return@withContext
             try {
                 val fetched = innerTube.fetchLibraryPlaylists().distinctBy { it.id }
-                // ArchiveTune uses the same non-destructive rule: an empty
+                // ArchiveTune Nightly uses the same non-destructive rule: an empty
                 // library response is not authoritative. InnerTube can return
                 // a structurally valid but empty page while auth/config is
                 // settling, so never replace the last visible snapshot with it.

@@ -97,8 +97,8 @@
     <string name="settings_download_lyrics">Download Synced Lyrics</string>
     <string name="widget_description" tools:ignore="MissingTranslation">LastWaveX Music Player Home Screen Widget</string>
     <string name="widget_compact_description" tools:ignore="MissingTranslation">LastWaveX Compact Music Pill Widget</string>
-    <string name="widget_canary_description" tools:ignore="MissingTranslation">ArchiveTune Canary Pill Widget (4x1)</string>
-    <string name="widget_stable_description" tools:ignore="MissingTranslation">ArchiveTune Stable Audiophile Card Widget (4x2)</string>
+    <string name="widget_canary_description" tools:ignore="MissingTranslation">ArchiveTune Nightly Canary Pill Widget (4x1)</string>
+    <string name="widget_stable_description" tools:ignore="MissingTranslation">ArchiveTune Nightly Stable Audiophile Card Widget (4x2)</string>
     <string name="settings_show_translation" tools:ignore="MissingTranslation">Lyrics Translation</string>
     <string name="settings_show_translation_sub" tools:ignore="MissingTranslation">Display translated lyrics lines below synced text when available</string>
     <string name="settings_show_phonetic" tools:ignore="MissingTranslation">Phonetic Pronunciation</string>

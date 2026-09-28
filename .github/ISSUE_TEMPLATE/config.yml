@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: X.com / Twitter (@Ishan____404)
+    url: https://x.com/Ishan____404
+    about: Follow updates or reach out to @Ishan____404 directly.
   - name: GitHub Discussions
     url: https://github.com/Specttre404/LastWaveX/discussions
     about: Ask questions, share feedback, or discuss features with the community.
