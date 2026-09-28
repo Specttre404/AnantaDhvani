@@ -113,7 +113,7 @@ class NativeAudioEngine @Inject constructor(
 
     /** Updates the native 15-band EQ; its gains are smoothed in C++. */
     fun setEqualizer(enabled: Boolean, preampDb: Float, gainsDb: FloatArray) {
-        require(gainsDb.size == EQUALIZER_BAND_COUNT) { "Expected 15 equalizer bands" }
+        require(gainsDb.size == EQUALIZER_BAND_COUNT) { "Expected 31 equalizer bands" }
         val safePreamp = if (preampDb.isFinite()) preampDb.coerceIn(-10f, 10f) else 0f
         val safeGains = FloatArray(gainsDb.size) { index ->
             val gain = gainsDb[index]
@@ -373,7 +373,7 @@ class NativeAudioEngine @Inject constructor(
 
     private companion object {
         const val TAG = "NativeAudioEngine"
-        const val EQUALIZER_BAND_COUNT = 15
+        const val EQUALIZER_BAND_COUNT = 31
 
         val libraryLoaded = try {
             System.loadLibrary("lastwave_audio")

@@ -11,7 +11,7 @@ namespace lastwave::audio {
 
 class DspProcessor final {
 public:
-    static constexpr std::size_t kEqualizerBandCount = 15;
+    static constexpr std::size_t kEqualizerBandCount = 31;
 
     DspProcessor() noexcept;
 
@@ -137,7 +137,7 @@ private:
     std::int32_t equalizerUpdateCountdown_{0};
     std::int32_t equalizerHeadroomCountdown_{0};
     std::uint32_t appliedEqualizerRevision_{0};
-    std::uint16_t activeEqualizerBands_{0};
+    std::uint32_t activeEqualizerBands_{0};
     float currentPreampDb_{0.0F};
     float currentPreampGain_{1.0F};
     float equalizerMaximumBoostDb_{0.0F};

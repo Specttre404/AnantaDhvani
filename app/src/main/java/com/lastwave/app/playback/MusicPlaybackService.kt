@@ -92,7 +92,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     @Inject lateinit var debugLog: ScrobbleDebugLog
     @Inject lateinit var themeRepository: ThemeRepository
     @Inject lateinit var artworkRepository: com.lastwave.app.data.artwork.ArtworkRepository
-    @Inject lateinit var androidAutoLibrary: AndroidAutoMediaLibrary
     @Inject lateinit var settingsPreferences: com.lastwave.app.data.local.SettingsPreferences
     @Inject lateinit var playlistRepository: com.lastwave.app.data.playlist.PlaylistRepository
 
@@ -137,7 +136,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     private var systemStateSignature = ""
     private var legacyBroadcastSignature = ""
     private var sessionQueueSignature = ""
-    private var carBrowseQueueSignature = ""
     @Volatile private var isPlaybackForeground = false
     private var artworkRequestKey = ""
     private var notificationPalette = NotificationPalette.default()
@@ -188,10 +186,12 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                         )
                     }
                     override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
-                        mediaId?.let(::playCarMediaId)
+                        if (!mediaId.isNullOrBlank()) {
+                            musicPlayer.play(PlayableTrack(title = mediaId, artist = "", videoId = mediaId))
+                        }
                     }
                     override fun onPlayFromSearch(query: String?, extras: Bundle?) {
-                        playCarSearch(resolveCarSearchQuery(query, extras))
+                        if (!query.isNullOrBlank()) musicPlayer.resume()
                     }
                 })
                 setSessionActivity(openAppPendingIntent())
@@ -267,7 +267,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                     requestArtwork(state.current)
                     publishSystemState(state)
                     publishNotification(state)
-                    publishCarBrowseState(state)
                     detectTransition(state)
                 }
         }
@@ -281,16 +280,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                 }
             }
         }
-        scope.launch {
-            androidAutoLibrary.playlistChanges.collect {
-                notifyCarLibraryChanged(AndroidAutoMediaLibrary.PLAYLISTS_ID)
-            }
-        }
-        scope.launch {
-            androidAutoLibrary.downloadChanges.distinctUntilChanged().collect {
-                notifyCarLibraryChanged(AndroidAutoMediaLibrary.DOWNLOADS_ID)
-            }
-        }
         startDetector()
     }
 
@@ -300,135 +289,23 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         rootHints: Bundle?,
     ): BrowserRoot? {
         if (mediaSession == null) return null
-        // KWGT, Wear OS, Bluetooth companions and other third-party
-        // controllers connect here as ordinary user apps — NOT as system /
-        // car hosts. Returning null rejects the connection
-        // (onConnectionFailed), which is why KWGT never listed LastWave as
-        // a media app and its transport buttons did nothing. The browse tree
-        // only exposes queue/playlist/download metadata, so any
-        // UID-verified caller may browse; transport stays gated by the
-        // session callback itself.
         if (!isAllowedMediaClient(clientPackageName, clientUid)) return null
-        return BrowserRoot(
-            AndroidAutoMediaLibrary.ROOT_ID,
-            Bundle().apply {
-                putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_LIST)
-                putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST)
-                putBoolean("android.media.browse.SEARCH_SUPPORTED", true)
-            },
-        )
+        return BrowserRoot("root", null)
     }
 
     override fun onLoadChildren(
         parentId: String,
         result: Result<List<MediaBrowserCompat.MediaItem>>,
     ) {
-        result.detach()
-        scope.launch {
-            val children = runCatching {
-                withContext(Dispatchers.IO) {
-                    androidAutoLibrary.loadChildren(parentId, musicPlayer.state.value)
-                }
-            }.onFailure { error ->
-                android.util.Log.w("MusicPlaybackService", "Android Auto browse failed for $parentId", error)
-            }.getOrDefault(emptyList())
-            result.sendResult(children)
-        }
-    }
-
-    override fun onSearch(
-        query: String,
-        extras: Bundle?,
-        result: Result<List<MediaBrowserCompat.MediaItem>>,
-    ) {
-        result.detach()
-        scope.launch {
-            val items = runCatching {
-                withContext(Dispatchers.IO) { androidAutoLibrary.search(query) }
-            }.onFailure { error ->
-                android.util.Log.w("MusicPlaybackService", "Android Auto search failed", error)
-            }.getOrDefault(emptyList())
-            result.sendResult(items)
-        }
+        result.sendResult(emptyList())
     }
 
     private fun isAllowedMediaClient(clientPackageName: String, clientUid: Int): Boolean = runCatching {
-        // System_server sometimes proxies browse connections (notably some
-        // Android Auto ROMs); always allow it.
         if (clientUid == android.os.Process.SYSTEM_UID || clientUid == android.os.Process.myUid()) return@runCatching true
-        // Android Auto projection & automotive packages
-        if (clientPackageName == "com.google.android.projection.gearhead" ||
-            clientPackageName == "com.google.android.carprojection" ||
-            clientPackageName == "com.google.android.apps.auto.repl" ||
-            clientPackageName == "com.google.android.googlequicksearchbox"
-        ) return@runCatching true
         val packages = packageManager.getPackagesForUid(clientUid)
         if (packages.isNullOrEmpty()) return@runCatching true
         packages.contains(clientPackageName)
     }.getOrDefault(true)
-
-    private fun playCarMediaId(mediaId: String) {
-        scope.launch {
-            val played = runCatching {
-                withContext(Dispatchers.IO) { androidAutoLibrary.playMediaId(mediaId, musicPlayer) }
-            }.onFailure { error ->
-                android.util.Log.w("MusicPlaybackService", "Android Auto playback request failed", error)
-            }.getOrDefault(false)
-            if (!played) publishCarPlaybackError("That item is no longer available")
-        }
-    }
-
-    private fun playCarSearch(query: String) {
-        if (query.isBlank()) {
-            musicPlayer.resume()
-            return
-        }
-        scope.launch {
-            val played = runCatching {
-                withContext(Dispatchers.IO) { androidAutoLibrary.playSearch(query, musicPlayer) }
-            }.onFailure { error ->
-                android.util.Log.w("MusicPlaybackService", "Android Auto voice search failed", error)
-            }.getOrDefault(false)
-            if (!played) publishCarPlaybackError("No playable tracks found")
-        }
-    }
-
-    private fun resolveCarSearchQuery(query: String?, extras: Bundle?): String {
-        query?.trim()?.takeIf(String::isNotEmpty)?.let { return it }
-        return listOfNotNull(
-            extras?.getString(MediaStore.EXTRA_MEDIA_TITLE),
-            extras?.getString(MediaStore.EXTRA_MEDIA_ARTIST),
-            extras?.getString(MediaStore.EXTRA_MEDIA_ALBUM),
-        ).map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
-    }
-
-    private fun publishCarPlaybackError(message: String) {
-        systemStateSignature = ""
-        runCatching {
-            mediaSession?.setPlaybackState(
-                PlaybackStateCompat.Builder()
-                    .setState(PlaybackStateCompat.STATE_ERROR, musicPlayer.state.value.positionMs, 0f)
-                    .setErrorMessage(message)
-                    .build(),
-            )
-        }
-    }
-
-    private fun publishCarBrowseState(state: MusicPlayerState) {
-        val signature = state.queue.joinToString(separator = "|") {
-            "${it.videoId.orEmpty()}:${it.title}:${it.artist}"
-        }
-        if (signature == carBrowseQueueSignature) return
-        carBrowseQueueSignature = signature
-        notifyCarLibraryChanged(AndroidAutoMediaLibrary.QUEUE_ID)
-    }
-
-    private fun notifyCarLibraryChanged(parentId: String) {
-        runCatching {
-            notifyChildrenChanged(AndroidAutoMediaLibrary.ROOT_ID)
-            notifyChildrenChanged(parentId)
-        }
-    }
 
     /**
      * Stock Android music broadcasts (`com.android.music.metachanged` /
@@ -543,9 +420,10 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         if (!promoteForPlayback()) return START_NOT_STICKY
         when (intent?.action) {
             Intent.ACTION_MEDIA_BUTTON -> androidx.media.session.MediaButtonReceiver.handleIntent(mediaSession, intent)
-            MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH -> playCarSearch(
-                resolveCarSearchQuery(intent.getStringExtra(android.app.SearchManager.QUERY), intent.extras),
-            )
+            MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH -> {
+                val query = intent.getStringExtra(android.app.SearchManager.QUERY)
+                if (!query.isNullOrBlank()) musicPlayer.resume()
+            }
             ACTION_PREVIOUS -> musicPlayer.previous()
             ACTION_TOGGLE -> musicPlayer.togglePlayPause()
             ACTION_NEXT -> musicPlayer.next()

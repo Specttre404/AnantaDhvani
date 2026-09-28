@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">LASTWAVEX</string>
+    <string name="app_name">LastWaveX</string>
 
     <!-- Bottom navigation -->
     <string name="nav_feed">Feed</string>
@@ -10,7 +10,7 @@
     <string name="update_available">Update Available</string>
     <string name="update">Update</string>
     <string name="dismiss_update">Dismiss update</string>
-    <string name="update_ready_to_install">LASTWAVEX v%1$s is ready to install</string>
+    <string name="update_ready_to_install">LastWaveX v%1$s is ready to install</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

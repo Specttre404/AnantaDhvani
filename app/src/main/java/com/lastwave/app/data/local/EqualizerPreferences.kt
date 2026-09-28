@@ -11,13 +11,21 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** The 15 studio-grade center frequencies (Hz) spanning 32 Hz to 16 kHz with high-resolution sub-bands. */
-val EQ_BAND_FREQS_HZ = intArrayOf(32, 48, 64, 96, 125, 180, 250, 350, 500, 750, 1000, 2000, 4000, 8000, 16000)
+/** The 31 ISO 1/3-octave center frequencies (Hz) spanning 20 Hz to 20 kHz. */
+val EQ_BAND_FREQS_HZ = floatArrayOf(
+    20f, 25f, 31.5f, 40f, 50f, 63f, 80f, 100f, 125f, 160f,
+    200f, 250f, 315f, 400f, 500f, 630f, 800f, 1000f, 1250f, 1600f,
+    2000f, 2500f, 3150f, 4000f, 5000f, 6300f, 8000f, 10000f, 12500f, 16000f, 20000f
+)
 const val EQ_MAX_GAIN_DB = 12f
 const val EQ_MAX_PREAMP_DB = 10f
 
-/** Compact frequency label under each band slider ("32", "48", "1K", "16K"...). */
-fun eqBandLabel(hz: Int): String = if (hz >= 1000) "${hz / 1000}K" else "$hz"
+/** Compact frequency label under each band slider ("20", "31.5", "1K", "20K"...). */
+fun eqBandLabel(hz: Float): String = when {
+    hz >= 1000f -> if (hz % 1000f == 0f) "${(hz / 1000f).toInt()}K" else "%.1fK".format(java.util.Locale.ROOT, hz / 1000f)
+    hz == 31.5f -> "31.5"
+    else -> "${hz.toInt()}"
+}
 
 data class EqPreset(
     val name: String,
@@ -28,25 +36,86 @@ object EqualizerPresets {
     const val CUSTOM_NAME = "Custom"
 
     val FLAT = EqPreset("Flat", List(EQ_BAND_FREQS_HZ.size) { 0f })
-    val STUDIO_MASTER = EqPreset(
-        "Studio Master",
-        listOf(2.6f, 2.8f, 2.2f, 0.6f, -1.8f, -2.6f, -1.2f, 0.0f, 1.2f, 2.4f, 3.6f, 4.0f, 4.2f, 4.5f, 4.8f),
-    )
-    val BASS_BOOST = EqPreset("Bass Boost", listOf(6.0f, 6.0f, 5.0f, 3.5f, 1.5f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
-    val BASS_REDUCER = EqPreset("Bass Reducer", listOf(-6.0f, -6.0f, -5.0f, -3.0f, -1.0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
-    val TREBLE_BOOST = EqPreset("Treble Boost", listOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0.5f, 1.5f, 3.0f, 4.5f, 6.0f, 7.0f, 8.0f, 9.0f))
-    val VOCAL_ENHANCER = EqPreset("Vocal Enhancer", listOf(-1.5f, -1.0f, -0.5f, 0f, 0.5f, 1.5f, 3.0f, 4.5f, 4.0f, 3.0f, 2.0f, 1.0f, 0.5f, 0.5f, 0f))
-    val ACOUSTIC = EqPreset("Acoustic", listOf(3.0f, 2.5f, 2.0f, 1.5f, 0.5f, 1.0f, 1.5f, 2.0f, 2.0f, 1.5f, 1.0f, 1.0f, 1.0f, 1.5f, 1.5f))
-    val ROCK = EqPreset("Rock", listOf(4.0f, 3.5f, 3.0f, 1.5f, 0f, -1.0f, -1.0f, -0.5f, 0.5f, 1.5f, 2.5f, 3.0f, 3.5f, 4.0f, 4.0f))
-    val ELECTRONIC_EDM = EqPreset("Electronic / EDM", listOf(5.0f, 4.5f, 3.5f, 2.0f, 0.5f, -1.0f, -0.5f, 1.0f, 2.5f, 3.0f, 3.0f, 2.5f, 3.5f, 4.5f, 5.0f))
-    val HIP_HOP = EqPreset("Hip-Hop", listOf(5.5f, 5.0f, 4.0f, 2.5f, 1.0f, -0.5f, -1.5f, -0.5f, 1.0f, 2.0f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f))
-    val CLASSICAL = EqPreset("Classical", listOf(3.0f, 2.5f, 2.0f, 1.5f, 0.5f, 0f, 0f, 0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.0f))
-    val JAZZ = EqPreset("Jazz", listOf(2.5f, 2.0f, 1.5f, 1.0f, 0f, -0.5f, 0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.0f, 2.5f, 2.5f, 2.5f))
-    val METAL = EqPreset("Metal", listOf(4.5f, 4.0f, 3.5f, 2.0f, 0.5f, -1.5f, -2.0f, -1.0f, 0.5f, 2.0f, 3.0f, 4.0f, 4.5f, 5.0f, 5.0f))
-    val LOUNGE = EqPreset("Lounge", listOf(1.5f, 1.5f, 1.0f, 0.5f, 0f, -0.5f, 0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.0f, 1.5f, 1.0f, 1.0f))
-    val RNB = EqPreset("R&B", listOf(5.0f, 4.5f, 3.5f, 2.0f, 1.0f, -0.5f, -1.0f, -0.5f, 0.5f, 1.5f, 2.0f, 2.5f, 3.0f, 3.0f, 3.0f))
-    val CLUB = EqPreset("Club", listOf(5.5f, 5.0f, 4.0f, 2.5f, 1.0f, 0f, -0.5f, 0f, 1.5f, 3.0f, 3.5f, 4.0f, 4.5f, 5.0f, 5.0f))
-    val DEEP_HOUSE = EqPreset("Deep House", listOf(6.0f, 5.5f, 4.5f, 3.0f, 1.0f, -0.5f, -1.0f, 0f, 1.0f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f, 4.5f))
+    val STUDIO_MASTER = EqPreset("Studio Master", listOf(
+        2.6f, 2.7f, 2.8f, 2.5f, 2.2f, 1.4f, 0.6f, -0.6f, -1.8f, -2.2f,
+        -2.6f, -1.9f, -1.2f, -0.6f, 0.0f, 0.6f, 1.2f, 1.8f, 2.4f, 3.0f,
+        3.6f, 3.8f, 4.0f, 4.1f, 4.2f, 4.35f, 4.5f, 4.65f, 4.8f, 4.9f, 5.0f
+    ))
+    val BASS_BOOST = EqPreset("Bass Boost", listOf(
+        6.0f, 6.0f, 6.0f, 5.5f, 5.0f, 4.2f, 3.5f, 2.5f, 1.5f, 0.8f,
+        0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f
+    ))
+    val BASS_REDUCER = EqPreset("Bass Reducer", listOf(
+        -6.0f, -6.0f, -6.0f, -5.5f, -5.0f, -4.0f, -3.0f, -2.0f, -1.0f, -0.5f,
+        0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f
+    ))
+    val TREBLE_BOOST = EqPreset("Treble Boost", listOf(
+        0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f, 0f, 0.2f, 0.5f, 1.0f, 1.5f, 2.2f,
+        3.0f, 3.7f, 4.5f, 5.2f, 6.0f, 6.5f, 7.0f, 7.5f, 8.0f, 8.5f, 9.0f
+    ))
+    val VOCAL_ENHANCER = EqPreset("Vocal Enhancer", listOf(
+        -1.5f, -1.2f, -1.0f, -0.7f, -0.5f, -0.2f, 0f, 0.2f, 0.5f, 1.0f,
+        1.5f, 2.2f, 3.0f, 3.7f, 4.5f, 4.2f, 4.0f, 3.5f, 3.0f, 2.5f,
+        2.0f, 1.5f, 1.0f, 0.7f, 0.5f, 0.5f, 0.5f, 0.2f, 0f, 0f, 0f
+    ))
+    val ACOUSTIC = EqPreset("Acoustic", listOf(
+        3.0f, 2.8f, 2.5f, 2.2f, 2.0f, 1.7f, 1.5f, 1.0f, 0.5f, 0.7f,
+        1.0f, 1.2f, 1.5f, 1.7f, 2.0f, 2.0f, 2.0f, 1.7f, 1.5f, 1.2f,
+        1.0f, 1.0f, 1.0f, 1.2f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f
+    ))
+    val ROCK = EqPreset("Rock", listOf(
+        4.0f, 3.8f, 3.5f, 3.2f, 3.0f, 2.2f, 1.5f, 0.7f, 0f, -0.5f,
+        -1.0f, -1.0f, -1.0f, -0.7f, -0.5f, 0f, 0.5f, 1.0f, 1.5f, 2.0f,
+        2.5f, 2.7f, 3.0f, 3.2f, 3.5f, 3.7f, 4.0f, 4.0f, 4.0f, 4.0f, 4.0f
+    ))
+    val ELECTRONIC_EDM = EqPreset("Electronic / EDM", listOf(
+        5.0f, 4.7f, 4.5f, 4.0f, 3.5f, 2.7f, 2.0f, 1.2f, 0.5f, 0f,
+        -0.5f, -0.8f, -1.0f, -0.5f, 0f, 0.5f, 1.0f, 1.7f, 2.5f, 2.8f,
+        3.0f, 3.0f, 3.0f, 2.7f, 2.5f, 3.0f, 3.5f, 4.0f, 4.5f, 4.8f, 5.0f
+    ))
+    val HIP_HOP = EqPreset("Hip-Hop", listOf(
+        5.5f, 5.2f, 5.0f, 4.5f, 4.0f, 3.2f, 2.5f, 1.7f, 1.0f, 0.2f,
+        -0.5f, -1.0f, -1.5f, -1.0f, -0.5f, 0.2f, 1.0f, 1.5f, 2.0f, 2.0f,
+        2.0f, 2.2f, 2.5f, 2.7f, 3.0f, 3.2f, 3.5f, 3.7f, 4.0f, 4.0f, 4.0f
+    ))
+    val CLASSICAL = EqPreset("Classical", listOf(
+        3.0f, 2.8f, 2.5f, 2.2f, 2.0f, 1.7f, 1.5f, 1.0f, 0.5f, 0.2f,
+        0f, 0f, 0f, 0f, 0f, 0.2f, 0.5f, 0.7f, 1.0f, 1.2f,
+        1.5f, 1.7f, 2.0f, 2.2f, 2.5f, 2.7f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f
+    ))
+    val JAZZ = EqPreset("Jazz", listOf(
+        2.5f, 2.2f, 2.0f, 1.7f, 1.5f, 1.2f, 1.0f, 0.5f, 0f, -0.2f,
+        -0.5f, -0.3f, 0f, 0.2f, 0.5f, 0.7f, 1.0f, 1.2f, 1.5f, 1.7f,
+        2.0f, 2.0f, 2.0f, 2.2f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f
+    ))
+    val METAL = EqPreset("Metal", listOf(
+        4.5f, 4.2f, 4.0f, 3.7f, 3.5f, 2.7f, 2.0f, 1.2f, 0.5f, -0.5f,
+        -1.5f, -1.8f, -2.0f, -1.5f, -1.0f, -0.2f, 0.5f, 1.2f, 2.0f, 2.5f,
+        3.0f, 3.5f, 4.0f, 4.2f, 4.5f, 4.7f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f
+    ))
+    val LOUNGE = EqPreset("Lounge", listOf(
+        1.5f, 1.5f, 1.5f, 1.2f, 1.0f, 0.7f, 0.5f, 0.2f, 0f, -0.2f,
+        -0.5f, -0.2f, 0f, 0.2f, 0.5f, 0.7f, 1.0f, 1.2f, 1.5f, 1.7f,
+        2.0f, 2.0f, 2.0f, 1.7f, 1.5f, 1.2f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+    ))
+    val RNB = EqPreset("R&B", listOf(
+        5.0f, 4.7f, 4.5f, 4.0f, 3.5f, 2.7f, 2.0f, 1.5f, 1.0f, 0.2f,
+        -0.5f, -0.8f, -1.0f, -0.8f, -0.5f, 0f, 0.5f, 1.0f, 1.5f, 1.7f,
+        2.0f, 2.2f, 2.5f, 2.7f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f
+    ))
+    val CLUB = EqPreset("Club", listOf(
+        5.5f, 5.2f, 5.0f, 4.5f, 4.0f, 3.2f, 2.5f, 1.7f, 1.0f, 0.5f,
+        0f, -0.2f, -0.5f, -0.2f, 0f, 0.7f, 1.5f, 2.2f, 3.0f, 3.2f,
+        3.5f, 3.7f, 4.0f, 4.2f, 4.5f, 4.7f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f
+    ))
+    val DEEP_HOUSE = EqPreset("Deep House", listOf(
+        6.0f, 5.7f, 5.5f, 5.0f, 4.5f, 3.7f, 3.0f, 2.0f, 1.0f, 0.2f,
+        -0.5f, -0.8f, -1.0f, -0.5f, 0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.2f,
+        2.5f, 2.7f, 3.0f, 3.2f, 3.5f, 3.7f, 4.0f, 4.2f, 4.5f, 4.8f, 5.0f
+    ))
 
     val ALL: List<EqPreset> = listOf(
         FLAT,
@@ -129,6 +198,15 @@ class EqualizerPreferences @Inject constructor(
         }
     }
 
+    suspend fun applyCustomSettings(settings: EqualizerSettings) {
+        dataStore.edit {
+            it[Keys.ENABLED] = settings.enabled
+            it[Keys.PRESET_NAME] = settings.presetName
+            it[Keys.PREAMP_DB] = settings.preampDb.coerceIn(-EQ_MAX_PREAMP_DB, EQ_MAX_PREAMP_DB)
+            it[Keys.GAINS_DB] = encodeGains(settings.gainsDb)
+        }
+    }
+
     suspend fun setBandGain(bandIndex: Int, gainDb: Float) {
         if (bandIndex !in EQ_BAND_FREQS_HZ.indices) return
         dataStore.edit {
@@ -151,4 +229,45 @@ class EqualizerPreferences @Inject constructor(
         gains.joinToString(",") { gain ->
             "%.1f".format(java.util.Locale.ROOT, if (gain.isFinite()) gain.coerceIn(-EQ_MAX_GAIN_DB, EQ_MAX_GAIN_DB) else 0f)
         }
+
+    fun exportCustomEqJson(settings: EqualizerSettings): String {
+        val gainsStr = settings.gainsDb.joinToString(",") { "%.1f".format(java.util.Locale.ROOT, it) }
+        return """
+            {
+              "version": "1.2.1",
+              "presetName": "${settings.presetName}",
+              "enabled": ${settings.enabled},
+              "preampDb": %.1f,
+              "bandCount": 31,
+              "gainsDb": [$gainsStr]
+            }
+        """.trimIndent().format(java.util.Locale.ROOT, settings.preampDb)
+    }
+
+    fun parseCustomEqJson(jsonString: String): EqualizerSettings? {
+        return try {
+            val enabled = jsonString.contains("\"enabled\": true") || jsonString.contains("\"enabled\":true")
+            val preampMatch = Regex("\"preampDb\":\\s*(-?\\d+(\\.\\d+)?)").find(jsonString)
+            val preamp = preampMatch?.groupValues?.get(1)?.toFloatOrNull()?.coerceIn(-10f, 10f) ?: 0f
+
+            val gainsMatch = Regex("\"gainsDb\":\\s*\\[(.*?)\\]", RegexOption.DOT_MATCHES_ALL).find(jsonString)
+            val gainsList = gainsMatch?.groupValues?.get(1)?.split(',')
+                ?.mapNotNull { it.trim().toFloatOrNull() }
+                ?.takeIf { it.size == EQ_BAND_FREQS_HZ.size }
+                ?.map { it.coerceIn(-EQ_MAX_GAIN_DB, EQ_MAX_GAIN_DB) }
+                ?: return null
+
+            val presetNameMatch = Regex("\"presetName\":\\s*\"(.*?)\"").find(jsonString)
+            val presetName = presetNameMatch?.groupValues?.get(1) ?: EqualizerPresets.CUSTOM_NAME
+
+            EqualizerSettings(
+                enabled = enabled,
+                presetName = presetName,
+                preampDb = preamp,
+                gainsDb = gainsList
+            )
+        } catch (_: Exception) {
+            null
+        }
+    }
 }

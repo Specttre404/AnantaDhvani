@@ -296,7 +296,7 @@ class AudioEffectsEngine @Inject constructor(
             val headroomDb = calculateHeadroomDb(gainsDb)
             for (band in 0 until equalizer.numberOfBands.toInt()) {
                 val centerHz = equalizer.getCenterFreq(band.toShort()) / MILLIHERTZ_PER_HZ
-                val gainDb = interpolateCurve(centerHz, gainsDb) + headroomDb
+                val gainDb = interpolateCurve(centerHz.toFloat(), gainsDb) + headroomDb
                 val levelMb = (gainDb * MILLIBELS_PER_DB).roundToInt().coerceIn(minimumMb, maximumMb)
                 equalizer.setBandLevel(band.toShort(), levelMb.toShort())
             }
@@ -332,7 +332,7 @@ class AudioEffectsEngine @Inject constructor(
             return -(maximumBoost - MAX_PRE_LIMITER_BOOST_DB).coerceAtLeast(0f)
         }
 
-        fun interpolateCurve(hz: Int, gainsDb: FloatArray): Float {
+        fun interpolateCurve(hz: Float, gainsDb: FloatArray): Float {
             if (gainsDb.size != EQ_BAND_FREQS_HZ.size) return 0f
             if (hz <= EQ_BAND_FREQS_HZ.first()) return gainsDb.first()
             if (hz >= EQ_BAND_FREQS_HZ.last()) return gainsDb.last()
@@ -340,8 +340,7 @@ class AudioEffectsEngine @Inject constructor(
                 val low = EQ_BAND_FREQS_HZ[index]
                 val high = EQ_BAND_FREQS_HZ[index + 1]
                 if (hz in low..high) {
-                    val position = (ln(hz.toFloat()) - ln(low.toFloat())) /
-                        (ln(high.toFloat()) - ln(low.toFloat()))
+                    val position = (ln(hz) - ln(low)) / (ln(high) - ln(low))
                     return gainsDb[index] + (gainsDb[index + 1] - gainsDb[index]) * position
                 }
             }

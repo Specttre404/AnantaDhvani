@@ -558,6 +558,22 @@ class SettingsViewModel @Inject constructor(
         launchSettingsAction("update the equalizer band") { equalizerPreferences.setBandGain(bandIndex, gainDb) }
     }
 
+    fun exportCustomEqJson(): String {
+        return equalizerPreferences.exportCustomEqJson(equalizer.value)
+    }
+
+    fun importCustomEqJson(jsonString: String) {
+        val imported = equalizerPreferences.parseCustomEqJson(jsonString)
+        if (imported != null) {
+            launchSettingsAction("import EQ profile") {
+                equalizerPreferences.applyCustomSettings(imported)
+                _uiState.update { it.copy(toastMessage = "EQ Profile '${imported.presetName}' imported!") }
+            }
+        } else {
+            _uiState.update { it.copy(toastMessage = "Invalid EQ JSON file format.") }
+        }
+    }
+
     // ── Data management (§8.5) ──
 
     fun clearRecommendationExclusions() {

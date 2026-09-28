@@ -8,9 +8,10 @@ namespace {
 
 constexpr double kPi = 3.1415926535897932384626433832795;
 constexpr std::array<double, DspProcessor::kEqualizerBandCount> kEqFrequenciesHz{
-    25.0, 40.0, 63.0, 100.0, 160.0,
-    250.0, 400.0, 630.0, 1000.0, 1600.0,
-    2500.0, 4000.0, 6300.0, 10000.0, 16000.0,
+    20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0,
+    125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
+    800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0,
+    5000.0, 6300.0, 8000.0, 10000.0, 12500.0, 16000.0, 20000.0,
 };
 // Updating 15 biquads every 32 samples was needlessly expensive while a
 // preset was smoothing. 128 samples is still below perceptual control
@@ -80,7 +81,7 @@ void DspProcessor::configure(double sampleRate) noexcept {
         if (std::abs(currentEqGainsDb_[band]) >= 0.0005F) {
             equalizerBands_[band] = Biquad::peaking(
                 sampleRate_, kEqFrequenciesHz[band], kEqQ, currentEqGainsDb_[band]);
-            activeEqualizerBands_ |= static_cast<std::uint16_t>(1U << band);
+            activeEqualizerBands_ |= static_cast<std::uint32_t>(1U << band);
         } else {
             equalizerBands_[band] = Biquad{};
         }
@@ -218,7 +219,7 @@ void DspProcessor::process(
         if (equalizerUpdateCountdown_-- <= 0) {
             const bool eqEnabled = targetEqualizerEnabled_.load(std::memory_order_acquire);
             bool coefficientsChanged = false;
-            std::uint16_t nextActiveBands = 0;
+            std::uint32_t nextActiveBands = 0;
             if (eqEnabled || activeEqualizerBands_ != 0U) {
                 for (std::size_t band = 0; band < kEqualizerBandCount; ++band) {
                     const bool bandFitsOutputRate = kEqFrequenciesHz[band] < sampleRate_ * 0.45;
@@ -240,14 +241,14 @@ void DspProcessor::process(
                     }
                     if (std::abs(currentEqGainsDb_[band]) >= 0.0005F ||
                         std::abs(targetGain) >= 0.0005F) {
-                        nextActiveBands |= static_cast<std::uint16_t>(1U << band);
+                        nextActiveBands |= static_cast<std::uint32_t>(1U << band);
                     }
                 }
             }
-            const auto deactivatedBands = static_cast<std::uint16_t>(
-                activeEqualizerBands_ & static_cast<std::uint16_t>(~nextActiveBands));
+            const auto deactivatedBands = static_cast<std::uint32_t>(
+                activeEqualizerBands_ & static_cast<std::uint32_t>(~nextActiveBands));
             for (std::size_t band = 0; band < kEqualizerBandCount; ++band) {
-                if ((deactivatedBands & static_cast<std::uint16_t>(1U << band)) != 0U) {
+                if ((deactivatedBands & static_cast<std::uint32_t>(1U << band)) != 0U) {
                     equalizerBands_[band].clear();
                 }
             }

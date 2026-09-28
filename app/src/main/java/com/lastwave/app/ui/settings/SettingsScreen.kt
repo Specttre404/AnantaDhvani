@@ -1663,7 +1663,39 @@ fun SettingsScreen(
         )
     }
 
-    // -- Experimental 15-band equalizer --
+    val exportEqLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.openOutputStream(uri)?.use { out ->
+                    out.write(viewModel.exportCustomEqJson().toByteArray())
+                }
+                viewModel.showToast("EQ profile exported successfully")
+            }.onFailure {
+                viewModel.showToast("Failed to export EQ profile")
+            }
+        }
+    }
+
+    val importEqLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                val json = context.contentResolver.openInputStream(uri)?.use { inp ->
+                    inp.bufferedReader().readText()
+                }
+                if (!json.isNullOrBlank()) {
+                    viewModel.importCustomEqJson(json)
+                }
+            }.onFailure {
+                viewModel.showToast("Failed to import EQ profile")
+            }
+        }
+    }
+
+    // -- 31-band studio equalizer --
     if (showEqSheet) {
         EqualizerSheet(
             eq = eq,
@@ -1674,6 +1706,8 @@ fun SettingsScreen(
             onBandChange = viewModel::setEqBandGain,
             onPreampPreview = viewModel::previewPreampDb,
             onPreampChange = viewModel::setPreampDb,
+            onExportProfile = { exportEqLauncher.launch("lastwavex_eq_${eq.presetName.lowercase().replace(' ', '_')}.json") },
+            onImportProfile = { importEqLauncher.launch(arrayOf("application/json", "*/*")) },
         )
     }
 
@@ -2244,11 +2278,11 @@ fun SettingsScreen(
 }
 
 private fun appVersionName(context: android.content.Context): String = try {
-    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.1.0"
+    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.2.1"
 } catch (error: Exception) {
-    "4.1.0"
+    "1.2.1"
 } catch (error: LinkageError) {
-    "4.1.0"
+    "1.2.1"
 }
 
 /** Small tap-scale used across the row-style cards on this screen for a
@@ -3157,6 +3191,13 @@ private fun AboutCard(versionName: String) {
             }
             Spacer(Modifier.height(14.dp))
             Text("LastWaveX", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "Crafted with passion by Ishan",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
+            )
             Spacer(Modifier.height(8.dp))
             Surface(
                 shape = ExpressivePillShape,
@@ -3254,13 +3295,13 @@ private fun ColorWheelSheet(onDismiss: () -> Unit, onApply: (Color) -> Unit) {
 
 private const val EQ_MAX_DB = EQ_MAX_GAIN_DB
 
-private fun eqBandCategory(hz: Int): String = when {
-    hz <= 40 -> "SUB"
-    hz <= 100 -> "BASS"
-    hz <= 250 -> "LOW-MID"
-    hz <= 1000 -> "MID"
-    hz <= 2500 -> "HIGH-MID"
-    hz <= 6300 -> "PRES"
+private fun eqBandCategory(hz: Float): String = when {
+    hz <= 40f -> "SUB"
+    hz <= 100f -> "BASS"
+    hz <= 250f -> "LOW-MID"
+    hz <= 1000f -> "MID"
+    hz <= 2500f -> "HIGH-MID"
+    hz <= 6300f -> "PRES"
     else -> "AIR"
 }
 
@@ -3423,6 +3464,8 @@ private fun EqualizerSheet(
     onBandChange: (Int, Float) -> Unit,
     onPreampPreview: (Float) -> Unit,
     onPreampChange: (Float) -> Unit,
+    onExportProfile: () -> Unit = {},
+    onImportProfile: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
@@ -3497,7 +3540,7 @@ private fun EqualizerSheet(
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            "15-band hardware acoustic tuning",
+                            "31-band studio graphic tuning",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -3600,6 +3643,31 @@ private fun EqualizerSheet(
                 gains = gains,
                 enabled = eq.enabled,
             )
+
+            // Export & Import Profiles Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                OutlinedButton(
+                    onClick = onExportProfile,
+                    modifier = Modifier.weight(1f),
+                    shape = ExpressivePillShape,
+                ) {
+                    Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Export Profile", style = MaterialTheme.typography.labelMedium)
+                }
+                OutlinedButton(
+                    onClick = onImportProfile,
+                    modifier = Modifier.weight(1f),
+                    shape = ExpressivePillShape,
+                ) {
+                    Icon(Icons.Filled.Download, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Import Profile", style = MaterialTheme.typography.labelMedium)
+                }
+            }
 
             // Presets Horizontal Flow
             SectionLabel("Presets")
@@ -3716,7 +3784,7 @@ private fun EqualizerSheet(
 @Composable
 private fun EqNativeSlider(
     gainDb: Float,
-    hz: Int,
+    hz: Float,
     enabled: Boolean,
     modifier: Modifier = Modifier,
     onGainChange: (Float) -> Unit,
