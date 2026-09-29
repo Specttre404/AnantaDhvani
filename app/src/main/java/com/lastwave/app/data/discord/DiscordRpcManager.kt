@@ -31,6 +31,7 @@ data class DiscordActivity(
     val artist: String,
     val album: String?,
     val artworkUrl: String?,
+    val videoId: String? = null,
     val isPlaying: Boolean,
     val positionMs: Long,
     val durationMs: Long,
@@ -66,6 +67,7 @@ class DiscordRpcManager @Inject constructor(
                                 artist = playerState.current.artist,
                                 album = playerState.current.album,
                                 artworkUrl = playerState.current.artworkUrl,
+                                videoId = playerState.current.videoId,
                                 isPlaying = playerState.isPlaying,
                                 positionMs = playerState.positionMs,
                                 durationMs = playerState.durationMs,
@@ -213,6 +215,19 @@ class DiscordRpcManager @Inject constructor(
                     put("large_text", activity.album ?: "LastWaveX Music")
                 }
                 put("assets", assetsJson)
+
+                if (!activity.videoId.isNullOrBlank()) {
+                    val buttonsArray = JSONArray().apply {
+                        put(JSONObject().apply {
+                            put("label", "Listen on YouTube Music")
+                            put("url", "https://music.youtube.com/watch?v=${activity.videoId}")
+                        })
+                    }
+                    put("buttons", buttonsArray)
+                    put("metadata", JSONObject().apply {
+                        put("button_urls", JSONArray().put("https://music.youtube.com/watch?v=${activity.videoId}"))
+                    })
+                }
             }
 
             val presenceJson = JSONObject().apply {

@@ -1583,119 +1583,9 @@ private fun FullPlayer(
             dominantColor = ambientColor,
             accentColor = ambientCompanion,
             track = track,
+            isPlaying = state.isPlaying,
             modifier = Modifier.fillMaxSize(),
         ) {
-            BoxWithConstraints(Modifier.fillMaxSize()) {
-                val bgWidth = constraints.maxWidth.toFloat()
-                val bgHeight = constraints.maxHeight.toFloat()
-                val bgMaxDimension = maxOf(bgWidth, bgHeight, 1f)
-
-                if (playerBackgroundStyle == com.lastwave.app.data.local.PlayerBackgroundStyle.BLURRED_GLASS) {
-                    Box(Modifier.matchParentSize().liquidGlassSource(playerBackdrop)) {
-                        BackdropBlur(radius = 36.dp, modifier = Modifier.fillMaxSize()) {
-                            PlayerArtwork(
-                                track = track,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .graphicsLayer {
-                                        scaleX = 1.35f
-                                        scaleY = 1.35f
-                                        alpha = 0.72f
-                                    },
-                                corner = 0.dp,
-                                decodeSizePx = 200,
-                            )
-                        }
-                    }
-                }
-
-                val renderMeshBlobs = playerBackgroundStyle != com.lastwave.app.data.local.PlayerBackgroundStyle.AMOLED_BLACK &&
-                        playerBackgroundStyle != com.lastwave.app.data.local.PlayerBackgroundStyle.PRISM_SPECTRUM &&
-                        playerBackgroundStyle != com.lastwave.app.data.local.PlayerBackgroundStyle.DYNAMIC_MONET
-
-                if (renderMeshBlobs) {
-                    // Apple Music: Vibrant chromatic ambient mesh blobs
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.radialGradient(
-                                    0f to ambientColor.copy(alpha = 0.58f),
-                                    0.45f to ambientColor.copy(alpha = 0.22f),
-                                    1f to Color.Transparent,
-                                    center = androidx.compose.ui.geometry.Offset(
-                                        bgWidth * 0.25f,
-                                        bgHeight * 0.20f,
-                                    ),
-                                    radius = bgMaxDimension * 0.85f,
-                                ),
-                            ),
-                    )
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.radialGradient(
-                                    0f to ambientCompanion.copy(alpha = 0.52f),
-                                    0.50f to ambientCompanion.copy(alpha = 0.20f),
-                                    1f to Color.Transparent,
-                                    center = androidx.compose.ui.geometry.Offset(
-                                        bgWidth * 0.88f,
-                                        bgHeight * 0.65f,
-                                    ),
-                                    radius = bgMaxDimension * 0.78f,
-                                ),
-                            ),
-                    )
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.radialGradient(
-                                    0f to ambientDeep.copy(alpha = 0.42f),
-                                    0.55f to ambientDeep.copy(alpha = 0.14f),
-                                    1f to Color.Transparent,
-                                    center = androidx.compose.ui.geometry.Offset(
-                                        bgWidth * 0.15f,
-                                        bgHeight * 0.82f,
-                                    ),
-                                    radius = bgMaxDimension * 0.70f,
-                                ),
-                            ),
-                    )
-
-                    // Apple Music: Contrast scrim gradient (ensures text & controls are clear while preserving vibrant colors)
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    0.00f to Color.Black.copy(alpha = 0.35f),
-                                    0.28f to Color.Black.copy(alpha = 0.15f),
-                                    0.65f to Color.Black.copy(alpha = 0.40f),
-                                    1.00f to Color.Black.copy(alpha = 0.72f),
-                                ),
-                            ),
-                    )
-                    // Subtle edge vignette
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.radialGradient(
-                                    0f to Color.Transparent,
-                                    0.65f to Color.Transparent,
-                                    1f to Color.Black.copy(alpha = 0.30f),
-                                    center = androidx.compose.ui.geometry.Offset(
-                                        bgWidth * 0.50f,
-                                        bgHeight * 0.40f,
-                                    ),
-                                    radius = bgMaxDimension * 0.80f,
-                                ),
-                            ),
-                    )
-                }
-            }
             Column(
                 Modifier
                     .fillMaxSize()
@@ -1867,9 +1757,16 @@ private fun FullPlayer(
                                         modifier = Modifier.fillMaxWidth().weight(1f),
                                         contentAlignment = BiasAlignment(0f, -0.45f),
                                     ) {
+                                        val maxArtSize = when (playerStyle) {
+                                            com.lastwave.app.data.local.PlayerStyle.CLASSIC -> 320.dp
+                                            com.lastwave.app.data.local.PlayerStyle.MINIMALIST -> 220.dp
+                                            com.lastwave.app.data.local.PlayerStyle.COMPACT_DOCK -> 260.dp
+                                            com.lastwave.app.data.local.PlayerStyle.IMMERSIVE_FULLSCREEN -> 420.dp
+                                            else -> 380.dp
+                                        }
                                         val artworkSize = (minOf(maxWidth, maxHeight) - 12.dp)
                                             .coerceAtLeast(0.dp)
-                                            .coerceAtMost(380.dp)
+                                            .coerceAtMost(maxArtSize)
 
                                         val glowAlpha by animateFloatAsState(
                                             targetValue = if (state.isPlaying) 0.70f else 0.35f,
@@ -1902,7 +1799,7 @@ private fun FullPlayer(
                                             label = "artworkPlayingScale",
                                         )
 
-                                        val isVinylMode = playerCoverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL || playerStyle == com.lastwave.app.data.local.PlayerStyle.VINYL_DISC
+                                        val isVinylMode = playerCoverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL
                                         val effectiveCoverStyle = if (isVinylMode) com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL else playerCoverStyle
 
                                         Surface(
@@ -2277,18 +2174,12 @@ private fun FullPlayer(
 
                                     Spacer(Modifier.height(12.dp))
 
-                                    // 4. Primary Transport Controls Glass Dock
-                                    Surface(
-                                        shape = CircleShape,
-                                        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.60f),
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                                    // 4. Primary Transport Controls
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                                        contentAlignment = Alignment.Center,
                                     ) {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            MainControls(state, player, isTranslucent = false)
-                                        }
+                                        MainControls(state, player, isTranslucent = false)
                                     }
 
                                     Spacer(Modifier.height(16.dp))

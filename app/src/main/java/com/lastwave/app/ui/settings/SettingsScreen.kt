@@ -844,6 +844,7 @@ fun SettingsScreen(
                             AccentPresetGrid(
                                 currentMode = theme?.mode ?: AccentMode.MANUAL,
                                 selectedHex = theme?.accentColorHex,
+                                onPickDynamic = { viewModel.setAccentMode(AccentMode.DYNAMIC) },
                                 onPickPreset = { hex -> viewModel.setManualAccent(Color(android.graphics.Color.parseColor(hex))) },
                                 onPickMono = { viewModel.setAccentMode(AccentMode.MONOCHROME) },
                                 onPickCustom = viewModel::openColorWheel,
@@ -889,9 +890,9 @@ fun SettingsScreen(
                                 subtitle = if (misc.isBitPerfectEnabled && eq.enabled) {
                                     "On \u2022 ${eq.presetName} (Bypassed by Bit-Perfect Mode)"
                                 } else if (eq.enabled) {
-                                    "On \u2022 ${eq.presetName} \u2022 15-band"
+                                    "On \u2022 ${eq.presetName} \u2022 31-band"
                                 } else {
-                                    "Shape your sound across 15 frequencies"
+                                    "Shape your sound across 31 frequencies"
                                 },
                                 onClick = { showEqSheet = true },
                                 position = position,
@@ -2990,6 +2991,7 @@ private fun LastFmIntegrationCard(
 private fun AccentPresetGrid(
     currentMode: AccentMode,
     selectedHex: String?,
+    onPickDynamic: () -> Unit,
     onPickPreset: (String) -> Unit,
     onPickMono: () -> Unit,
     onPickCustom: () -> Unit,
@@ -3008,7 +3010,7 @@ private fun AccentPresetGrid(
             label = "Monet",
             selected = dynamicSelected,
             modifier = Modifier.weight(1f),
-            onClick = { onPickPreset("#00E5FF") }, // fallback preset triggers dynamic/monet
+            onClick = onPickDynamic,
         ) {
             Box(
                 Modifier
@@ -3364,7 +3366,7 @@ private fun ColorWheelSheet(onDismiss: () -> Unit, onApply: (Color) -> Unit) {
     }
 }
 
-// -- Experimental 15-band equalizer (Settings → Experimental → Equalizer) --
+// -- Experimental 31-band equalizer (Settings → Experimental → Equalizer) --
 
 private const val EQ_MAX_DB = EQ_MAX_GAIN_DB
 

@@ -151,9 +151,13 @@ fun WavySeekBar(
     val baseAmp3Px = with(density) { 7.5.dp.toPx() }
     val draggingAmpPx = with(density) { 1.2.dp.toPx() }
 
-    val amp1 by animateFloatAsState(if (dragging) draggingAmpPx else baseAmp1Px, tween(180), label = "Amp1")
-    val amp2 by animateFloatAsState(if (dragging) draggingAmpPx else baseAmp2Px, tween(180), label = "Amp2")
-    val amp3 by animateFloatAsState(if (dragging) draggingAmpPx else baseAmp3Px, tween(180), label = "Amp3")
+    val targetAmp1 = if (dragging) draggingAmpPx else if (isPlaying) baseAmp1Px else baseAmp1Px * 0.25f
+    val targetAmp2 = if (dragging) draggingAmpPx else if (isPlaying) baseAmp2Px else baseAmp2Px * 0.25f
+    val targetAmp3 = if (dragging) draggingAmpPx else if (isPlaying) baseAmp3Px else baseAmp3Px * 0.25f
+
+    val amp1 by animateFloatAsState(targetAmp1, tween(240), label = "Amp1")
+    val amp2 by animateFloatAsState(targetAmp2, tween(240), label = "Amp2")
+    val amp3 by animateFloatAsState(targetAmp3, tween(240), label = "Amp3")
 
     val waveLength1Px = with(density) { 160.dp.toPx() }
     val waveLength2Px = with(density) { 125.dp.toPx() }
@@ -398,6 +402,30 @@ fun WavySeekBar(
                                 topLeft = Offset(thumbX - 1.5.dp.toPx(), centerY - faderH / 2f + 3.dp.toPx()),
                                 size = Size(3.dp.toPx(), faderH - 6.dp.toPx()),
                                 cornerRadius = CornerRadius(1.dp.toPx(), 1.dp.toPx()),
+                            )
+                        }
+
+                        SeekbarStyle.CAPSULE_PILL -> {
+                            val pillH = 10.dp.toPx()
+                            val cRadius = CornerRadius(5.dp.toPx(), 5.dp.toPx())
+                            drawRoundRect(
+                                color = inactiveColor,
+                                topLeft = Offset(0f, centerY - pillH / 2f),
+                                size = Size(width, pillH),
+                                cornerRadius = cRadius,
+                            )
+                            if (thumbX > 0f) {
+                                drawRoundRect(
+                                    color = primaryColor,
+                                    topLeft = Offset(0f, centerY - pillH / 2f),
+                                    size = Size(thumbX, pillH),
+                                    cornerRadius = cRadius,
+                                )
+                            }
+                            drawCircle(
+                                color = primaryColor,
+                                radius = 8.dp.toPx(),
+                                center = Offset(thumbX, centerY),
                             )
                         }
                     }

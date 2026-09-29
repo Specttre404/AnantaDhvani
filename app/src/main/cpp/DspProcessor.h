@@ -115,6 +115,8 @@ private:
             previousInput[1] = inputRight;
             left = static_cast<float>((high[0] + low[1]) * gain);
             right = static_cast<float>((high[1] + low[0]) * gain);
+            if (!std::isfinite(left)) left = 0.0F;
+            if (!std::isfinite(right)) right = 0.0F;
         }
 
         inline void clear() noexcept {

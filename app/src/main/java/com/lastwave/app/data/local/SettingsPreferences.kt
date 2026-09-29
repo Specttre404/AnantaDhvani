@@ -41,7 +41,8 @@ enum class SeekbarStyle(val id: String, val title: String, val description: Stri
     WAVY_FLUID("wavy_fluid", "Wavy Fluid", "Multi-frequency sine wave undulating during playback and flattening on pause."),
     SEGMENTED_DASH("segmented_dash", "Segmented Dash", "High-tech discrete dashed time bar with glowing progress heads."),
     MINIMAL_PILL("minimal_pill", "Minimal Pill", "Ultra-slim line that expands into a tactile pill on touch."),
-    STUDIO_CONSOLE("studio_console", "Studio Console", "Precision analog mixing desk fader with tick marks and exact time readout.");
+    STUDIO_CONSOLE("studio_console", "Studio Console", "Precision analog mixing desk fader with tick marks and exact time readout."),
+    CAPSULE_PILL("capsule_pill", "Capsule Pill", "Tactile stadium capsule slider with smooth progress fill.");
 
     companion object {
         fun fromId(id: String?): SeekbarStyle =
@@ -50,15 +51,11 @@ enum class SeekbarStyle(val id: String, val title: String, val description: Stri
 }
 
 enum class PlayerStyle(val id: String, val title: String, val description: String) {
-    CLASSIC("classic", "Classic", "Traditional centered album art frame with standard linear controllers"),
-    MODERN_M3("modern_m3", "Modern M3 Expressive", "M3 Expressive container tokens & asymmetrical radius blocks"),
-    IMMERSIVE_FULLSCREEN("immersive_fullscreen", "Immersive Fullscreen", "Edge-to-edge artwork with floating translucent action bars"),
-    MINIMALIST("minimalist", "Editorial Minimalist", "Striking editorial typography focus with ultra-thin progress indicators"),
-    VINYL_DISC("vinyl_disc", "Rotating Vinyl", "Animated vinyl record art window with vintage tonearm physics"),
-    CAROUSEL("carousel", "Card Carousel", "Swipeable card layout enabling quick horizontal queue scrubbing"),
-    SPLIT_SCREEN("split_screen", "Split Screen Dual-Pane", "Dual-pane arrangement keeping lyrics or queue directly beside controls"),
-    COMPACT_DOCK("compact_dock", "Compact One-Handed Dock", "Minimized control deck optimized for one-handed reachability"),
-    CINEMATIC_CANVAS("cinematic_canvas", "Cinematic Canvas", "Motion-backed layout prioritizing animated artist loops");
+    MODERN_M3("modern_m3", "Modern M3 Expressive", "Adaptive layout with clean typography, dynamic spacing, and floating action dock"),
+    CLASSIC("classic", "Classic", "Centered square artwork with balanced linear controllers and full transport rows"),
+    IMMERSIVE_FULLSCREEN("immersive_fullscreen", "Immersive Fullscreen", "Edge-to-edge artwork presentation with subtle semi-transparent controls"),
+    MINIMALIST("minimalist", "Minimalist", "Typography-first distraction-free mode with essential controls only"),
+    COMPACT_DOCK("compact_dock", "Compact Dock", "One-handed reachability layout with controls closer to the bottom");
 
     companion object {
         fun fromId(id: String?): PlayerStyle =
@@ -192,6 +189,8 @@ data class MiscSettings(
     /** Ids of Home tab sections the user hid ([HomeSection.id]).
      *  Empty = everything visible. Unknown ids are dropped on read. */
     val hiddenHomeSections: Set<String> = emptySet(),
+    /** Optional floating dynamic island capsule/notch overlay. */
+    val enableDynamicIslandNotch: Boolean = false,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -307,6 +306,7 @@ class SettingsPreferences @Inject constructor(
         val USE_ALBUM_ARTIST_FOLDERS = booleanPreferencesKey("lw_use_album_artist_folders")
         val PRIMARY_ARTIST_ONLY = booleanPreferencesKey("lw_primary_artist_only")
         val HIDDEN_HOME_SECTIONS = stringSetPreferencesKey("lw_hidden_home_sections")
+        val ENABLE_DYNAMIC_ISLAND_NOTCH = booleanPreferencesKey("lw_enable_dynamic_island_notch")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -358,6 +358,7 @@ class SettingsPreferences @Inject constructor(
                 hiddenHomeSections = p.readSafely(Keys.HIDDEN_HOME_SECTIONS)
                     ?.filter { id -> HomeSection.entries.any { it.id == id } }?.toSet()
                     ?: emptySet(),
+                enableDynamicIslandNotch = p.readSafely(Keys.ENABLE_DYNAMIC_ISLAND_NOTCH) ?: false,
             )
         }
 
@@ -501,6 +502,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setPlayerStyle(style: PlayerStyle) {
         dataStore.edit { it[Keys.PLAYER_STYLE] = style.id }
+    }
+
+    suspend fun setEnableDynamicIslandNotch(enabled: Boolean) {
+        dataStore.edit { it[Keys.ENABLE_DYNAMIC_ISLAND_NOTCH] = enabled }
     }
 
     suspend fun setPlayerBackgroundStyle(style: PlayerBackgroundStyle) {
