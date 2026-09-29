@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -109,7 +110,7 @@ fun LoginScreen(
                         )
                     }
                 }
-                Text("LastWaveX", style = MaterialTheme.typography.headlineMedium)
+                Text("Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 Text(
                     "Your music, your way — powered by YouTube Music",
                     style = MaterialTheme.typography.bodyMedium,

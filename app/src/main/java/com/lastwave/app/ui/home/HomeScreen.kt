@@ -167,7 +167,7 @@ fun HomeScreen(
         topBar = {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 ExpressiveHeader(
-                    title = "LastWaveX",
+                    title = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
                     modifier = Modifier.adaptiveContentWidth(maxWidth = 860.dp),
                     actions = {
                         HeaderActionIcon(Icons.Filled.Explore, "Discover", onOpenDiscover)
@@ -718,7 +718,7 @@ private fun StatsCard(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            "LastWaveX Insights",
+                            "Ananta Dhvani Insights",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,

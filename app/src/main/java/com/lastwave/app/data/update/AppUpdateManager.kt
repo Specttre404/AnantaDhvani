@@ -25,7 +25,7 @@ data class UpdateInfo(
     val latestVersion: String = "",
     val currentVersion: String = "",
     val releaseNotes: String = "",
-    val releaseUrl: String = "https://github.com/specttre404/LastWaveX/releases",
+    val releaseUrl: String = "https://github.com/Specttre404/AnantaDhvani/releases",
     val isDismissed: Boolean = false,
     val message: String? = null,
 )
@@ -44,9 +44,9 @@ class AppUpdateManager @Inject constructor(
     val updateInfo: StateFlow<UpdateInfo> = _updateInfo.asStateFlow()
 
     fun getCurrentVersion(): String = try {
-        context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.1.0"
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.3.0"
     } catch (_: Exception) {
-        "4.1.0"
+        "1.3.0"
     }
 
     fun checkForUpdate(isSilent: Boolean = false) {
@@ -57,18 +57,18 @@ class AppUpdateManager @Inject constructor(
         scope.launch {
             try {
                 val info = withContext(Dispatchers.IO) {
-                    val url = URL("https://api.github.com/repos/specttre404/LastWaveX/releases/latest")
+                    val url = URL("https://api.github.com/repos/Specttre404/AnantaDhvani/releases/latest")
                     val conn = (url.openConnection() as HttpURLConnection).apply {
                         requestMethod = "GET"
                         connectTimeout = 5000
                         readTimeout = 5000
-                        setRequestProperty("User-Agent", "LASTWAVEX-App")
+                        setRequestProperty("User-Agent", "AnantaDhvani-App")
                     }
                     if (conn.responseCode == 200) {
                         val body = conn.inputStream.bufferedReader().use { it.readText() }
                         val json = JSONObject(body)
                         val tag = json.optString("tag_name", "").removePrefix("v").trim()
-                        val htmlUrl = json.optString("html_url", "https://github.com/specttre404/LastWaveX/releases")
+                        val htmlUrl = json.optString("html_url", "https://github.com/Specttre404/AnantaDhvani/releases")
                         val bodyText = json.optString("body", "")
                         val isNewer = isVersionNewer(tag, currentVer)
                         UpdateInfo(
@@ -78,13 +78,13 @@ class AppUpdateManager @Inject constructor(
                             currentVersion = currentVer,
                             releaseNotes = bodyText,
                             releaseUrl = htmlUrl,
-                            message = if (isNewer) "Version v$tag available!" else "LASTWAVEX is up to date (v$currentVer)",
+                            message = if (isNewer) "Version v$tag available!" else "Ananta Dhvani is up to date (v$currentVer)",
                         )
                     } else {
                         UpdateInfo(
                             isChecking = false,
                             currentVersion = currentVer,
-                            message = if (!isSilent) "LASTWAVEX is up to date (v$currentVer)" else null,
+                            message = if (!isSilent) "Ananta Dhvani is up to date (v$currentVer)" else null,
                         )
                     }
                 }
@@ -118,7 +118,7 @@ class AppUpdateManager @Inject constructor(
     }
 
     fun openUpdate(context: Context) {
-        val url = _updateInfo.value.releaseUrl.ifBlank { "https://github.com/specttre404/LastWaveX/releases" }
+        val url = _updateInfo.value.releaseUrl.ifBlank { "https://github.com/Specttre404/AnantaDhvani/releases" }
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)

@@ -207,7 +207,7 @@ fun FeedScreen(
                 .adaptiveContentWidth(maxWidth = 920.dp),
         ) {
             ExpressiveHeader(
-                title = "LastWaveX",
+                title = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
                 actions = {
                     HeaderActionIcon(Icons.Filled.TrendingUp, "Charts & Rankings", onOpenCharts)
                     HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
@@ -749,7 +749,7 @@ private fun InfiniteRadioHero(
                                 modifier = Modifier.size(12.dp),
                             )
                             Text(
-                                "LastWaveX Instant Radio",
+                                "Ananta Dhvani Instant Radio",
                                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.1.sp),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,

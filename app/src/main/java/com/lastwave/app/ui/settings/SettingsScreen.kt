@@ -1498,9 +1498,9 @@ fun SettingsScreen(
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = stringResource(R.string.settings_source_code),
-                                subtitle = "github.com/specttre404/LastWaveX",
+                                subtitle = "github.com/Specttre404/AnantaDhvani",
                                 onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/specttre404/LastWaveX"))
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Specttre404/AnantaDhvani"))
                                     if (!startActivitySafely(context, intent)) {
                                         viewModel.showToast("No browser is available")
                                     }
@@ -3259,13 +3259,13 @@ private fun AboutCard(versionName: String) {
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_launcher_logo),
-                    contentDescription = "LastWaveX",
+                    contentDescription = "Ananta Dhvani",
                     tint = Color.Unspecified,
                     modifier = Modifier.size(72.dp),
                 )
             }
             Spacer(Modifier.height(14.dp))
-            Text("LastWaveX", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text("Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(Modifier.height(6.dp))
             Text(
                 "Crafted with passion by Ishan",

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">LastWaveX</string>
+    <string name="app_name">Ananta Dhvani</string>
+    <string name="app_name_full" tools:ignore="MissingTranslation">Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)</string>
 
     <!-- Bottom navigation -->
     <string name="nav_feed">Feed</string>
