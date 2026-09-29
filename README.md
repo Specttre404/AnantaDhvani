@@ -1,23 +1,23 @@
 <div align="center">
 
-<img src="docs/assets/logo.svg" alt="LastWaveX Logo" width="128" height="128" />
+<img src="docs/assets/logo.svg" alt="Ananta Dhvani Logo" width="128" height="128" />
 
-# LastWaveX
+# Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)
 
 **Next-Gen YouTube Music Client & Universal Audiophile Player for Android**  
-*Bit-Perfect USB DAC • 31-Band Studio Equalizer • R128 Loudness Normalization • Synced Word-by-Word Lyrics • Material 3 Expressive • Zero Bloat*
+*Bit-Perfect USB DAC • 31-Band Studio Equalizer • Parametric Q • Binaural Crossfeed • R128 Loudness • Synced Lyrics • Zero Bloat*
 
 [![Build Status](https://img.shields.io/badge/Build-Passing%20(24%2F24%20Tests)-success?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026%2B)-blue?style=for-the-badge&logo=android)](https://github.com/Specttre404/LastWaveX)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-purple?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
 [![Toolkit](https://img.shields.io/badge/Toolkit-Jetpack%20Compose%201.7.5-deepskyblue?style=for-the-badge&logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
 [![Client](https://img.shields.io/badge/Client-YouTube%20Music-red?style=for-the-badge&logo=youtubemusic)](https://music.youtube.com)
-[![Architecture](https://img.shields.io/badge/Architecture-Clean%20MVVM%20+%20C++%20DSP-yellowgreen?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
-[![Design](https://img.shields.io/badge/Design-Material%203%20Expressive%20+%20LiquidGlass-critical?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20MVVM%20%2B%20C%2B%2B%20DSP-yellowgreen?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
+[![Design](https://img.shields.io/badge/Design-Material%203%20Expressive%20%2B%20LiquidGlass-critical?style=for-the-badge)](https://github.com/Specttre404/LastWaveX)
 [![VirusTotal Safe](https://img.shields.io/badge/VirusTotal-Safe-success?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com/gui/file/98c2e016ca563d11e5bee81dcecf928cc55c1a47b3dff481e66834c06784c5f5/detection)
 [![License](https://img.shields.io/badge/License-GPLv3-orange?style=for-the-badge)](LICENSE)
 
-[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Feature Matrix](#-implemented-features-matrix) • [In-App Gallery](#-in-app-screenshots-showcase) • [Roadmap](#-project-roadmap) • [Build from Source](#%EF%B8%8F-building-from-source) • [Developer (@Ishan____404)](https://x.com/Ishan____404)
+[Download Latest APK](https://github.com/Specttre404/LastWaveX/releases) • [Key Highlights](#-key-upgrades--highlights-since-v100) • [Feature Matrix](#-feature-comparison) • [Architecture](#-technical-foundation) • [Security & Privacy](#-security-privacy--integrity) • [Developer (@Ishan____404)](https://x.com/Ishan____404)
 
 </div>
 
@@ -26,76 +26,95 @@
 ## 📖 Product Overview & Positioning
 
 > [!IMPORTANT]
-> **LastWaveX is a high-fidelity Online Streaming Music Client**, powered by the YouTube Music catalog and Lossless Qobuz/FLAC CDN streams, paired with optional local caching, downloads, and local device audio scanning. It is engineered by Ishan for audiophiles and power listeners who want cloud streaming flexibility without compression artifacts, advertisement tracking, or proprietary app bloat.
+> **Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)** — meaning *Infinite Sound* — is a high-fidelity Online Streaming Music Client and Universal Audiophile Player, powered by the YouTube Music catalog and Lossless FLAC/Qobuz CDN streams, paired with local audio file playback. Engineered by Ishan ([@Ishan____404](https://x.com/Ishan____404)) for audiophiles and power listeners who demand uncompromising sound quality without advertisement tracking, telemetry, or proprietary app bloat.
 
-Every tier of the audio pipeline—from raw PCM processing in native C++ to millisecond-accurate synchronized karaoke typography—has been built from scratch to eliminate playback lag, audio distortion, and battery drain.
-
----
-
-## 🚀 Major Release Highlights: v1.0.0 Audiophile Studio Edition
-
-* **31-Band Studio Graphic Equalizer:** Full professional ISO 1/3-octave center frequencies (20 Hz to 20 kHz) with ±12.0 dB range and 0.1 dB precision.
-* **Master Preamp Gain Staging:** Dedicated -10.0 dB to +10.0 dB master preamp control to prevent digital clipping when boosting equalizer bands.
-* **Custom EQ Profile JSON Export & Import:** Full JSON serialization and SAF file import/export for custom 31-band tuning profiles.
-* **ReplayGain 2.0 / ITU-R BS.1770 (R128) Loudness Normalization:** Perceived LUFS target leveling (+2.0 dB) with a soft limiter ceiling (-0.5 dBFS) preventing inter-sample clipping.
-* **Logarithmic Fade-Out Sleep Timer:** Natural, audiophile exponential decay curve over the final 30 seconds of playback.
-* **Pitch & Tempo Shift Controls:** Independent Pitch (0.8x to 1.2x) and Speed/Tempo (0.5x to 2.0x) parameters via Media3 `PlaybackParameters`.
-* **31-Point Bézier Frequency Visualizer:** Real-time smooth Bézier spline curve on Canvas with ambient gradient fill.
-* **Total Bloat Removal & Developer Branding:** 100% excised all AI dependencies and background services for zero background drain. Crafted with passion by **Ishan** ([@Ishan____404](https://x.com/Ishan____404)).
+Every tier of the audio pipeline—from raw 32-bit Float PCM processing in C++ to millisecond-accurate synchronized karaoke typography—is built to eliminate playback jitter, audio distortion, and background battery drain.
 
 ---
 
-## ⚡ What Makes LastWaveX Different?
+## 🌟 Key Upgrades & Highlights (Since v1.0.0)
 
-| Conventional Players | LastWaveX |
-| :--- | :--- |
-| **Resampled Android Audio** (48 kHz forced mixing) | **Bit-Perfect Direct Passthrough** bypassing Android's mixer for external USB DACs |
-| **Jarring Volume Differences** across tracks | **R128 Loudness Normalization** (+2 dB target leveling) with -0.5 dBFS soft limiter |
-| **Spoken Intros & Long Music Video Sketches** | **Integrated SponsorBlock** automatically seeking past filler, intros, and dead air |
-| **Static Square Covers** | **Rotating Vinyl Record Mode** with physical spin deceleration and grooved rings |
-| **Basic Unsynced Text** | **Word-by-Word Karaoke Motion**, Romaji/Pinyin phonetics, and real-time translations |
-| **Bloated Social Feeds & Ad Tracking** | **100% Open-Source (GPLv3)**, privacy-respecting, zero telemetry, zero advertisements |
+### 1. 🎛️ 31-Band Studio Graphic EQ Suite + Parametric Q-Factor
+- **Full 31 ISO Center Frequencies**: Spanning 20 Hz to 20 kHz with -12.0 dB to +12.0 dB precision sliders.
+- **Parametric Q Bandwidth Control**: Adjustable filter bell resonance (0.5 to 2.8, default 1.414 / √2) for surgical notch filtering or broad tonal sculpting.
+- **Master Preamp Gain Staging**: Slider (-10.0 dB to +10.0 dB) to eliminate digital clipping when boosting bands.
+- **18 Studio Presets**: Flat, Studio Master, Harman Target, Diffuse-Field, Acoustic Strings, Classical Hall, Smooth Jazz, Bass Punch, Sub-Bass Rumble, Bass Cut, Vocal Warmth, Hard Rock, Heavy Metal, EDM / Club, Hip-Hop 808, R&B Soul, Lounge, and Podcast Voice.
+- **JSON Profile Import, Export & Copy Code**: Full SAF profile serialization and 1-tap clipboard code sharing.
+
+### 2. 🎧 Binaural Headphone Crossfeed & Dual-DSP Engine
+- **BS2B Acoustic Room Tuning**: Crossfeed algorithm (`levelDb` 3.0 to 9.5 dB, 700 Hz cutoff) simulates natural speaker acoustic decay on headphones, eliminating fatigue during extended listening sessions.
+- **Dual-DSP Pipeline**: Parallel `oboeDsp_` and `mediaDsp_` instances process both native Oboe output and platform MediaCodec streams with zero dropped frames.
+
+### 3. 🎨 Decoupled Canvas Shaders & Refractive Resonance Prism Icon
+- **8 Pure Backdrop Canvas Engines**: `AMOLED_BLACK` (pure #000000 with sub-bass radial glow), `HDR_VIVID` (high-contrast gradient with pulse), `FLUID_GRADIENT`, `AMBIENT_GLOW`, `DYNAMIC_HARMONY`, `DYNAMIC_MONET`, `PRISM_SPECTRUM`, and `BLURRED_GLASS`.
+- **Decoupled Rendering**: Canvas shaders render cleanly without muddy or dark artwork overlays.
+- **Refractive Resonance Prism Icon**: Brand-new adaptive icon and standalone vector logo with specular glass ring and gradient audio wave.
+
+### 4. 📊 5 Selectable Seekbar Styles
+- **Wavy Fluid**: Multi-frequency sine wave undulating during playback and flattening on pause.
+- **Segmented Dash**: High-tech 32-segment dashed time bar with glowing progress heads.
+- **Minimal Pill**: Ultra-slim line expanding into a tactile pill on touch.
+- **Studio Console**: Precision analog mixing desk fader with tick marks and numeric readout.
+- **Capsule Pill**: Stadium-rounded tactile pill slider.
+
+### 5. 📱 Clean Player Architecture & Tactile Gestures
+- **Uncluttered Transport Deck**: Removed enclosing pill shapes and Surface boxes around play/pause and metadata—controls sit directly over the dynamic background canvas.
+- **5 Layout Architectures**: `MODERN_M3`, `CLASSIC` (centered 320dp artwork), `IMMERSIVE_FULLSCREEN` (expanded 420dp art), `MINIMALIST` (typography-first 220dp art), and `COMPACT_DOCK` (bottom-anchored controls).
+- **Physics & Gestures**: Left/Right 30% double-tap seek (±5s/10s), Center 40% double-tap heart burst with spring scaling, vertical drag dismiss into mini player, and tactile haptic feedback.
+
+### 6. 🎙️ Ambient Audio Recognition & Voice Search
+- **In-App Sound Search**: 5-second 16-bit PCM AudioRecord capture with radar pulse animation, identifying tracks via AudD / SoundSearch and displaying high-res match cards with a 1-tap **"Play Now in LastWaveX"** button.
+- **Voice Search & Multi-Source Tabs**: SpeechRecognizer integration with multi-category tabs: Tracks, Artists, Albums, Playlists, Users, and **Local Files** (`SearchTab.LOCAL`).
+
+### 7. 📶 Stream Quality & Storage Cache Controls
+- **Per-Network Streaming Tiers**: Independent quality settings for Wi-Fi (Hi-Res Lossless 24/192, 24/96, CD 16/44.1, 320k) and Cellular (Data Saver 160k, 320k, Match Wi-Fi) with Auto Data-Saver toggle.
+- **1-Tap Cache Manager**: Calculates temporary audio/image cache size and wipes temporary chunk buffers without touching downloaded offline tracks.
+
+### 8. 📜 Lyrics Engine & Quote Exporter
+- **Multi-Engine Fallback**: LRCLIB, Kugou, and TTML engines with dual "Translate" and "Phonetic" toggles.
+- **8 Kinetic Animation Presets**: Apple Fluid, Karaoke Pulse, Kinetic Slide, Cinematic Focus, Lossless Glow, Glass Elevation, Dynamic Focus Zoom, and Minimal Clean.
+- **1080×1350 Quote Exporter**: Select 1–4 lyric lines and export shareable PNG quote cards in Minimalist Dark, Dynamic Gradient, or Frosted Glassmorphic styles.
+
+### 9. 🌐 Integrations (Last.fm & Discord RPC)
+- **Last.fm Overhaul**: Local offline scrobble queuing in Room/memory with auto-flush on connection restore, real-time love/unlove sync on track heart tap, and configurable scrobble percent threshold (25% to 90%).
+- **Discord Rich Presence**: Sends live track title, artist, album, elapsed/total playback timestamps, high-res artwork URL, and `"Listen on YouTube Music"` action buttons via Discord Gateway WebSocket.
+
+### 10. 📊 Audio Diagnostics HUD & Offline Audio
+- **Full Hardware Signal Path**: Input Source → Decoder → 31-Band C++ DSP Engine → R128 Loudness Enhancer → AudioTrack / USB DAC.
+- **Live Telemetry & Copy Report**: Real-time sample rate, bit depth, bitrate, jitter (0.0 ms), buffer health, R128 target (+2.0 LUFS), volume headroom, and 1-tap "Copy Full Diagnostics" report button.
+- **Logarithmic Sleep Timer**: Exponential decay volume fade-out over the final 30 seconds of playback.
 
 ---
 
-## 📱 In-App Screenshots Showcase
+## ⚡ Feature Comparison
 
-<div align="center">
-  <img src="docs/assets/screenshots/feed.png" width="23%" alt="Feed & Discovery" />
-  <img src="docs/assets/screenshots/player_vinyl.png" width="23%" alt="Rotating Vinyl Player" />
-  <img src="docs/assets/screenshots/equalizer.png" width="23%" alt="31-Band Studio Equalizer" />
-  <img src="docs/assets/screenshots/diagnostics.png" width="23%" alt="Hardware Diagnostics" />
-</div>
+| Feature | Conventional Players | Ananta Dhvani |
+| :--- | :--- | :--- |
+| **USB DAC Output** | Resampled forced 48 kHz mixing | **Bit-Perfect Direct Passthrough** bypassing Android system mixer |
+| **Equalizer** | Basic 5-band system EQ | **31-Band Studio Graphic EQ** + Parametric Q + Preamp + 18 Presets |
+| **Acoustic Tuning** | Flat stereo output | **Binaural Headphone Crossfeed** (BS2B algorithm) |
+| **Volume Leveling** | Inconsistent track volumes | **R128 Loudness Normalization** (+2 dB target, -0.5 dBFS soft limiter) |
+| **Commercial Intros / Skits** | Played in full | **Integrated SponsorBlock** automatically skipping filler & dead air |
+| **Lyrics Experience** | Basic unsynced text | **Word-by-Word Karaoke Motion**, Phonetics, Translations, PNG Exporter |
+| **Privacy & Telemetry** | Ad tracking & analytics SDKs | **100% Free & Open-Source (GPLv3)**, Zero Telemetry, Zero Ads |
 
 ---
 
-## ✨ Implemented Features Matrix
+## 🛡️ Security, Privacy & Integrity
 
-### 🎛️ Studio-Grade Audio Engine & DSP
-* **Bit-Perfect Mode:** Routes raw bit-exact streams directly to external USB DACs, bypassing the Android system resampler and software EQ.
-* **31-Band Studio Equalizer:** Full ISO 1/3-octave graphic equalizer with instant zero-stutter gain switching, preamp gain staging, and JSON profile import/export.
-* **R128 Loudness Normalization:** Perceived LUFS target leveling with soft-knee limiting.
-* **Dynamic Bass Boost:** Real-time low-frequency harmonics amplification (20 Hz to 160 Hz) with soft-knee limiting.
-* **Configurable Crossfade:** Smooth 1 to 12-second dual-player overlapping transitions.
-* **Skip Silence:** Detects and skips dead air in audio tracks without clipping vocal tails.
-* **Playback Speed & Pitch Controls:** Independent Speed (0.5x to 2.0x) and Pitch (0.8x to 1.2x) sliders.
-* **Stats for Nerds HUD:** Real-time overlay displaying active audio codec, sample rate, bit depth, channel configuration, and DAC output clock drift.
+We prioritize user safety, code auditability, and absolute transparency:
 
-### 🎙️ Advanced Lyrics & Card Generator
-* **Synchronized & Word-by-Word Lyrics:** Millisecond-accurate vocal highlighting powered by LRCLIB, Kugou, and TTML engines.
-* **Dual Translation & Phonetics Toggles:** One-tap header controls to display English translations and Romanized (Romaji/Pinyin) guides for non-Latin songs.
-* **Lyric Card / Quote Image Generator:** Highlight 1–4 lines of lyrics and export as high-resolution (1080×1350) shareable cards in three designs.
-
-### 🎨 Visual Architecture & Customization
-* **Rotating Vinyl Record Mode:** Transforms standard album covers into a spinning vinyl record with grooved micro-rings and realistic momentum physics.
-* **8 Dynamic Backdrop Engines:** `HDR_VIVID`, `FLUID_GRADIENT`, `DYNAMIC_HARMONY`, `AMBIENT_GLOW`, `DYNAMIC_MONET`, `AMOLED_BLACK`, `BLURRED_GLASS`, and `PRISM_SPECTRUM`.
-* **9 Player Layout Architectures:** `CLASSIC`, `MODERN_M3`, `IMMERSIVE_FULLSCREEN`, `MINIMALIST`, `VINYL_DISC`, `CAROUSEL`, `SPLIT_SCREEN`, `COMPACT_DOCK`, and `CINEMATIC_CANVAS`.
+* **VirusTotal Clean Verification**: Every compiled release APK (`app-release.apk`) is independently audited across 70+ leading antivirus engines with **0/70 detections (Safe / Clean)**.
+* **Zero Telemetry & Spyware**: No AdMob, no Google Analytics, no Firebase tracking, and zero background data harvesting. Network calls query public endpoints directly without intermediate proxy servers.
+* **ProGuard Log Sanitization**: All `Log.v`, `Log.d`, and `Log.i` debug calls are stripped in release builds (`-assumenosideeffects class android.util.Log`).
+* **Cleartext Traffic Elimination**: Enforces `cleartextTrafficPermitted="false"` across `AndroidManifest.xml` and `network_security_config.xml`.
+* **Hardware-Backed Keystore**: Credentials (e.g. Discord tokens, Last.fm sessions) are encrypted locally using Android Keystore AES-256-GCM.
 
 ---
 
 ## 🏛️ Technical Foundation
 
-LastWaveX is structured under **Clean Architecture** and reactive unidirectional data flow (UDF):
+Ananta Dhvani is structured under **Clean Architecture** and reactive unidirectional data flow (UDF):
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
@@ -122,48 +141,42 @@ LastWaveX is structured under **Clean Architecture** and reactive unidirectional
 * **Audio Stack:** ExoPlayer (Media3), Android AudioTrack, and C++ Oboe DSP bridge.
 * **Persistence:** Android Jetpack DataStore (Preferences) and Room Database with SQLite.
 * **Networking & Concurrency:** OkHttp 4.12, Retrofit 2, Kotlin Coroutines, and `StateFlow`.
-* **Image Loading:** Coil with asynchronous bitmap preloading for card exporters.
+* **Image Loading:** Coil with asynchronous bitmap preloading.
 * **Test Suite:** 24 Unit Tests verifying DSP math, offline LRC parsing, and mock streams with 0 skips and 0 failures.
 
 ---
 
-## 🗺️ Project Roadmap
+## 🛠️ Building from Source
 
-### ✅ Completed
-* 31-Band Studio Equalizer (20 Hz – 20 kHz with 0.1 dB precision)
-* Master Preamp Gain Staging (-10 dB to +10 dB) & JSON profile import/export
-* Real-time 31-point Bézier frequency curve canvas visualizer
-* R128 / ITU-R BS.1770 Loudness Normalization
-* Logarithmic Fade-Out Sleep Timer
-* Pitch & Speed/Tempo Shift Controls
-* MediaStore Local Audio Scanner (FLAC/MP3 import)
-* Storage Cache Cleaner & Storage Manager
-* VirusTotal 0/70 Safe security verification (ArchiveTune Nightly standard)
+### Prerequisites
+* **Android Studio**: Ladybug / 2024.2.1+ or IntelliJ IDEA with Android plugin.
+* **JDK**: OpenJDK 17 or higher.
+* **Android SDK**: API Level 35 (Android 15) with NDK 28.2.
 
-### 🔄 In Progress
-* ReplayGain 2.0 track-level metadata tag reader
-* Advanced parametric Q bandwidth slider
+### Build Commands
+```bash
+# Clone repository
+git clone https://github.com/Specttre404/LastWaveX.git
+cd LastWaveX
 
-### 📋 Planned
-* Custom user EQ preset sharing hub
-* Extended multi-channel spatial binaural panner
+# Run Kotlin compilation check
+./gradlew app:compileDebugKotlin
 
----
+# Execute unit tests
+./gradlew app:testDebugUnitTest
 
-## 🛡️ Security & Safety Verification (VirusTotal Safe)
+# Build Release APK
+./gradlew app:assembleRelease
+```
 
-LastWaveX is 100% Free and Open-Source Software (GPLv3). We prioritize user safety, auditability, and transparency:
-
-* **VirusTotal Scanned:** Every compiled release APK (`app-release.apk`) is independently audited across 70+ leading antivirus and security engines (Kaspersky, Avast, BitDefender, Google Play Protect, Microsoft Defender, etc.) with **0/70 detections (Safe / Clean)**, following ArchiveTune Nightly's verification standards.
-* **Zero Telemetry & Spyware:** No commercial tracking SDKs, no Google AdMob, no behavioral analytics, and zero background data collection. All network requests query public endpoints directly without intermediate proxy servers.
-* **Hardware-Backed Keystore:** External credentials (e.g., Discord Gateway tokens, Last.fm sessions) are encrypted locally using Android Keystore AES-256-GCM. Plaintext tokens are never logged or stored in plain preferences.
+The compiled release APK will be generated at `app/build/outputs/apk/release/app-release.apk`.
 
 ---
 
 ## 📜 Credits & Upstream Acknowledgments
 
 We stand on the shoulders of giants in the open-source Android audio community:
-* **[LastWave](https://github.com/Specttre404/LastWaveX)** — Original foundational architecture, baseline playback service, and UI inspiration.
+* **[LastWave](https://github.com/Specttre404/LastWaveX)** — Foundational architecture, baseline playback service, and original UI inspiration.
 * **[ArchiveTune Nightly](https://github.com/ArchiveTune)** — Inspiration for audiophile tuning, clean design language, and transparent security/VirusTotal audit practices.
 * **[VIVI Music](https://github.com/vivi-music/vivi)** — Foundational open-source music client architecture, stream resolution patterns, and queue management.
 * **[Media3 ExoPlayer](https://developer.android.com/media/media3)** — Android audio playback foundation.
@@ -179,18 +192,18 @@ We stand on the shoulders of giants in the open-source Android audio community:
 Connect with the developer and maintainer:
 * **Developer:** **Ishan**
 * **X (formerly Twitter):** [@Ishan____404](https://x.com/Ishan____404)
-* **GitHub Discussions:** [LastWaveX Discussions](https://github.com/Specttre404/LastWaveX/discussions)
-* **Bug Reports & Feature Requests:** [LastWaveX Issues](https://github.com/Specttre404/LastWaveX/issues)
+* **GitHub Discussions:** [Ananta Dhvani Discussions](https://github.com/Specttre404/LastWaveX/discussions)
+* **Bug Reports & Feature Requests:** [Ananta Dhvani Issues](https://github.com/Specttre404/LastWaveX/issues)
 
 ---
 
 ## ⚖️ Disclaimer & License
 
-LastWaveX is developed for educational, private, and research purposes. All music streaming content is accessed via publicly available network interfaces. All trademarks, track names, artist identities, and album covers belong to their respective copyright holders.
+Ananta Dhvani is developed for educational, private, and research purposes. All music streaming content is accessed via publicly available network interfaces. All trademarks, track names, artist identities, and album covers belong to their respective copyright holders.
 
 Distributed under the **GNU General Public License v3.0 (GPLv3)**. See [`LICENSE`](LICENSE) for complete terms.
 
 <div align="center">
-  <p><b>LastWaveX</b> — Free &amp; Open Source Software for Android</p>
+  <p><b>Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)</b> — Free &amp; Open Source Software for Android</p>
   <p>Crafted with passion by <a href="https://x.com/Ishan____404">Ishan (@Ishan____404)</a></p>
 </div>
