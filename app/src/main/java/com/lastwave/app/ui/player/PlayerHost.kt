@@ -663,6 +663,7 @@ private fun ExpandedPlayer(
         lyricsUiVersion = settings.lyricsUiVersion,
         lyricsAnimation = settings.lyricsAnimation,
         wavySeekbarEnabled = settings.wavySeekbarEnabled,
+        seekbarStyle = settings.seekbarStyle,
         playerCoverStyle = settings.playerCoverStyle,
         playerStyle = settings.playerStyle,
         playerBackgroundStyle = settings.playerBackgroundStyle,
@@ -1429,6 +1430,7 @@ private fun FullPlayer(
     lyricsUiVersion: LyricsUiVersion = LyricsUiVersion.MODERN,
     lyricsAnimation: LyricsAnimation = LyricsAnimation.APPLE_FLUID,
     wavySeekbarEnabled: Boolean = true,
+    seekbarStyle: com.lastwave.app.data.local.SeekbarStyle = com.lastwave.app.data.local.SeekbarStyle.WAVY_FLUID,
     playerCoverStyle: com.lastwave.app.data.local.PlayerCoverStyle = com.lastwave.app.data.local.PlayerCoverStyle.SQUARE_COVER,
     playerStyle: com.lastwave.app.data.local.PlayerStyle = com.lastwave.app.data.local.PlayerStyle.MODERN_M3,
     playerBackgroundStyle: com.lastwave.app.data.local.PlayerBackgroundStyle = com.lastwave.app.data.local.PlayerBackgroundStyle.BLURRED_GLASS,
@@ -2268,6 +2270,7 @@ private fun FullPlayer(
                                         isPlaying = state.isPlaying,
                                         trackKey = track.videoId ?: "${track.artist}|${track.title}",
                                         wavyEnabled = wavySeekbarEnabled,
+                                        seekbarStyle = seekbarStyle,
                                         onSeek = player::seekTo,
                                         isTranslucent = false,
                                     )
@@ -2429,6 +2432,7 @@ private fun SeekBar(
     isPlaying: Boolean,
     trackKey: String?,
     wavyEnabled: Boolean = true,
+    seekbarStyle: com.lastwave.app.data.local.SeekbarStyle = com.lastwave.app.data.local.SeekbarStyle.WAVY_FLUID,
     onSeek: (Long) -> Unit,
     isTranslucent: Boolean = false,
 ) {
@@ -2442,6 +2446,7 @@ private fun SeekBar(
             onSeek = onSeek,
             isTranslucent = isTranslucent,
             trackKey = trackKey,
+            seekbarStyle = seekbarStyle,
         )
         return
     }

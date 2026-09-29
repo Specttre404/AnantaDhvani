@@ -267,21 +267,56 @@ fun SearchScreen(
                                     }
                                 }
 
+                                var showAudioRecognitionSheet by remember { mutableStateOf(false) }
+
+                                val voiceSearchLauncher = rememberLauncherForActivityResult(
+                                    contract = ActivityResultContracts.StartActivityForResult(),
+                                ) { result ->
+                                    if (result.resultCode == android.app.Activity.RESULT_OK) {
+                                        val spokenText = result.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+                                        if (!spokenText.isNullOrBlank()) {
+                                            viewModel.executeSearch(spokenText)
+                                        }
+                                    }
+                                }
+
                                 IconButton(
                                     onClick = {
-                                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                                            viewModel.startAudioRecognition()
-                                        } else {
-                                            micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                        val intent = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                            putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                            putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Speak track, artist, or album name...")
                                         }
+                                        runCatching { voiceSearchLauncher.launch(intent) }
                                     },
                                     modifier = Modifier.size(28.dp),
                                 ) {
                                     Icon(
                                         Icons.Filled.Mic,
+                                        contentDescription = "Voice Search",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                }
+
+                                IconButton(
+                                    onClick = { showAudioRecognitionSheet = true },
+                                    modifier = Modifier.size(28.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Filled.GraphicEq,
                                         contentDescription = "Identify song by audio",
                                         tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(18.dp),
+                                    )
+                                }
+
+                                if (showAudioRecognitionSheet) {
+                                    com.lastwave.app.ui.common.AudioRecognitionSheet(
+                                        recognitionManager = viewModel.audioRecognitionManager,
+                                        onDismiss = { showAudioRecognitionSheet = false },
+                                        onPlayRecognizedTrack = { song ->
+                                            viewModel.executeSearch(song.query)
+                                        },
                                     )
                                 }
                             }
@@ -509,7 +544,7 @@ fun SearchScreen(
                                                 },
                                                 onMenu = {
                                                     menuTarget = when (state.tab) {
-                                                        SearchTab.TRACKS -> TrackMenuTarget.Track(topResult.name, topResult.artist.orEmpty(), topResult.url)
+                                                        SearchTab.TRACKS, SearchTab.LOCAL -> TrackMenuTarget.Track(topResult.name, topResult.artist.orEmpty(), topResult.url)
                                                         SearchTab.ARTISTS -> TrackMenuTarget.Artist(topResult.name, topResult.url)
                                                         SearchTab.ALBUMS -> TrackMenuTarget.Album(topResult.name, topResult.artist.orEmpty(), topResult.url)
                                                         SearchTab.PLAYLISTS, SearchTab.USERS -> null
@@ -525,7 +560,7 @@ fun SearchScreen(
                                         key = { it.entityId ?: it.url.ifBlank { it.name + it.artist.orEmpty() } },
                                         contentType = { "search_result" },
                                     ) { item ->
-                                        val isItemPlaying = state.tab == SearchTab.TRACKS && playbackState.isPlaying &&
+                                        val isItemPlaying = (state.tab == SearchTab.TRACKS || state.tab == SearchTab.LOCAL) && playbackState.isPlaying &&
                                             playbackState.current?.title.equals(item.name, ignoreCase = true) &&
                                             (item.artist.isNullOrBlank() || playbackState.current?.artist.equals(item.artist, ignoreCase = true))
 
@@ -542,7 +577,7 @@ fun SearchScreen(
                                                 }
                                             },
                                             onLongClick = {
-                                                if (state.tab == SearchTab.TRACKS) {
+                                                if (state.tab == SearchTab.TRACKS || state.tab == SearchTab.LOCAL) {
                                                     addToPlaylist(
                                                         com.lastwave.app.playback.PlayableTrack(
                                                             title = item.name,
@@ -556,7 +591,7 @@ fun SearchScreen(
                                             },
                                             onMenu = {
                                                 menuTarget = when (state.tab) {
-                                                    SearchTab.TRACKS -> TrackMenuTarget.Track(item.name, item.artist.orEmpty(), item.url)
+                                                    SearchTab.TRACKS, SearchTab.LOCAL -> TrackMenuTarget.Track(item.name, item.artist.orEmpty(), item.url)
                                                     SearchTab.ARTISTS -> TrackMenuTarget.Artist(item.name, item.url)
                                                     SearchTab.ALBUMS -> TrackMenuTarget.Album(item.name, item.artist.orEmpty(), item.url)
                                                     SearchTab.PLAYLISTS, SearchTab.USERS -> null
@@ -722,7 +757,7 @@ private fun TopResultCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val fallback = when (tab) {
-                SearchTab.TRACKS -> if (isPlaying) Icons.Filled.GraphicEq else Icons.Filled.MusicNote
+                SearchTab.TRACKS, SearchTab.LOCAL -> if (isPlaying) Icons.Filled.GraphicEq else Icons.Filled.MusicNote
                 SearchTab.ARTISTS -> Icons.Filled.Person
                 SearchTab.ALBUMS -> Icons.Filled.Album
                 SearchTab.PLAYLISTS -> Icons.AutoMirrored.Filled.QueueMusic
@@ -759,6 +794,7 @@ private fun TopResultCard(
                             SearchTab.ARTISTS -> "TOP ARTIST"
                             SearchTab.ALBUMS -> "TOP ALBUM"
                             SearchTab.PLAYLISTS -> "TOP PLAYLIST"
+                            SearchTab.LOCAL -> "LOCAL FILE"
                             SearchTab.USERS -> "USER"
                         },
                         style = MaterialTheme.typography.labelSmall,
@@ -775,7 +811,7 @@ private fun TopResultCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 val subtitle = when (tab) {
-                    SearchTab.TRACKS -> item.artist.orEmpty()
+                    SearchTab.TRACKS, SearchTab.LOCAL -> item.artist.orEmpty()
                     SearchTab.ALBUMS -> item.artist.orEmpty()
                     SearchTab.PLAYLISTS -> item.subtitle.orEmpty()
                     SearchTab.ARTISTS -> item.subtitle.orEmpty().ifBlank { "Artist" }
@@ -966,13 +1002,13 @@ private fun SearchResultRow(
             .combinedClickable(
                 enabled = tab != SearchTab.USERS,
                 onClick = onClick,
-                onLongClick = if (tab == SearchTab.TRACKS) onLongClick else onMenu,
+                onLongClick = if (tab == SearchTab.TRACKS || tab == SearchTab.LOCAL) onLongClick else onMenu,
             )
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val fallback = when (tab) {
-            SearchTab.TRACKS -> if (isPlaying) Icons.Filled.GraphicEq else Icons.Filled.MusicNote
+            SearchTab.TRACKS, SearchTab.LOCAL -> if (isPlaying) Icons.Filled.GraphicEq else Icons.Filled.MusicNote
             SearchTab.ARTISTS -> Icons.Filled.Person
             SearchTab.ALBUMS -> Icons.Filled.Album
             SearchTab.PLAYLISTS -> Icons.AutoMirrored.Filled.QueueMusic
@@ -1002,7 +1038,7 @@ private fun SearchResultRow(
                 overflow = TextOverflow.Ellipsis,
             )
             val subtitle = when (tab) {
-                SearchTab.TRACKS -> listOfNotNull(item.artist, item.subtitle).joinToString(" \u00b7 ")
+                SearchTab.TRACKS, SearchTab.LOCAL -> listOfNotNull(item.artist, item.subtitle).joinToString(" \u00b7 ")
                 SearchTab.ALBUMS -> item.subtitle ?: item.artist.orEmpty()
                 SearchTab.PLAYLISTS -> item.subtitle.orEmpty()
                 SearchTab.ARTISTS -> item.subtitle.orEmpty()
@@ -1037,6 +1073,7 @@ private fun SearchFilterPills(
         SearchTab.ARTISTS to "Artists",
         SearchTab.ALBUMS to "Albums",
         SearchTab.PLAYLISTS to "Playlists",
+        SearchTab.LOCAL to "Local Files",
         SearchTab.USERS to "Users",
     )
     Row(

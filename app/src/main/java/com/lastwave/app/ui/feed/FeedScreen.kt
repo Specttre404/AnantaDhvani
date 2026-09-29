@@ -953,6 +953,7 @@ private fun FeedLoadingSkeleton() {
 
 @Composable
 private fun FeedFooter(lastUpdatedMillis: Long) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val label = remember(lastUpdatedMillis) {
         if (lastUpdatedMillis <= 0L) "Made for you from your taste"
         else try {
@@ -964,11 +965,12 @@ private fun FeedFooter(lastUpdatedMillis: Long) {
             "Made for you from your taste"
         }
     }
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp, bottom = 4.dp),
-        contentAlignment = Alignment.Center,
+            .padding(top = 12.dp, bottom = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
             label,
@@ -976,6 +978,28 @@ private fun FeedFooter(lastUpdatedMillis: Long) {
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
         )
+        Text(
+            "Crafted with passion by Ishan",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Surface(
+            onClick = {
+                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://x.com/Ishan____404"))
+                try { context.startActivity(intent) } catch (_: Exception) {}
+            },
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.padding(top = 2.dp),
+        ) {
+            Text(
+                "@Ishan____404 on X (Twitter)",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            )
+        }
     }
 }
 

@@ -43,14 +43,18 @@ class YouTubeStreamExtractor @Inject constructor(
         } catch (error: Exception) {
             throw IOException("YouTube stream extraction failed for $videoId", error)
         }
-        val stream = if (preferM4a) {
-            info.audioStreams
-                .filter { it.format?.mimeType?.contains("mp4") == true || it.format?.mimeType?.contains("m4a") == true }
-                .maxByOrNull { maxOf(it.averageBitrate, it.bitrate) }
-                ?: info.audioStreams.maxByOrNull { maxOf(it.averageBitrate, it.bitrate) }
-        } else {
-            info.audioStreams.maxByOrNull { maxOf(it.averageBitrate, it.bitrate) }
-        } ?: throw IOException("YouTube returned no playable audio stream for $videoId")
+        val stream = info.audioStreams.maxByOrNull { s ->
+            val rate = maxOf(s.averageBitrate, s.bitrate)
+            val isOpus = s.format?.mimeType?.contains("webm") == true || s.format?.mimeType?.contains("opus") == true
+            val isAac = s.format?.mimeType?.contains("mp4") == true || s.format?.mimeType?.contains("m4a") == true
+            when {
+                preferM4a && isAac -> rate * 10
+                !preferM4a && isOpus -> rate * 10
+                isAac || isOpus -> rate * 5
+                else -> rate
+            }
+        } ?: info.audioStreams.maxByOrNull { maxOf(it.averageBitrate, it.bitrate) }
+        ?: throw IOException("YouTube returned no playable audio stream for $videoId")
         val reportedBitrate = maxOf(stream.averageBitrate, stream.bitrate)
         val result = YouTubeAudioStream(
             videoId = videoId,

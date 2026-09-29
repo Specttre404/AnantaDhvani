@@ -41,7 +41,7 @@ class SearchViewModel @Inject constructor(
     private val repository: SearchRepository,
     private val historyRepository: SearchHistoryRepository,
     private val musicPlayer: MusicPlayer,
-    private val audioRecognitionManager: com.lastwave.app.data.recognition.AudioRecognitionManager,
+    val audioRecognitionManager: com.lastwave.app.data.recognition.AudioRecognitionManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -174,7 +174,7 @@ class SearchViewModel @Inject constructor(
         searchQueueJob?.cancel()
         val tab = _uiState.value.tab
         when (tab) {
-            SearchTab.TRACKS -> {
+            SearchTab.TRACKS, SearchTab.LOCAL -> {
                 val selected = PlayableTrack(
                     title = item.name,
                     artist = item.artist.orEmpty(),
@@ -182,8 +182,7 @@ class SearchViewModel @Inject constructor(
                     artworkUrl = item.artworkUrl,
                     videoId = item.videoId,
                 )
-                // Start immediately. Similar song radio queue loads and extends infinitely.
-                musicPlayer.play(selected, sourceLabel = "Search", startRadio = true)
+                musicPlayer.play(selected, sourceLabel = "Search", startRadio = tab == SearchTab.TRACKS)
             }
             SearchTab.ARTISTS, SearchTab.ALBUMS -> viewModelScope.launch {
                 val tracks = runCatching { repository.songsFor(item) }.getOrDefault(emptyList())

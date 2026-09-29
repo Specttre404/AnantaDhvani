@@ -36,6 +36,18 @@ enum class PlayerCoverStyle(val id: String, val title: String) {
     }
 }
 
+enum class SeekbarStyle(val id: String, val title: String, val description: String) {
+    WAVY_FLUID("wavy_fluid", "Wavy Fluid", "Multi-frequency sine wave undulating during playback and flattening on pause."),
+    SEGMENTED_DASH("segmented_dash", "Segmented Dash", "High-tech discrete dashed time bar with glowing progress heads."),
+    MINIMAL_PILL("minimal_pill", "Minimal Pill", "Ultra-slim line that expands into a tactile pill on touch."),
+    STUDIO_CONSOLE("studio_console", "Studio Console", "Precision analog mixing desk fader with tick marks and exact time readout.");
+
+    companion object {
+        fun fromId(id: String?): SeekbarStyle =
+            entries.firstOrNull { it.id == id } ?: WAVY_FLUID
+    }
+}
+
 enum class PlayerStyle(val id: String, val title: String, val description: String) {
     CLASSIC("classic", "Classic", "Traditional centered album art frame with standard linear controllers"),
     MODERN_M3("modern_m3", "Modern M3 Expressive", "M3 Expressive container tokens & asymmetrical radius blocks"),
@@ -156,6 +168,8 @@ data class MiscSettings(
     /** When true (default), uses the multi-layer dynamic wavy seekbar.
      *  When false, uses the classic standard progress slider in the player tab. */
     val wavySeekbarEnabled: Boolean = true,
+    /** Selectable seekbar style (Wavy Fluid, Segmented Dash, Minimal Pill, Studio Console). */
+    val seekbarStyle: SeekbarStyle = SeekbarStyle.WAVY_FLUID,
     /** When true (default), downloads fetch and save synced lyrics (.lrc companion files and embedded tags). */
     val downloadLyrics: Boolean = true,
     /** In-app language override tag: "system" (default), "en", "tr", "zh-Hans". */
@@ -277,6 +291,7 @@ class SettingsPreferences @Inject constructor(
         val PLAYER_BACKGROUND_STYLE = stringPreferencesKey("lw_player_background_style")
         val BACKGROUND_STYLE_INDEX = intPreferencesKey("background_style_index")
         val WAVY_SEEKBAR_ENABLED = booleanPreferencesKey("lw_wavy_seekbar_enabled")
+        val SEEKBAR_STYLE = stringPreferencesKey("lw_seekbar_style")
         val DOWNLOAD_LYRICS = booleanPreferencesKey("lw_download_lyrics")
         val APP_LANGUAGE = stringPreferencesKey("lw_app_language")
         val DOWNLOAD_FOLDER = stringPreferencesKey("lw_download_folder")
@@ -322,6 +337,7 @@ class SettingsPreferences @Inject constructor(
                 playerBackgroundStyle = p.readSafely(Keys.BACKGROUND_STYLE_INDEX)?.let { PlayerBackgroundStyle.entries.getOrNull(it) }
                     ?: PlayerBackgroundStyle.fromId(p.readSafely(Keys.PLAYER_BACKGROUND_STYLE)),
                 wavySeekbarEnabled = p.readSafely(Keys.WAVY_SEEKBAR_ENABLED) ?: true,
+                seekbarStyle = SeekbarStyle.fromId(p.readSafely(Keys.SEEKBAR_STYLE)),
                 downloadLyrics = p.readSafely(Keys.DOWNLOAD_LYRICS) ?: true,
                 appLanguageTag = AppLanguage.fromTag(p.readSafely(Keys.APP_LANGUAGE)).tag,
                 downloadFolder = sanitizeDownloadFolderName(p.readSafely(Keys.DOWNLOAD_FOLDER)),
@@ -487,6 +503,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setWavySeekbarEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.WAVY_SEEKBAR_ENABLED] = enabled }
+    }
+
+    suspend fun setSeekbarStyle(style: SeekbarStyle) {
+        dataStore.edit { it[Keys.SEEKBAR_STYLE] = style.id }
     }
 
     suspend fun setDownloadLyrics(enabled: Boolean) {

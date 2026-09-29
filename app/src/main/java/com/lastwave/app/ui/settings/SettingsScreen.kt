@@ -186,12 +186,13 @@ import kotlin.math.roundToInt
 
 private data class AccentPreset(val name: String, val hex: String)
 private val ACCENT_PRESETS = listOf(
-    AccentPreset("Crimson", "#E03030"),
-    AccentPreset("Violet", "#7C4DFF"),
-    AccentPreset("Ocean", "#2196C6"),
-    AccentPreset("Sage", "#6B9E6B"),
-    AccentPreset("Amber", "#E0A030"),
-    AccentPreset("Rose", "#E0507A"),
+    AccentPreset("Electric Cyan", "#00E5FF"),
+    AccentPreset("Neon Amethyst", "#9D4EDD"),
+    AccentPreset("Amber Tube", "#FFB703"),
+    AccentPreset("Obsidian Gold", "#D4AF37"),
+    AccentPreset("Emerald Hifi", "#06D6A0"),
+    AccentPreset("Cyber Magenta", "#FF007F"),
+    AccentPreset("Crimson Peak", "#E63946"),
 )
 
 // -- Expressive shape scale used only within this screen --
@@ -900,7 +901,7 @@ fun SettingsScreen(
                                 iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 title = stringResource(R.string.settings_wavy_seekbar),
                                 subtitle = if (misc.wavySeekbarEnabled) {
-                                    "Multi-layer fluid wavy progress slider"
+                                    "Style: ${misc.seekbarStyle.title} — ${misc.seekbarStyle.description}"
                                 } else {
                                     "Classic standard progress slider"
                                 },
@@ -908,6 +909,54 @@ fun SettingsScreen(
                                 onCheckedChange = viewModel::setWavySeekbarEnabled,
                                 position = position,
                             )
+                            4 -> if (misc.wavySeekbarEnabled) {
+                                Surface(
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                ) {
+                                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text("Seekbar Style", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                        com.lastwave.app.data.local.SeekbarStyle.entries.forEach { style ->
+                                            val selected = style == misc.seekbarStyle
+                                            Surface(
+                                                onClick = { viewModel.setSeekbarStyle(style) },
+                                                shape = CircleShape,
+                                                color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                                                modifier = Modifier.fillMaxWidth(),
+                                            ) {
+                                                Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                                    Text(
+                                                        style.title,
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                                                        color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                                                        modifier = Modifier.weight(1f),
+                                                    )
+                                                    if (selected) {
+                                                        Icon(Icons.Filled.Check, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                SettingsToggleCard(
+                                    icon = Icons.Filled.AutoAwesome,
+                                    iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                                    iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    title = stringResource(R.string.settings_studio_clarity),
+                                    subtitle = if (misc.isStudioMasterClarityEnabled) {
+                                        "Restores high-frequency detail and enhances audio spatial clarity"
+                                    } else {
+                                        "Original unshaped output"
+                                    },
+                                    checked = misc.isStudioMasterClarityEnabled,
+                                    onCheckedChange = viewModel::setStudioMasterClarity,
+                                    position = position,
+                                )
+                            }
                             4 -> SettingsToggleCard(
                                 icon = Icons.Filled.AutoAwesome,
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
@@ -2937,20 +2986,36 @@ private fun AccentPresetGrid(
     onPickMono: () -> Unit,
     onPickCustom: () -> Unit,
 ) {
-    // A preset only reads as "selected" while the user is actually in
-    // manual mode — Dynamic/Monochrome shouldn't light up whichever preset
-    // happens to hex-match by coincidence.
     fun isPresetSelected(hex: String) =
         currentMode == AccentMode.MANUAL && selectedHex?.equals(hex, ignoreCase = true) == true
     val customSelected = currentMode == AccentMode.MANUAL &&
         selectedHex != null &&
         ACCENT_PRESETS.none { it.hex.equals(selectedHex, ignoreCase = true) }
     val monoSelected = currentMode == AccentMode.MONOCHROME
+    val dynamicSelected = currentMode == AccentMode.DYNAMIC
 
-    // One unified 4-column tile grid — six color presets plus Mono and
-    // Custom as tiles of their own, not a separate row of pill buttons.
-    Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
-        ACCENT_PRESETS.take(4).forEach { preset ->
+    // 2 rows of 4 columns
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        ColorTile(
+            label = "Monet",
+            selected = dynamicSelected,
+            modifier = Modifier.weight(1f),
+            onClick = { onPickPreset("#00E5FF") }, // fallback preset triggers dynamic/monet
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        androidx.compose.ui.graphics.Brush.linearGradient(
+                            listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary),
+                        ),
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+            }
+        }
+        ACCENT_PRESETS.take(3).forEach { preset ->
             ColorTile(
                 label = preset.name,
                 selected = isPresetSelected(preset.hex),
@@ -2961,9 +3026,9 @@ private fun AccentPresetGrid(
             }
         }
     }
-    Spacer(Modifier.height(14.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
-        ACCENT_PRESETS.drop(4).forEach { preset ->
+    Spacer(Modifier.height(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        ACCENT_PRESETS.drop(3).take(2).forEach { preset ->
             ColorTile(
                 label = preset.name,
                 selected = isPresetSelected(preset.hex),
@@ -2989,7 +3054,7 @@ private fun AccentPresetGrid(
                     Icons.Filled.Contrast,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }
@@ -3004,16 +3069,16 @@ private fun AccentPresetGrid(
                     .fillMaxSize()
                     .background(
                         androidx.compose.ui.graphics.Brush.sweepGradient(
-                            listOf(Color(0xFFE03030), Color(0xFFE0A030), Color(0xFF6B9E6B), Color(0xFF2196C6), Color(0xFF7C4DFF), Color(0xFFE03030)),
+                            listOf(Color(0xFF00E5FF), Color(0xFF9D4EDD), Color(0xFFFFB703), Color(0xFF06D6A0), Color(0xFFFF007F), Color(0xFF00E5FF)),
                         ),
                     ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    Icons.Filled.Colorize,
+                    Icons.Filled.Palette,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }

@@ -80,8 +80,8 @@ fun PlayerBackgroundBackdrop(
                         .background(
                             Brush.radialGradient(
                                 colors = listOf(
-                                    dominantColor.copy(alpha = 0.9f),
-                                    accentColor.copy(alpha = 0.5f),
+                                    dominantColor.copy(alpha = 0.95f),
+                                    accentColor.copy(alpha = 0.60f),
                                     Color.Black,
                                 ),
                                 center = Offset(500f, 300f),
@@ -113,8 +113,8 @@ fun PlayerBackgroundBackdrop(
                             .background(
                                 Brush.linearGradient(
                                     colors = listOf(
-                                        dominantColor.copy(alpha = 0.7f),
-                                        accentColor.copy(alpha = 0.5f),
+                                        dominantColor.copy(alpha = 0.75f),
+                                        accentColor.copy(alpha = 0.55f),
                                         Color.Transparent,
                                     ),
                                     start = Offset(0f, 0f),
@@ -126,26 +126,19 @@ fun PlayerBackgroundBackdrop(
             }
 
             PlayerBackgroundStyle.DYNAMIC_HARMONY -> {
-                if (track != null) {
-                    BackdropBlur(radius = 24.dp, modifier = Modifier.fillMaxSize()) {
-                        ArtworkImage(
-                            name = track.title,
-                            artist = track.artist,
-                            embeddedUrl = track.artworkUrl,
-                            fallbackIcon = Icons.Filled.MusicNote,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer {
-                                    scaleX = 1.3f
-                                    scaleY = 1.3f
-                                    alpha = 0.70f
-                                },
-                            decodeSizePx = 200,
-                        )
-                    }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerHigh))
-                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    dominantColor.copy(alpha = 0.85f),
+                                    accentColor.copy(alpha = 0.40f),
+                                    MaterialTheme.colorScheme.background,
+                                )
+                            )
+                        ),
+                )
             }
 
             PlayerBackgroundStyle.AMBIENT_GLOW -> {
@@ -161,12 +154,12 @@ fun PlayerBackgroundBackdrop(
                             .background(
                                 Brush.radialGradient(
                                     colors = listOf(
-                                        dominantColor.copy(alpha = 0.4f),
-                                        accentColor.copy(alpha = 0.2f),
+                                        dominantColor.copy(alpha = 0.50f),
+                                        accentColor.copy(alpha = 0.30f),
                                         Color.Transparent,
                                     ),
                                     center = Offset(500f, 400f),
-                                    radius = 900f,
+                                    radius = 950f,
                                 ),
                             ),
                     )
@@ -195,7 +188,22 @@ fun PlayerBackgroundBackdrop(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black),
-                )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    colors = listOf(
+                                        dominantColor.copy(alpha = 0.18f),
+                                        Color.Transparent,
+                                    ),
+                                    center = Offset(500f, 450f),
+                                    radius = 700f,
+                                )
+                            )
+                    )
+                }
             }
 
             PlayerBackgroundStyle.BLURRED_GLASS -> {
@@ -213,7 +221,7 @@ fun PlayerBackgroundBackdrop(
                                     scaleY = 1.4f
                                     alpha = 0.65f
                                 },
-                            decodeSizePx = 200,
+                            decodeSizePx = null,
                         )
                     }
                 } else {
@@ -222,9 +230,9 @@ fun PlayerBackgroundBackdrop(
             }
 
             PlayerBackgroundStyle.PRISM_SPECTRUM -> {
-                val primary = dominantColor.copy(alpha = 0.6f)
-                val tertiary = accentColor.copy(alpha = 0.5f)
-                val secondary = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
+                val primary = dominantColor.copy(alpha = 0.65f)
+                val tertiary = accentColor.copy(alpha = 0.55f)
+                val secondary = MaterialTheme.colorScheme.secondary.copy(alpha = 0.45f)
 
                 Box(
                     modifier = Modifier

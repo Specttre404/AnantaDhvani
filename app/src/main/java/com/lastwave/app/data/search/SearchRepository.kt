@@ -22,7 +22,7 @@ import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class SearchTab { TRACKS, ARTISTS, ALBUMS, PLAYLISTS, USERS }
+enum class SearchTab { TRACKS, ARTISTS, ALBUMS, PLAYLISTS, USERS, LOCAL }
 
 @Immutable
 data class SearchResultItem(
@@ -46,6 +46,7 @@ class SearchRepository @Inject constructor(
     private val sessionPreferences: SessionPreferences,
     private val innerTube: InnerTubeMusicApi,
     private val http: OkHttpClient,
+    private val downloadedTrackDao: dagger.Lazy<com.lastwave.app.data.local.db.DownloadedTrackDao>,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -114,6 +115,21 @@ class SearchRepository @Inject constructor(
             SearchTab.USERS -> {
                 val key = sessionPreferences.session.first().apiKey
                 if (key.isBlank()) emptyList() else lookupUser(key, query)
+            }
+            SearchTab.LOCAL -> {
+                val downloaded = runCatching { downloadedTrackDao.get().getAllList() }.getOrDefault(emptyList())
+                downloaded.filter {
+                    it.title.contains(query, ignoreCase = true) || it.artist.contains(query, ignoreCase = true)
+                }.map {
+                    SearchResultItem(
+                        name = it.title,
+                        artist = it.artist,
+                        artworkUrl = it.artworkUrl,
+                        subtitle = if (it.album.isNotBlank()) it.album else "Local Offline Track",
+                        videoId = it.trackKey,
+                        entityId = it.trackKey,
+                    )
+                }
             }
         }.filter { it.name.isNotBlank() }
     }

@@ -198,6 +198,12 @@ fun MainShell(
             onOpenGenerator = onOpenGenerator,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
+
+        com.lastwave.app.ui.common.DynamicIslandCapsule(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(10f),
+        )
     }
 }
 
