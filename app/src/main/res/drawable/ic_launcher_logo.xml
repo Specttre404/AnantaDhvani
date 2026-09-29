@@ -1,28 +1,54 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="72dp"
     android:height="72dp"
     android:viewportWidth="72"
     android:viewportHeight="72">
-    <!-- LastWaveX Standalone In-App Logo: Prism Waveform (72dp x 72dp) -->
+    <!-- Background Circle -->
     <path
-        android:pathData="M 15.75,36 C 20.25,36 22.5,23.625 27,23.625 C 31.5,23.625 33.75,48.375 38.25,48.375 C 42.75,48.375 45,28.125 49.5,28.125 C 52.875,28.125 55.125,36 58.5,36"
+        android:pathData="M 36,0 A 36,36 0 1,1 35.99,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="36"
+                android:startY="0"
+                android:endX="36"
+                android:endY="72"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF13161F" />
+                <item android:offset="1.0" android:color="#FF0A0C10" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Glass Ring -->
+    <path
+        android:pathData="M 36,18 A 18,18 0 1,1 35.99,18 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#30FFFFFF"
+        android:fillColor="#00000000" />
+
+    <!-- Waveform -->
+    <path
+        android:pathData="M 16,36 C 20,36 23,24 28,24 C 33,24 35,48 40,48 C 45,48 47,28 52,28 C 54,28 56,36 58,36"
         android:strokeWidth="4.5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round">
-        <gradient
-            android:startX="15.75"
-            android:startY="23.625"
-            android:endX="58.5"
-            android:endY="48.375"
-            android:type="linear">
-            <item android:offset="0.0" android:color="#FF00E5FF" />
-            <item android:offset="0.5" android:color="#FF7C4DFF" />
-            <item android:offset="1.0" android:color="#FFFF4081" />
-        </gradient>
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="16"
+                android:startY="24"
+                android:endX="58"
+                android:endY="48"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00E5FF" />
+                <item android:offset="0.5" android:color="#FF9D4EDD" />
+                <item android:offset="1.0" android:color="#FFFF007F" />
+            </gradient>
+        </aapt:attr>
     </path>
 
     <!-- Pulse Node -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M 38.25,48.375 m -2,0 a 2,2 0 1,0 4,0 a 2,2 0 1,0 -4,0" />
+        android:pathData="M 40,48 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
 </vector>

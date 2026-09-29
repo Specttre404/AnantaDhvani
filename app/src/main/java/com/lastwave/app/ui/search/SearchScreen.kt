@@ -141,15 +141,7 @@ fun SearchScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val isListeningAudio by viewModel.isListeningAudio.collectAsStateWithLifecycle()
     val recognitionError by viewModel.recognitionError.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
-    val micPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        if (isGranted) {
-            viewModel.startAudioRecognition()
-        }
-    }
     val musicPlayer = com.lastwave.app.ui.player.LocalMusicPlayer.current
     val playbackState by musicPlayer.chromeState.collectAsStateWithLifecycle()
     var menuTarget by remember { mutableStateOf<TrackMenuTarget?>(null) }

@@ -52,3 +52,11 @@
 -dontwarn com.dokar.quickjs.**
 -dontwarn com.metrolist.innertubex.**
 -dontwarn io.ktor.**
+
+# Strip Log.v, Log.d, Log.i in release builds
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}

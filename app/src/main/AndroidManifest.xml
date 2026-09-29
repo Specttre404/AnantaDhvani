@@ -72,6 +72,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LastWave.Splash"
         android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:localeConfig="@xml/locales_config"
         android:hardwareAccelerated="true"
         android:largeHeap="true"
@@ -153,7 +154,7 @@
         <service
             android:name=".service.MediaScrobbleListenerService"
             android:exported="true"
-            android:label="LASTWAVEX Scrobbler"
+            android:label="LastWaveX Scrobbler"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />

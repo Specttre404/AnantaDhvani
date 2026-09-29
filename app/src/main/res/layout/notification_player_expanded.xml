@@ -41,7 +41,7 @@
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
-                android:text="LASTWAVEX  •  NOW PLAYING"
+                android:text="LastWaveX  •  Now Playing"
                 android:textSize="10sp" />
 
             <TextView
