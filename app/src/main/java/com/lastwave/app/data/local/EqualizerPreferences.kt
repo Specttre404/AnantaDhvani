@@ -144,6 +144,7 @@ data class EqualizerSettings(
     val enabled: Boolean = false,
     val presetName: String = EqualizerPresets.FLAT.name,
     val preampDb: Float = 0f,
+    val filterQ: Float = 1.414f,
     val gainsDb: List<Float> = EqualizerPresets.FLAT.gainsDb,
 )
 
@@ -155,6 +156,7 @@ class EqualizerPreferences @Inject constructor(
         val ENABLED = booleanPreferencesKey("lw_eq_enabled")
         val PRESET_NAME = stringPreferencesKey("lw_eq_preset")
         val PREAMP_DB = floatPreferencesKey("lw_eq_preamp")
+        val FILTER_Q = floatPreferencesKey("lw_eq_filter_q")
         val GAINS_DB = stringPreferencesKey("lw_eq_gains")
     }
 
@@ -173,10 +175,12 @@ class EqualizerPreferences @Inject constructor(
                 ?: EqualizerPresets.byName(resolvedName)?.gainsDb
                 ?: EqualizerPresets.FLAT.gainsDb
             val preamp = p.readSafely(Keys.PREAMP_DB)?.takeIf { it.isFinite() }?.coerceIn(-EQ_MAX_PREAMP_DB, EQ_MAX_PREAMP_DB) ?: 0f
+            val q = p.readSafely(Keys.FILTER_Q)?.takeIf { it.isFinite() }?.coerceIn(0.5f, 2.8f) ?: 1.414f
             EqualizerSettings(
                 enabled = p.readSafely(Keys.ENABLED) ?: false,
                 presetName = resolvedName,
                 preampDb = preamp,
+                filterQ = q,
                 gainsDb = gains,
             )
         }
@@ -188,6 +192,11 @@ class EqualizerPreferences @Inject constructor(
     suspend fun setPreampDb(db: Float) {
         val safeDb = if (db.isFinite()) db.coerceIn(-EQ_MAX_PREAMP_DB, EQ_MAX_PREAMP_DB) else 0f
         dataStore.edit { it[Keys.PREAMP_DB] = safeDb }
+    }
+
+    suspend fun setFilterQ(q: Float) {
+        val safeQ = if (q.isFinite()) q.coerceIn(0.5f, 2.8f) else 1.414f
+        dataStore.edit { it[Keys.FILTER_Q] = safeQ }
     }
 
     suspend fun applyPreset(preset: EqPreset) {

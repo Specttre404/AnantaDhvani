@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Check
 import com.lastwave.app.util.BatteryOptimizationHelper
 import androidx.compose.material3.OutlinedTextField
@@ -1755,6 +1756,13 @@ fun SettingsScreen(
             onBandChange = viewModel::setEqBandGain,
             onPreampPreview = viewModel::previewPreampDb,
             onPreampChange = viewModel::setPreampDb,
+            onFilterQChange = viewModel::setFilterQ,
+            onCopyEqCode = {
+                val json = viewModel.exportCustomEqJson()
+                val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("EQ Profile JSON", json))
+                viewModel.showToast("EQ Code copied to clipboard")
+            },
             onExportProfile = { exportEqLauncher.launch("lastwavex_eq_${eq.presetName.lowercase().replace(' ', '_')}.json") },
             onImportProfile = { importEqLauncher.launch(arrayOf("application/json", "*/*")) },
         )
@@ -3529,6 +3537,8 @@ private fun EqualizerSheet(
     onBandChange: (Int, Float) -> Unit,
     onPreampPreview: (Float) -> Unit,
     onPreampChange: (Float) -> Unit,
+    onFilterQChange: (Float) -> Unit = {},
+    onCopyEqCode: () -> Unit = {},
     onExportProfile: () -> Unit = {},
     onImportProfile: () -> Unit = {},
 ) {
@@ -3703,6 +3713,53 @@ private fun EqualizerSheet(
                 }
             }
 
+            // Filter Q Slider (0.5 to 2.8)
+            var filterQ by androidx.compose.runtime.remember(eq.filterQ) {
+                androidx.compose.runtime.mutableFloatStateOf(eq.filterQ.coerceIn(0.5f, 2.8f))
+            }
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                tonalElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp).fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Filter Q (Bandwidth)", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                            Text("Filter bell resonance (0.5 wide to 2.8 narrow)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                        ) {
+                            Text(
+                                text = "%.2f".format(filterQ),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            )
+                        }
+                    }
+                    Slider(
+                        value = filterQ,
+                        onValueChange = { value -> filterQ = value },
+                        valueRange = 0.5f..2.8f,
+                        enabled = eq.enabled,
+                        modifier = Modifier.fillMaxWidth(),
+                        onValueChangeFinished = { onFilterQChange(filterQ) },
+                    )
+                }
+            }
+
             // Real-Time Frequency Response Visualizer
             EqualizerCurveGraph(
                 gains = gains,
@@ -3712,25 +3769,34 @@ private fun EqualizerSheet(
             // Export & Import Profiles Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 OutlinedButton(
                     onClick = onExportProfile,
                     modifier = Modifier.weight(1f),
                     shape = ExpressivePillShape,
                 ) {
-                    Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("Export Profile", style = MaterialTheme.typography.labelMedium)
+                    Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Export", style = MaterialTheme.typography.labelMedium)
                 }
                 OutlinedButton(
                     onClick = onImportProfile,
                     modifier = Modifier.weight(1f),
                     shape = ExpressivePillShape,
                 ) {
-                    Icon(Icons.Filled.Download, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("Import Profile", style = MaterialTheme.typography.labelMedium)
+                    Icon(Icons.Filled.Download, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Import", style = MaterialTheme.typography.labelMedium)
+                }
+                OutlinedButton(
+                    onClick = onCopyEqCode,
+                    modifier = Modifier.weight(1f),
+                    shape = ExpressivePillShape,
+                ) {
+                    Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Copy Code", style = MaterialTheme.typography.labelMedium)
                 }
             }
 

@@ -236,8 +236,9 @@ void DspProcessor::process(
                         std::abs(previousGain - currentEqGainsDb_[band]) > 0.000001F;
                     coefficientsChanged = coefficientsChanged || bandChanged;
                     if (bandChanged) {
+                        const double activeQ = targetEqualizerQ_.load(std::memory_order_acquire);
                         equalizerBands_[band].setPeaking(
-                            sampleRate_, kEqFrequenciesHz[band], kEqQ, currentEqGainsDb_[band]);
+                            sampleRate_, kEqFrequenciesHz[band], activeQ, currentEqGainsDb_[band]);
                     }
                     if (std::abs(currentEqGainsDb_[band]) >= 0.0005F ||
                         std::abs(targetGain) >= 0.0005F) {
@@ -386,6 +387,10 @@ void DspProcessor::process(
             // device-dependent coloration that listeners report as distortion.
             outputLeft += (wetLeft - dryLeft) * currentWet_;
             outputRight += (wetRight - dryRight) * currentWet_;
+        }
+
+        if (channelCount == 2 && targetCrossfeedEnabled_.load(std::memory_order_acquire)) {
+            crossfeed_.process(outputLeft, outputRight);
         }
 
         // Analog soft-knee saturation: provides clean headroom without squashing the track
@@ -570,6 +575,17 @@ void DspProcessor::Crossfeed::configure(
     a1High = -xHigh;
     gain = 1.0 / (1.0 - gainHigh + gainLow);
     clear();
+}
+
+void DspProcessor::setCrossfeed(bool enabled, float levelDb, float cutoffHz) noexcept {
+    targetCrossfeedEnabled_.store(enabled, std::memory_order_release);
+    targetCrossfeedLevelDb_.store(levelDb, std::memory_order_release);
+    targetCrossfeedCutoffHz_.store(cutoffHz, std::memory_order_release);
+    crossfeed_.configure(sampleRate_, cutoffHz, levelDb);
+}
+
+void DspProcessor::setEqualizerQ(float q) noexcept {
+    targetEqualizerQ_.store(q, std::memory_order_release);
 }
 
 }  // namespace lastwave::audio

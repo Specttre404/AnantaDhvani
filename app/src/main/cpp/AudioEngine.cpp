@@ -848,4 +848,14 @@ void AudioEngine::buildFadeCurve(std::int32_t sampleRate) {
     }
 }
 
+void AudioEngine::setCrossfeed(bool enabled, float levelDb, float cutoffHz) noexcept {
+    oboeDsp_.setCrossfeed(enabled, levelDb, cutoffHz);
+    mediaDsp_.setCrossfeed(enabled, levelDb, cutoffHz);
+}
+
+void AudioEngine::setEqualizerQ(float q) noexcept {
+    oboeDsp_.setEqualizerQ(q);
+    mediaDsp_.setEqualizerQ(q);
+}
+
 }  // namespace lastwave::audio

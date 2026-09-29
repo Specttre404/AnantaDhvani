@@ -164,6 +164,30 @@ Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetEqualizer(
     engine->setEqualizer(enabled == JNI_TRUE, preampDb, gains.data(), gains.size());
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetCrossfeed(
+    JNIEnv*,
+    jobject,
+    jlong handle,
+    jboolean enabled,
+    jfloat levelDb,
+    jfloat cutoffHz) {
+    if (auto* engine = fromHandle(handle); engine != nullptr) {
+        engine->setCrossfeed(enabled == JNI_TRUE, levelDb, cutoffHz);
+    }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetEqualizerQ(
+    JNIEnv*,
+    jobject,
+    jlong handle,
+    jfloat filterQ) {
+    if (auto* engine = fromHandle(handle); engine != nullptr) {
+        engine->setEqualizerQ(filterQ);
+    }
+}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_lastwave_app_playback_NativeAudioEngine_nativeConfigureMediaProcessor(
     JNIEnv*,

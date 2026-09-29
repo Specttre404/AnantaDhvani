@@ -892,7 +892,8 @@ class MusicPlayer @Inject constructor(
                         if (playerDelegate.isInitialized()) player.volume = 1f
                         player.pause()
                     } else if (remaining != null && remaining in 1..30_000L) {
-                        val fadeFactor = (remaining / 30_000f).coerceIn(0f, 1f)
+                        val linearFactor = (remaining / 30_000f).coerceIn(0f, 1f)
+                        val fadeFactor = (kotlin.math.expm1(linearFactor * 2f) / kotlin.math.expm1(2f)).coerceIn(0f, 1f)
                         if (playerDelegate.isInitialized()) player.volume = fadeFactor
                     } else if (remaining != null && remaining > 30_000L) {
                         if (playerDelegate.isInitialized() && player.volume < 1f) player.volume = 1f

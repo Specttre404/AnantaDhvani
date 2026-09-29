@@ -573,8 +573,20 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update { it.copy(toastMessage = "EQ Profile '${imported.presetName}' imported!") }
             }
         } else {
-            _uiState.update { it.copy(toastMessage = "Invalid EQ JSON file format.") }
+            _uiState.update { it.copy(toastMessage = "Invalid EQ Profile JSON format") }
         }
+    }
+
+    fun setFilterQ(q: Float) = launchSettingsAction("update equalizer filter Q") {
+        equalizerPreferences.setFilterQ(q)
+    }
+
+    fun setCrossfeedEnabled(enabled: Boolean) = launchSettingsAction("update crossfeed setting") {
+        settingsPreferences.setCrossfeedEnabled(enabled)
+    }
+
+    fun setCrossfeedLevelDb(levelDb: Float) = launchSettingsAction("update crossfeed level") {
+        settingsPreferences.setCrossfeedLevelDb(levelDb)
     }
 
     // ── Data management (§8.5) ──

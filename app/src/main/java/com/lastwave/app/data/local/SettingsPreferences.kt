@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -157,6 +158,10 @@ data class MiscSettings(
     val discordRpcEnabled: Boolean = false,
     val discordUserToken: String = "",
     val discordConnectedUsername: String = "",
+    /** Binaural Headphone Crossfeed Acoustic Room Tuning. */
+    val crossfeedEnabled: Boolean = false,
+    val crossfeedLevelDb: Float = 4.5f,
+    val crossfeedCutoffHz: Float = 700f,
     /** Shake device to skip to next track during playback. */
     val shakeToSkipEnabled: Boolean = false,
     /** Player Now Playing artwork style (Square Cover or Rotating Vinyl). */
@@ -285,6 +290,9 @@ class SettingsPreferences @Inject constructor(
         val DISCORD_RPC_ENABLED = booleanPreferencesKey("lw_discord_rpc_enabled")
         val DISCORD_USER_TOKEN = stringPreferencesKey("lw_discord_user_token")
         val DISCORD_CONNECTED_USERNAME = stringPreferencesKey("lw_discord_connected_username")
+        val CROSSFEED_ENABLED = booleanPreferencesKey("lw_crossfeed_enabled")
+        val CROSSFEED_LEVEL_DB = floatPreferencesKey("lw_crossfeed_level_db")
+        val CROSSFEED_CUTOFF_HZ = floatPreferencesKey("lw_crossfeed_cutoff_hz")
         val SHAKE_TO_SKIP_ENABLED = booleanPreferencesKey("lw_shake_to_skip_enabled")
         val PLAYER_COVER_STYLE = stringPreferencesKey("lw_player_cover_style")
         val PLAYER_STYLE = stringPreferencesKey("lw_player_style")
@@ -331,6 +339,9 @@ class SettingsPreferences @Inject constructor(
                 discordRpcEnabled = p.readSafely(Keys.DISCORD_RPC_ENABLED) ?: false,
                 discordUserToken = p.readSafely(Keys.DISCORD_USER_TOKEN).orEmpty(),
                 discordConnectedUsername = p.readSafely(Keys.DISCORD_CONNECTED_USERNAME).orEmpty(),
+                crossfeedEnabled = p.readSafely(Keys.CROSSFEED_ENABLED) ?: false,
+                crossfeedLevelDb = p.readSafely(Keys.CROSSFEED_LEVEL_DB)?.takeIf { it.isFinite() }?.coerceIn(3.0f, 9.5f) ?: 4.5f,
+                crossfeedCutoffHz = p.readSafely(Keys.CROSSFEED_CUTOFF_HZ)?.takeIf { it.isFinite() } ?: 700.0f,
                 shakeToSkipEnabled = p.readSafely(Keys.SHAKE_TO_SKIP_ENABLED) ?: false,
                 playerCoverStyle = PlayerCoverStyle.fromId(p.readSafely(Keys.PLAYER_COVER_STYLE)),
                 playerStyle = PlayerStyle.fromId(p.readSafely(Keys.PLAYER_STYLE)),
@@ -470,6 +481,14 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setDiscordConnectedUsername(username: String) {
         dataStore.edit { it[Keys.DISCORD_CONNECTED_USERNAME] = username.trim() }
+    }
+
+    suspend fun setCrossfeedEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.CROSSFEED_ENABLED] = enabled }
+    }
+
+    suspend fun setCrossfeedLevelDb(levelDb: Float) {
+        dataStore.edit { it[Keys.CROSSFEED_LEVEL_DB] = levelDb.coerceIn(3.0f, 9.5f) }
     }
 
     suspend fun setShakeToSkipEnabled(enabled: Boolean) {

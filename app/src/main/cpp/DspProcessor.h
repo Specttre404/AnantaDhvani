@@ -25,6 +25,8 @@ public:
         float preampDb,
         const float* gainsDb,
         std::size_t gainCount) noexcept;
+    void setCrossfeed(bool enabled, float levelDb, float cutoffHz) noexcept;
+    void setEqualizerQ(float q) noexcept;
     void process(
         float* interleaved,
         std::int32_t frameCount,
@@ -129,6 +131,10 @@ private:
     std::atomic<bool> bitPerfectEnabled_{false};
     std::atomic<bool> peakProtectionEnabled_{false};
     std::atomic<bool> targetEqualizerEnabled_{false};
+    std::atomic<bool> targetCrossfeedEnabled_{false};
+    std::atomic<float> targetCrossfeedLevelDb_{4.5F};
+    std::atomic<float> targetCrossfeedCutoffHz_{700.0F};
+    std::atomic<float> targetEqualizerQ_{1.414F};
     std::atomic<float> targetPreampDb_{0.0F};
     std::atomic<std::uint32_t> targetEqualizerRevision_{0};
     std::array<std::atomic<float>, kEqualizerBandCount> targetEqGainsDb_{};

@@ -57,8 +57,15 @@ class NativeAudioEngine @Inject constructor(
                     .collect(::setStudioMasterClarity)
             }
             applicationScope.launch(Dispatchers.Default) {
+                settingsPreferences.settings
+                    .collect { settings ->
+                        setCrossfeed(settings.crossfeedEnabled, settings.crossfeedLevelDb, settings.crossfeedCutoffHz)
+                    }
+            }
+            applicationScope.launch(Dispatchers.Default) {
                 equalizerPreferences.settings.collect { settings ->
                     setEqualizer(settings.enabled, settings.preampDb, settings.gainsDb.toFloatArray())
+                    setEqualizerQ(settings.filterQ)
                 }
             }
         }
@@ -120,6 +127,14 @@ class NativeAudioEngine @Inject constructor(
             if (gain.isFinite()) gain.coerceIn(-EQ_MAX_GAIN_DB, EQ_MAX_GAIN_DB) else 0f
         }
         withHandle(Unit) { nativeSetEqualizer(it, enabled, safePreamp, safeGains) }
+    }
+
+    fun setCrossfeed(enabled: Boolean, levelDb: Float = 4.5f, cutoffHz: Float = 700f) {
+        withHandle(Unit) { nativeSetCrossfeed(it, enabled, levelDb, cutoffHz) }
+    }
+
+    fun setEqualizerQ(filterQ: Float) {
+        withHandle(Unit) { nativeSetEqualizerQ(it, filterQ) }
     }
 
     internal fun configureMediaProcessor(
@@ -321,6 +336,8 @@ class NativeAudioEngine @Inject constructor(
     private external fun nativeSetBitPerfect(handle: Long, enabled: Boolean)
     private external fun nativeIsBitPerfect(handle: Long): Boolean
     private external fun nativeSetEqualizer(handle: Long, enabled: Boolean, preampDb: Float, gainsDb: FloatArray)
+    private external fun nativeSetCrossfeed(handle: Long, enabled: Boolean, levelDb: Float, cutoffHz: Float)
+    private external fun nativeSetEqualizerQ(handle: Long, filterQ: Float)
     private external fun nativeConfigureMediaProcessor(
         handle: Long,
         inputSampleRate: Int,
