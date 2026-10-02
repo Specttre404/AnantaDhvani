@@ -855,6 +855,12 @@ fun SettingsScreen(
                         currentTheme = misc.appIconTheme,
                         onSelectIcon = viewModel::setAppIconTheme,
                     )
+                    StreamBufferTuningCard(
+                        minBufferMs = misc.minBufferMs,
+                        maxBufferMs = misc.maxBufferMs,
+                        playbackBufferMs = misc.bufferForPlaybackMs,
+                        onBufferChange = viewModel::setBufferTuning,
+                    )
                 }
             }
 
@@ -2988,6 +2994,43 @@ private fun LastFmIntegrationCard(
             },
             dismissButton = { TextButton(onClick = { showDisconnectConfirm = false }) { Text("Cancel") } },
         )
+    }
+}
+
+@Composable
+private fun StreamBufferTuningCard(
+    minBufferMs: Int,
+    maxBufferMs: Int,
+    playbackBufferMs: Int,
+    onBufferChange: (min: Int, max: Int, start: Int, rebuffer: Int) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Waves, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Stream Buffer Tuning", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("ExoPlayer buffer duration limits", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Text("Min Buffer: ${minBufferMs / 1000}s", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = minBufferMs.toFloat(),
+                onValueChange = { onBufferChange(it.toInt(), maxBufferMs, playbackBufferMs, 5000) },
+                valueRange = 5000f..60000f,
+            )
+            Text("Max Buffer: ${maxBufferMs / 1000}s", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = maxBufferMs.toFloat(),
+                onValueChange = { onBufferChange(minBufferMs, it.toInt(), playbackBufferMs, 5000) },
+                valueRange = 15000f..120000f,
+            )
+        }
     }
 }
 

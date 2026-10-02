@@ -1802,6 +1802,12 @@ private fun FullPlayer(
                                         val isVinylMode = playerCoverStyle == com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL
                                         val effectiveCoverStyle = if (isVinylMode) com.lastwave.app.data.local.PlayerCoverStyle.ROTATING_VINYL else playerCoverStyle
 
+                                        val tonearmAngle by animateFloatAsState(
+                                            targetValue = if (state.isPlaying && isVinylMode) 28f else 0f,
+                                            animationSpec = spring(stiffness = 300f, dampingRatio = 0.7f),
+                                            label = "tonearmAngle",
+                                        )
+
                                         Surface(
                                             shape = if (isVinylMode) RoundedCornerShape(0.dp) else RoundedCornerShape(32.dp),
                                             color = if (isVinylMode) Color.Transparent else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),

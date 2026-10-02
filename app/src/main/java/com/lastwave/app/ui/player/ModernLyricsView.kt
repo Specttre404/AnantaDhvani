@@ -246,6 +246,20 @@ fun ModernLyricsPanel(
                                     horizontalArrangement = Arrangement.Center,
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
+                                    var manualOffsetMs by remember { mutableLongStateOf(0L) }
+                                    Surface(
+                                        onClick = { manualOffsetMs = if (manualOffsetMs >= 1000L) -1000L else manualOffsetMs + 250L },
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.6f),
+                                        contentColor = MaterialTheme.colorScheme.primary,
+                                    ) {
+                                        Text(
+                                            text = if (manualOffsetMs == 0L) "SYNC \u2022 0ms" else "SYNC \u2022 ${if (manualOffsetMs > 0) "+" else ""}${manualOffsetMs}ms",
+                                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                        )
+                                    }
+                                    Spacer(Modifier.width(8.dp))
                                     Surface(
                                         shape = CircleShape,
                                         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),

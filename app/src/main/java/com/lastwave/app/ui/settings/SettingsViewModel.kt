@@ -528,6 +528,30 @@ class SettingsViewModel @Inject constructor(
         settingsPreferences.setCacheQuotaMb(quotaMb)
     }
 
+    fun setAudioOffloadEnabled(enabled: Boolean) = launchSettingsAction("update audio offload") {
+        settingsPreferences.setAudioOffloadEnabled(enabled)
+    }
+
+    fun setPreferredAudioCodec(codec: com.lastwave.app.data.local.PreferredAudioCodec) = launchSettingsAction("update preferred audio codec") {
+        settingsPreferences.setPreferredAudioCodec(codec)
+    }
+
+    fun setSilenceSettings(thresholdDb: Float, minDurationMs: Long) = launchSettingsAction("update silence settings") {
+        settingsPreferences.setSilenceSettings(thresholdDb, minDurationMs)
+    }
+
+    fun setIncognitoMode(enabled: Boolean) = launchSettingsAction("update incognito mode") {
+        settingsPreferences.setIncognitoMode(enabled)
+    }
+
+    fun setLyricsOffsetMs(offsetMs: Long) = launchSettingsAction("update lyrics sync offset") {
+        settingsPreferences.setLyricsOffsetMs(offsetMs)
+    }
+
+    fun setMiniPlayerSwipeStyle(style: com.lastwave.app.data.local.MiniPlayerSwipeStyle) = launchSettingsAction("update mini player swipe style") {
+        settingsPreferences.setMiniPlayerSwipeStyle(style)
+    }
+
     // ── Experimental: 15-band equalizer ──
 
     fun setEqualizerEnabled(enabled: Boolean) {
