@@ -64,6 +64,8 @@ public:
     void setEqualizer(bool enabled, float preampDb, const float* gainsDb, std::size_t gainCount) noexcept;
     void setCrossfeed(bool enabled, float levelDb, float cutoffHz) noexcept;
     void setEqualizerQ(float q) noexcept;
+    void setSpatialAudio(bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio) noexcept;
+    void setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept;
 
     [[nodiscard]] bool configureMediaProcessor(
         std::int32_t inputSampleRate,

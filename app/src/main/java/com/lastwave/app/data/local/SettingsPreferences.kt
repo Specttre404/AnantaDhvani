@@ -48,6 +48,17 @@ enum class AppIconTheme(val id: String, val title: String) {
     }
 }
 
+enum class MiniPlayerSwipeStyle(val id: String, val title: String) {
+    SKIP_TRACKS("skip_tracks", "Swipe Left/Right to Skip Tracks"),
+    OPEN_QUEUE("open_queue", "Swipe Up to Open Queue"),
+    DISMISS_PLAYER("dismiss_player", "Swipe Down to Dismiss Player");
+
+    companion object {
+        fun fromId(id: String?): MiniPlayerSwipeStyle =
+            entries.firstOrNull { it.id == id } ?: SKIP_TRACKS
+    }
+}
+
 enum class SeekbarStyle(val id: String, val title: String, val description: String) {
     WAVY_FLUID("wavy_fluid", "Wavy Fluid", "Multi-frequency sine wave undulating during playback and flattening on pause."),
     SEGMENTED_DASH("segmented_dash", "Segmented Dash", "High-tech discrete dashed time bar with glowing progress heads."),
@@ -214,6 +225,12 @@ data class MiscSettings(
     val maxBufferMs: Int = 50_000,
     val bufferForPlaybackMs: Int = 2_500,
     val bufferForPlaybackAfterRebufferMs: Int = 5_000,
+    /** Hardware Audio Offload / Direct SoC Tunneling mode. */
+    val audioOffloadEnabled: Boolean = false,
+    /** Mini player swipe action behavior. */
+    val miniPlayerSwipeStyle: MiniPlayerSwipeStyle = MiniPlayerSwipeStyle.SKIP_TRACKS,
+    /** Global lyrics sync calibration offset in milliseconds (-2000ms to +2000ms). */
+    val lyricsOffsetMs: Long = 0L,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -339,6 +356,9 @@ class SettingsPreferences @Inject constructor(
         val MAX_BUFFER_MS = intPreferencesKey("lw_max_buffer_ms")
         val BUFFER_FOR_PLAYBACK_MS = intPreferencesKey("lw_buffer_for_playback_ms")
         val BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = intPreferencesKey("lw_buffer_for_playback_after_rebuffer_ms")
+        val AUDIO_OFFLOAD_ENABLED = booleanPreferencesKey("lw_audio_offload_enabled")
+        val LYRICS_OFFSET_MS = longPreferencesKey("lw_lyrics_offset_ms")
+        val MINI_PLAYER_SWIPE_STYLE = stringPreferencesKey("lw_mini_player_swipe_style")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -400,6 +420,9 @@ class SettingsPreferences @Inject constructor(
                 maxBufferMs = (p.readSafely(Keys.MAX_BUFFER_MS) ?: 50_000).coerceIn(15_000, 120_000),
                 bufferForPlaybackMs = (p.readSafely(Keys.BUFFER_FOR_PLAYBACK_MS) ?: 2_500).coerceIn(500, 10_000),
                 bufferForPlaybackAfterRebufferMs = (p.readSafely(Keys.BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS) ?: 5_000).coerceIn(1_000, 15_000),
+                audioOffloadEnabled = p.readSafely(Keys.AUDIO_OFFLOAD_ENABLED) ?: false,
+                lyricsOffsetMs = (p.readSafely(Keys.LYRICS_OFFSET_MS) ?: 0L).coerceIn(-5000L, 5000L),
+                miniPlayerSwipeStyle = MiniPlayerSwipeStyle.fromId(p.readSafely(Keys.MINI_PLAYER_SWIPE_STYLE)),
             )
         }
 
@@ -573,6 +596,18 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setCacheQuotaMb(quotaMb: Long) {
         dataStore.edit { it[Keys.CACHE_QUOTA_MB] = quotaMb }
+    }
+
+    suspend fun setLyricsOffsetMs(offsetMs: Long) {
+        dataStore.edit { it[Keys.LYRICS_OFFSET_MS] = offsetMs.coerceIn(-5000L, 5000L) }
+    }
+
+    suspend fun setMiniPlayerSwipeStyle(style: MiniPlayerSwipeStyle) {
+        dataStore.edit { it[Keys.MINI_PLAYER_SWIPE_STYLE] = style.id }
+    }
+
+    suspend fun setAudioOffloadEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.AUDIO_OFFLOAD_ENABLED] = enabled }
     }
 
     suspend fun setPlayerBackgroundStyle(style: PlayerBackgroundStyle) {

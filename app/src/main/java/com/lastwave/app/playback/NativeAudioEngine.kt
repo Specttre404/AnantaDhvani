@@ -324,6 +324,14 @@ class NativeAudioEngine @Inject constructor(
         }
     }
 
+    fun setSpatialAudio(enabled: Boolean, roomSize: Float, damping: Float, haasDelayMs: Float, widthRatio: Float) {
+        withHandle(Unit) { nativeSetSpatialAudio(it, enabled, roomSize, damping, haasDelayMs, widthRatio) }
+    }
+
+    fun setBitcrusher(enabled: Boolean, bits: Int, downsampleFactor: Int) {
+        withHandle(Unit) { nativeSetBitcrusher(it, enabled, bits, downsampleFactor) }
+    }
+
     private external fun nativeCreate(): Long
     private external fun nativeDestroy(handle: Long)
     private external fun nativeStart(handle: Long, preferredOutputSampleRate: Int): Boolean
@@ -338,6 +346,8 @@ class NativeAudioEngine @Inject constructor(
     private external fun nativeSetEqualizer(handle: Long, enabled: Boolean, preampDb: Float, gainsDb: FloatArray)
     private external fun nativeSetCrossfeed(handle: Long, enabled: Boolean, levelDb: Float, cutoffHz: Float)
     private external fun nativeSetEqualizerQ(handle: Long, filterQ: Float)
+    private external fun nativeSetSpatialAudio(handle: Long, enabled: Boolean, roomSize: Float, damping: Float, haasDelayMs: Float, widthRatio: Float)
+    private external fun nativeSetBitcrusher(handle: Long, enabled: Boolean, bits: Int, downsampleFactor: Int)
     private external fun nativeConfigureMediaProcessor(
         handle: Long,
         inputSampleRate: Int,

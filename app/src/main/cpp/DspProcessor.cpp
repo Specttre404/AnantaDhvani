@@ -393,6 +393,21 @@ void DspProcessor::process(
             crossfeed_.process(outputLeft, outputRight);
         }
 
+        spatialReverb_.process(
+            outputLeft, outputRight,
+            targetSpatialEnabled_.load(std::memory_order_acquire),
+            targetSpatialRoomSize_.load(std::memory_order_acquire),
+            targetSpatialDamping_.load(std::memory_order_acquire),
+            targetSpatialHaasDelayMs_.load(std::memory_order_acquire),
+            targetSpatialWidthRatio_.load(std::memory_order_acquire),
+            sampleRate_);
+
+        bitcrusher_.process(
+            outputLeft, outputRight,
+            targetBitcrusherEnabled_.load(std::memory_order_acquire),
+            targetBitcrusherBits_.load(std::memory_order_acquire),
+            targetBitcrusherDownsample_.load(std::memory_order_acquire));
+
         // Analog soft-knee saturation: provides clean headroom without squashing the track
         auto softSaturate = [](float x) noexcept -> float {
             const float absX = std::abs(x);
@@ -582,6 +597,28 @@ void DspProcessor::setCrossfeed(bool enabled, float levelDb, float cutoffHz) noe
     targetCrossfeedLevelDb_.store(levelDb, std::memory_order_release);
     targetCrossfeedCutoffHz_.store(cutoffHz, std::memory_order_release);
     crossfeed_.configure(sampleRate_, cutoffHz, levelDb);
+}
+
+void DspProcessor::setSpatialAudio(
+    bool enabled,
+    float roomSize,
+    float damping,
+    float haasDelayMs,
+    float widthRatio) noexcept {
+    targetSpatialEnabled_.store(enabled, std::memory_order_release);
+    targetSpatialRoomSize_.store(std::clamp(roomSize, 0.0F, 1.0F), std::memory_order_release);
+    targetSpatialDamping_.store(std::clamp(damping, 0.0F, 1.0F), std::memory_order_release);
+    targetSpatialHaasDelayMs_.store(std::clamp(haasDelayMs, 5.0F, 35.0F), std::memory_order_release);
+    targetSpatialWidthRatio_.store(std::clamp(widthRatio, 0.5F, 2.5F), std::memory_order_release);
+}
+
+void DspProcessor::setBitcrusher(
+    bool enabled,
+    int bits,
+    int downsampleFactor) noexcept {
+    targetBitcrusherEnabled_.store(enabled, std::memory_order_release);
+    targetBitcrusherBits_.store(std::clamp(bits, 4, 16), std::memory_order_release);
+    targetBitcrusherDownsample_.store(std::clamp(downsampleFactor, 1, 8), std::memory_order_release);
 }
 
 void DspProcessor::setEqualizerQ(float q) noexcept {

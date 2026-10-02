@@ -27,6 +27,8 @@ public:
         std::size_t gainCount) noexcept;
     void setCrossfeed(bool enabled, float levelDb, float cutoffHz) noexcept;
     void setEqualizerQ(float q) noexcept;
+    void setSpatialAudio(bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio) noexcept;
+    void setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept;
     void process(
         float* interleaved,
         std::int32_t frameCount,
@@ -138,6 +140,58 @@ private:
     std::atomic<float> targetCrossfeedCutoffHz_{700.0F};
     std::atomic<float> targetEqualizerQ_{1.414F};
     std::atomic<float> targetPreampDb_{0.0F};
+    std::atomic<bool> targetSpatialEnabled_{false};
+    std::atomic<float> targetSpatialRoomSize_{0.5F};
+    std::atomic<float> targetSpatialDamping_{0.5F};
+    std::atomic<float> targetSpatialHaasDelayMs_{15.0F};
+    std::atomic<float> targetSpatialWidthRatio_{1.2F};
+    std::atomic<bool> targetBitcrusherEnabled_{false};
+    std::atomic<int> targetBitcrusherBits_{10};
+    std::atomic<int> targetBitcrusherDownsample_{2};
+
+    struct SpatialReverb final {
+        std::array<float, 4096> delayBufferLeft{};
+        std::array<float, 4096> delayBufferRight{};
+        std::size_t writeIdx{0};
+
+        inline void process(float& left, float& right, bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio, double sampleRate) noexcept {
+            if (!enabled) return;
+            std::size_t haasSamples = static_cast<std::size_t>((haasDelayMs * sampleRate) / 1000.0);
+            if (haasSamples >= 4090) haasSamples = 4090;
+
+            delayBufferLeft[writeIdx] = left;
+            delayBufferRight[writeIdx] = right;
+
+            std::size_t readIdx = (writeIdx + 4096 - haasSamples) % 4096;
+            float delayedRight = delayBufferRight[readIdx];
+
+            float mid = (left + right) * 0.5f;
+            float side = (left - right) * 0.5f * widthRatio;
+            left = mid + side;
+            right = mid - side + (delayedRight * roomSize * 0.35f);
+
+            writeIdx = (writeIdx + 1) % 4096;
+        }
+    } spatialReverb_{};
+
+    struct Bitcrusher final {
+        int counter{0};
+        float lastLeft{0.0f};
+        float lastRight{0.0f};
+
+        inline void process(float& left, float& right, bool enabled, int bits, int downsampleFactor) noexcept {
+            if (!enabled) return;
+            counter++;
+            if (counter >= downsampleFactor) {
+                counter = 0;
+                float step = std::pow(2.0f, static_cast<float>(bits - 1));
+                lastLeft = std::round(left * step) / step;
+                lastRight = std::round(right * step) / step;
+            }
+            left = lastLeft;
+            right = lastRight;
+        }
+    } bitcrusher_{};
     std::atomic<std::uint32_t> targetEqualizerRevision_{0};
     std::array<std::atomic<float>, kEqualizerBandCount> targetEqGainsDb_{};
     std::array<float, kEqualizerBandCount> currentEqGainsDb_{};

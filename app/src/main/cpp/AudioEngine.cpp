@@ -414,6 +414,16 @@ void AudioEngine::setEqualizer(
     mediaDsp_.setEqualizer(enabled, preampDb, gainsDb, gainCount);
 }
 
+void AudioEngine::setSpatialAudio(bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio) noexcept {
+    oboeDsp_.setSpatialAudio(enabled, roomSize, damping, haasDelayMs, widthRatio);
+    mediaDsp_.setSpatialAudio(enabled, roomSize, damping, haasDelayMs, widthRatio);
+}
+
+void AudioEngine::setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept {
+    oboeDsp_.setBitcrusher(enabled, bits, downsampleFactor);
+    mediaDsp_.setBitcrusher(enabled, bits, downsampleFactor);
+}
+
 bool AudioEngine::configureMediaProcessor(
     std::int32_t inputSampleRate,
     std::int32_t outputSampleRate,

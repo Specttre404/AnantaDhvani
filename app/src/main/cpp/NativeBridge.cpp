@@ -142,6 +142,34 @@ Java_com_lastwave_app_playback_NativeAudioEngine_nativeIsBitPerfect(
     return (engine != nullptr && engine->isBitPerfect()) ? JNI_TRUE : JNI_FALSE;
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetSpatialAudio(
+    JNIEnv*,
+    jobject,
+    jlong handle,
+    jboolean enabled,
+    jfloat roomSize,
+    jfloat damping,
+    jfloat haasDelayMs,
+    jfloat widthRatio) {
+    if (auto* engine = fromHandle(handle); engine != nullptr) {
+        engine->setSpatialAudio(enabled == JNI_TRUE, roomSize, damping, haasDelayMs, widthRatio);
+    }
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetBitcrusher(
+    JNIEnv*,
+    jobject,
+    jlong handle,
+    jboolean enabled,
+    jint bits,
+    jint downsampleFactor) {
+    if (auto* engine = fromHandle(handle); engine != nullptr) {
+        engine->setBitcrusher(enabled == JNI_TRUE, bits, downsampleFactor);
+    }
+}
+
 
 
 extern "C" JNIEXPORT void JNICALL

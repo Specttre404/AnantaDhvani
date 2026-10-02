@@ -217,6 +217,26 @@ class EqualizerPreferences @Inject constructor(
         dataStore.edit { it[Keys.PREAMP_DB] = safeDb }
     }
 
+    suspend fun applyCustomSettings(presetName: String, gainsDb: List<Float>, preampDb: Float = 0f) {
+        dataStore.edit {
+            it[Keys.PRESET_NAME] = presetName
+            it[Keys.GAINS_DB] = gainsDb.joinToString(",")
+            it[Keys.PREAMP_DB] = preampDb
+        }
+    }
+
+    fun generateShareCode(settings: EqualizerSettings): String {
+        val gainsStr = settings.gainsDb.joinToString(",") { "%.1f".format(it) }
+        return android.util.Base64.encodeToString(gainsStr.toByteArray(), android.util.Base64.NO_WRAP)
+    }
+
+    fun parseShareCode(code: String): List<Float>? {
+        return runCatching {
+            val decoded = String(android.util.Base64.decode(code.trim(), android.util.Base64.NO_WRAP))
+            decoded.split(",").mapNotNull { it.toFloatOrNull() }.takeIf { it.size == EQ_BAND_FREQS_HZ.size }
+        }.getOrNull()
+    }
+
     suspend fun setFilterQ(q: Float) {
         val safeQ = if (q.isFinite()) q.coerceIn(0.5f, 2.8f) else 1.414f
         dataStore.edit { it[Keys.FILTER_Q] = safeQ }
