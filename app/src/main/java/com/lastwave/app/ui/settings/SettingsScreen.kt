@@ -861,6 +861,21 @@ fun SettingsScreen(
                         playbackBufferMs = misc.bufferForPlaybackMs,
                         onBufferChange = viewModel::setBufferTuning,
                     )
+                    StreamCodecCard(
+                        currentCodec = misc.preferredAudioCodec,
+                        onSelectCodec = viewModel::setPreferredAudioCodec,
+                    )
+                    NotchSettingsCard(
+                        enabled = misc.enableDynamicIslandNotch,
+                        topMarginDp = misc.notchTopMarginDp,
+                        widthDp = misc.notchCapsuleWidthDp,
+                        dismissSec = misc.notchAutoDismissSec,
+                        onNotchChange = viewModel::setDynamicNotchSettings,
+                    )
+                    CacheQuotaCard(
+                        currentQuotaMb = misc.cacheQuotaMb,
+                        onSelectQuotaMb = viewModel::setCacheQuotaMb,
+                    )
                 }
             }
 
@@ -3030,6 +3045,117 @@ private fun StreamBufferTuningCard(
                 onValueChange = { onBufferChange(minBufferMs, it.toInt(), playbackBufferMs, 5000) },
                 valueRange = 15000f..120000f,
             )
+        }
+    }
+}
+
+@Composable
+private fun StreamCodecCard(
+    currentCodec: com.lastwave.app.data.local.PreferredAudioCodec,
+    onSelectCodec: (com.lastwave.app.data.local.PreferredAudioCodec) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.HighQuality, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Stream Codec Forcing", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Select preferred audio container & codec", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                com.lastwave.app.data.local.PreferredAudioCodec.entries.forEach { codec ->
+                    val isSelected = codec == currentCodec
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onSelectCodec(codec) },
+                        label = { Text(codec.label, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotchSettingsCard(
+    enabled: Boolean,
+    topMarginDp: Int,
+    widthDp: Int,
+    dismissSec: Int,
+    onNotchChange: (enabled: Boolean, topMargin: Int, width: Int, dismiss: Int) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Apps, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Punch-Hole & Notch Island", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Floating dynamic island capsule", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = { onNotchChange(it, topMarginDp, widthDp, dismissSec) },
+                )
+            }
+            if (enabled) {
+                Text("Top Offset: ${topMarginDp}dp", style = MaterialTheme.typography.labelSmall)
+                Slider(
+                    value = topMarginDp.toFloat(),
+                    onValueChange = { onNotchChange(enabled, it.toInt(), widthDp, dismissSec) },
+                    valueRange = 0f..24f,
+                )
+                Text("Capsule Width: ${widthDp}dp", style = MaterialTheme.typography.labelSmall)
+                Slider(
+                    value = widthDp.toFloat(),
+                    onValueChange = { onNotchChange(enabled, topMarginDp, it.toInt(), dismissSec) },
+                    valueRange = 180f..320f,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CacheQuotaCard(
+    currentQuotaMb: Long,
+    onSelectQuotaMb: (Long) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Download, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Disk Cache Quota", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Maximum local buffer limit", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            val quotas = listOf(512L to "512 MB", 1024L to "1 GB", 2048L to "2 GB", 5120L to "5 GB", -1L to "Unlimited")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                quotas.forEach { (mb, label) ->
+                    val isSelected = mb == currentQuotaMb
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onSelectQuotaMb(mb) },
+                        label = { Text(label, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
         }
     }
 }

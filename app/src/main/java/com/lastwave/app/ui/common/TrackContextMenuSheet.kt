@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Info
@@ -355,6 +356,20 @@ fun TrackContextMenuSheet(
         return
     }
 
+    var showTagEditorSheet by remember { mutableStateOf(false) }
+    if (showTagEditorSheet && target is TrackMenuTarget.Track) {
+        val playable = playableTrack ?: PlayableTrack(title = target.name, artist = target.artist)
+        com.lastwave.app.ui.local.TagEditorSheet(
+            track = playable,
+            onSave = { newTitle, newArtist, newAlbum ->
+                showTagEditorSheet = false
+                onDismiss()
+            },
+            onDismiss = { showTagEditorSheet = false },
+        )
+        return
+    }
+
     if (showEqualizerSheet) {
         EqualizerSheet(
             onDismiss = { showEqualizerSheet = false },
@@ -538,6 +553,11 @@ fun TrackContextMenuSheet(
                     }
                     if (capabilities.showCopyActions) {
                         add { pos -> MenuActionRow(Icons.Filled.ContentCopy, "Copy Song", position = pos) { clipboard.setText(AnnotatedString("${t.name} \u2014 ${t.artist}")); onDismiss() } }
+                    }
+                    add { pos ->
+                        MenuActionRow(Icons.Filled.Edit, "Edit ID3 Tags & Metadata", position = pos) {
+                            showTagEditorSheet = true
+                        }
                     }
                     add { pos ->
                         MenuActionRow(Icons.Filled.GraphicEq, "Equalizer & Sound FX", position = pos) {
