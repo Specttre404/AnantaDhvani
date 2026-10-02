@@ -47,6 +47,11 @@ class LocalAudioScanner @Inject constructor(
                     val album = cursor.getString(albumColumn).orEmpty().ifBlank { "Unknown Album" }
                     val durationMs = cursor.getLong(durationColumn)
 
+                    val excludedKeywords = listOf("whatsapp", "notification", "ringtone", "call_record", "voice_note")
+                    if (excludedKeywords.any { title.contains(it, ignoreCase = true) || album.contains(it, ignoreCase = true) }) {
+                        continue
+                    }
+
                     val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
                     tracks.add(

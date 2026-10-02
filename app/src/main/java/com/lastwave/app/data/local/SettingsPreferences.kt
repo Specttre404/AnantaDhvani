@@ -48,6 +48,18 @@ enum class AppIconTheme(val id: String, val title: String) {
     }
 }
 
+enum class PreferredAudioCodec(val id: String, val label: String) {
+    AUTO("auto", "Auto (Highest Bitrate)"),
+    FORCE_OPUS("force_opus", "Force Opus / WebM (160–256 kbps)"),
+    FORCE_AAC("force_aac", "Force AAC / M4A (128–256 kbps)"),
+    FORCE_LOSSLESS("force_lossless", "Force Lossless / FLAC Direct");
+
+    companion object {
+        fun fromId(id: String?): PreferredAudioCodec =
+            entries.firstOrNull { it.id == id } ?: AUTO
+    }
+}
+
 enum class MiniPlayerSwipeStyle(val id: String, val title: String) {
     SKIP_TRACKS("skip_tracks", "Swipe Left/Right to Skip Tracks"),
     OPEN_QUEUE("open_queue", "Swipe Up to Open Queue"),
@@ -231,6 +243,13 @@ data class MiscSettings(
     val miniPlayerSwipeStyle: MiniPlayerSwipeStyle = MiniPlayerSwipeStyle.SKIP_TRACKS,
     /** Global lyrics sync calibration offset in milliseconds (-2000ms to +2000ms). */
     val lyricsOffsetMs: Long = 0L,
+    /** Stream codec & container forcing preference. */
+    val preferredAudioCodec: PreferredAudioCodec = PreferredAudioCodec.AUTO,
+    /** Silence trimming parameters. */
+    val silenceThresholdDb: Float = -42.0f,
+    val minSilenceDurationMs: Long = 250L,
+    /** Incognito / Private listening session. */
+    val isIncognitoMode: Boolean = false,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -359,6 +378,10 @@ class SettingsPreferences @Inject constructor(
         val AUDIO_OFFLOAD_ENABLED = booleanPreferencesKey("lw_audio_offload_enabled")
         val LYRICS_OFFSET_MS = longPreferencesKey("lw_lyrics_offset_ms")
         val MINI_PLAYER_SWIPE_STYLE = stringPreferencesKey("lw_mini_player_swipe_style")
+        val PREFERRED_AUDIO_CODEC = stringPreferencesKey("lw_preferred_audio_codec")
+        val SILENCE_THRESHOLD_DB = floatPreferencesKey("lw_silence_threshold_db")
+        val MIN_SILENCE_DURATION_MS = longPreferencesKey("lw_min_silence_duration_ms")
+        val IS_INCOGNITO_MODE = booleanPreferencesKey("lw_is_incognito_mode")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -423,6 +446,10 @@ class SettingsPreferences @Inject constructor(
                 audioOffloadEnabled = p.readSafely(Keys.AUDIO_OFFLOAD_ENABLED) ?: false,
                 lyricsOffsetMs = (p.readSafely(Keys.LYRICS_OFFSET_MS) ?: 0L).coerceIn(-5000L, 5000L),
                 miniPlayerSwipeStyle = MiniPlayerSwipeStyle.fromId(p.readSafely(Keys.MINI_PLAYER_SWIPE_STYLE)),
+                preferredAudioCodec = PreferredAudioCodec.fromId(p.readSafely(Keys.PREFERRED_AUDIO_CODEC)),
+                silenceThresholdDb = (p.readSafely(Keys.SILENCE_THRESHOLD_DB) ?: -42.0f).coerceIn(-60.0f, -25.0f),
+                minSilenceDurationMs = (p.readSafely(Keys.MIN_SILENCE_DURATION_MS) ?: 250L).coerceIn(50L, 1500L),
+                isIncognitoMode = p.readSafely(Keys.IS_INCOGNITO_MODE) ?: false,
             )
         }
 
@@ -604,6 +631,21 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setMiniPlayerSwipeStyle(style: MiniPlayerSwipeStyle) {
         dataStore.edit { it[Keys.MINI_PLAYER_SWIPE_STYLE] = style.id }
+    }
+
+    suspend fun setPreferredAudioCodec(codec: PreferredAudioCodec) {
+        dataStore.edit { it[Keys.PREFERRED_AUDIO_CODEC] = codec.id }
+    }
+
+    suspend fun setSilenceSettings(thresholdDb: Float, minDurationMs: Long) {
+        dataStore.edit {
+            it[Keys.SILENCE_THRESHOLD_DB] = thresholdDb.coerceIn(-60.0f, -25.0f)
+            it[Keys.MIN_SILENCE_DURATION_MS] = minDurationMs.coerceIn(50L, 1500L)
+        }
+    }
+
+    suspend fun setIncognitoMode(enabled: Boolean) {
+        dataStore.edit { it[Keys.IS_INCOGNITO_MODE] = enabled }
     }
 
     suspend fun setAudioOffloadEnabled(enabled: Boolean) {

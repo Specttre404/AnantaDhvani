@@ -432,6 +432,8 @@ class MusicPlayer @Inject constructor(
      * counted as a skip.
      */
     private fun recordLocalListenSignal(reason: Int) {
+        val currentMisc = runCatching { kotlinx.coroutines.runBlocking { settingsPreferences.settings.first() } }.getOrNull()
+        if (currentMisc?.isIncognitoMode == true) return
         val previousTrack = _state.value.current ?: return
         val previousPositionMs = _state.value.positionMs
         val previousDurationMs = _state.value.durationMs

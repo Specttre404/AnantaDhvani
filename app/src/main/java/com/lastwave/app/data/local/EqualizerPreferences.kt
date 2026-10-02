@@ -169,6 +169,7 @@ data class EqualizerSettings(
     val preampDb: Float = 0f,
     val filterQ: Float = 1.414f,
     val gainsDb: List<Float> = EqualizerPresets.FLAT.gainsDb,
+    val bandQValues: List<Float> = List(EQ_BAND_FREQS_HZ.size) { 1.414f },
 )
 
 @Singleton
@@ -181,6 +182,7 @@ class EqualizerPreferences @Inject constructor(
         val PREAMP_DB = floatPreferencesKey("lw_eq_preamp")
         val FILTER_Q = floatPreferencesKey("lw_eq_filter_q")
         val GAINS_DB = stringPreferencesKey("lw_eq_gains")
+        val BAND_QS = stringPreferencesKey("lw_eq_band_qs")
     }
 
     val settings: Flow<EqualizerSettings> = dataStore.data
@@ -198,13 +200,18 @@ class EqualizerPreferences @Inject constructor(
                 ?: EqualizerPresets.byName(resolvedName)?.gainsDb
                 ?: EqualizerPresets.FLAT.gainsDb
             val preamp = p.readSafely(Keys.PREAMP_DB)?.takeIf { it.isFinite() }?.coerceIn(-EQ_MAX_PREAMP_DB, EQ_MAX_PREAMP_DB) ?: 0f
-            val q = p.readSafely(Keys.FILTER_Q)?.takeIf { it.isFinite() }?.coerceIn(0.5f, 2.8f) ?: 1.414f
+            val q = p.readSafely(Keys.FILTER_Q)?.takeIf { it.isFinite() }?.coerceIn(0.1f, 10.0f) ?: 1.414f
+            val storedQs = p.readSafely(Keys.BAND_QS)?.split(',')?.mapNotNull(String::toFloatOrNull)
+                ?.takeIf { it.size == EQ_BAND_FREQS_HZ.size }
+                ?.map { bandQ -> if (bandQ.isFinite()) bandQ.coerceIn(0.1f, 10.0f) else 1.414f }
+                ?: List(EQ_BAND_FREQS_HZ.size) { q }
             EqualizerSettings(
                 enabled = p.readSafely(Keys.ENABLED) ?: false,
                 presetName = resolvedName,
                 preampDb = preamp,
                 filterQ = q,
                 gainsDb = gains,
+                bandQValues = storedQs,
             )
         }
 
