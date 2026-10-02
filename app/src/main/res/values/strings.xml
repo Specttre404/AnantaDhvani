@@ -11,7 +11,7 @@
     <string name="update_available">Update Available</string>
     <string name="update">Update</string>
     <string name="dismiss_update">Dismiss update</string>
-    <string name="update_ready_to_install">LastWaveX v%1$s is ready to install</string>
+    <string name="update_ready_to_install">Ananta Dhvani v%1$s is ready to install</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>

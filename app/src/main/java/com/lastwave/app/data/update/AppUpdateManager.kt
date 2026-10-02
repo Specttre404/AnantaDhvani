@@ -62,7 +62,7 @@ class AppUpdateManager @Inject constructor(
                         requestMethod = "GET"
                         connectTimeout = 5000
                         readTimeout = 5000
-                        setRequestProperty("User-Agent", "AnantaDhvani-App")
+                        setRequestProperty("User-Agent", "Ananta Dhvani-App")
                     }
                     if (conn.responseCode == 200) {
                         val body = conn.inputStream.bufferedReader().use { it.readText() }

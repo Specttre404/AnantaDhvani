@@ -71,6 +71,7 @@ import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Waves
 import com.lastwave.app.data.local.LyricsAnimation
 import com.lastwave.app.data.local.LyricsUiVersion
+import com.lastwave.app.data.local.AppIconTheme
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Palette
@@ -833,9 +834,8 @@ fun SettingsScreen(
             }
 
             item {
-                Column {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionLabel(stringResource(R.string.settings_section_accent))
-                    Spacer(Modifier.height(10.dp))
                     Card(
                         shape = CardOuterShape,
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -851,6 +851,10 @@ fun SettingsScreen(
                             )
                         }
                     }
+                    AppIconSelectorCard(
+                        currentTheme = misc.appIconTheme,
+                        onSelectIcon = viewModel::setAppIconTheme,
+                    )
                 }
             }
 
@@ -2984,6 +2988,69 @@ private fun LastFmIntegrationCard(
             },
             dismissButton = { TextButton(onClick = { showDisconnectConfirm = false }) { Text("Cancel") } },
         )
+    }
+}
+
+@Composable
+private fun AppIconSelectorCard(
+    currentTheme: AppIconTheme,
+    onSelectIcon: (AppIconTheme) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("App Launcher Icon", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Choose Material 3 Expressive launcher icon theme", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                AppIconTheme.entries.forEach { iconTheme ->
+                    val isSelected = iconTheme == currentTheme
+                    Surface(
+                        onClick = { onSelectIcon(iconTheme) },
+                        shape = RoundedCornerShape(18.dp),
+                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                        border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .background(if (iconTheme == AppIconTheme.DARK) Color(0xFF0B0D13) else Color(0xFFF2F4F8)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    painter = painterResource(if (iconTheme == AppIconTheme.DARK) R.drawable.ic_launcher_dark_foreground else R.drawable.ic_launcher_light_foreground),
+                                    contentDescription = iconTheme.title,
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(38.dp),
+                                )
+                            }
+                            Text(
+                                iconTheme.title,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

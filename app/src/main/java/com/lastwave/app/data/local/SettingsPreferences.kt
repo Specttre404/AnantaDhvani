@@ -37,6 +37,16 @@ enum class PlayerCoverStyle(val id: String, val title: String) {
     }
 }
 
+enum class AppIconTheme(val id: String, val title: String) {
+    DARK("dark", "Expressive Dark (Obsidian)"),
+    LIGHT("light", "Expressive Light (Porcelain)");
+
+    companion object {
+        fun fromId(id: String?): AppIconTheme =
+            entries.firstOrNull { it.id == id } ?: DARK
+    }
+}
+
 enum class SeekbarStyle(val id: String, val title: String, val description: String) {
     WAVY_FLUID("wavy_fluid", "Wavy Fluid", "Multi-frequency sine wave undulating during playback and flattening on pause."),
     SEGMENTED_DASH("segmented_dash", "Segmented Dash", "High-tech discrete dashed time bar with glowing progress heads."),
@@ -191,6 +201,8 @@ data class MiscSettings(
     val hiddenHomeSections: Set<String> = emptySet(),
     /** Optional floating dynamic island capsule/notch overlay. */
     val enableDynamicIslandNotch: Boolean = false,
+    /** Active launcher app icon theme. */
+    val appIconTheme: AppIconTheme = AppIconTheme.DARK,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -307,6 +319,7 @@ class SettingsPreferences @Inject constructor(
         val PRIMARY_ARTIST_ONLY = booleanPreferencesKey("lw_primary_artist_only")
         val HIDDEN_HOME_SECTIONS = stringSetPreferencesKey("lw_hidden_home_sections")
         val ENABLE_DYNAMIC_ISLAND_NOTCH = booleanPreferencesKey("lw_enable_dynamic_island_notch")
+        val APP_ICON_THEME = stringPreferencesKey("lw_app_icon_theme")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -359,6 +372,7 @@ class SettingsPreferences @Inject constructor(
                     ?.filter { id -> HomeSection.entries.any { it.id == id } }?.toSet()
                     ?: emptySet(),
                 enableDynamicIslandNotch = p.readSafely(Keys.ENABLE_DYNAMIC_ISLAND_NOTCH) ?: false,
+                appIconTheme = AppIconTheme.fromId(p.readSafely(Keys.APP_ICON_THEME)),
             )
         }
 
@@ -502,6 +516,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setPlayerStyle(style: PlayerStyle) {
         dataStore.edit { it[Keys.PLAYER_STYLE] = style.id }
+    }
+
+    suspend fun setAppIconTheme(icon: AppIconTheme) {
+        dataStore.edit { it[Keys.APP_ICON_THEME] = icon.id }
     }
 
     suspend fun setEnableDynamicIslandNotch(enabled: Boolean) {

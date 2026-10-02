@@ -97,6 +97,7 @@ class SettingsViewModel @Inject constructor(
     private val downloadedTrackDao: com.lastwave.app.data.local.db.DownloadedTrackDao,
     private val songPlayStatsRepository: com.lastwave.app.data.repository.SongPlayStatsRepository,
     private val appLocaleManager: com.lastwave.app.util.AppLocaleManager,
+    private val appIconManager: com.lastwave.app.util.AppIconManager,
     val playlistImportManager: com.lastwave.app.data.playlist.PlaylistImportManager,
     val innerTube: com.lastwave.app.data.music.InnerTubeMusicApi,
     val appUpdateManager: com.lastwave.app.data.update.AppUpdateManager,
@@ -508,6 +509,11 @@ class SettingsViewModel @Inject constructor(
     /** Persists + applies; AppLocaleManager owns error handling and threading. */
     fun setAppLanguage(language: AppLanguage) {
         appLocaleManager.applyLanguage(language)
+    }
+
+    fun setAppIconTheme(icon: com.lastwave.app.data.local.AppIconTheme) = launchSettingsAction("switch app icon") {
+        settingsPreferences.setAppIconTheme(icon)
+        appIconManager.switchIcon(icon)
     }
 
     // ── Experimental: 15-band equalizer ──

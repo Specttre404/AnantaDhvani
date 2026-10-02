@@ -3,14 +3,24 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- LASTWAVEX Prism Signal Mark (Monochrome Layer for Android 13+ Themed Icons) -->
+
+    <!-- Glass Ring -->
+    <path
+        android:pathData="M 54,28 A 26,26 0 1,1 53.99,28 Z"
+        android:strokeWidth="3"
+        android:strokeColor="#FF000000"
+        android:fillColor="#00000000" />
+
+    <!-- Soundwave -->
+    <path
+        android:pathData="M 24,54 C 30,54 34,36 42,36 C 50,36 53,72 61,72 C 69,72 72,42 79,42 C 82,42 84,54 88,54"
+        android:strokeWidth="6.5"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Pulse Node -->
     <path
         android:fillColor="#FF000000"
-        android:pathData="M 32,28 L 58,54 L 32,80 L 23,71 L 41,54 L 23,37 Z" />
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M 76,28 L 50,54 L 76,80 L 85,71 L 67,54 L 85,37 Z" />
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M 54,42 L 66,54 L 54,66 L 42,54 Z" />
+        android:pathData="M 61,72 m -3.5,0 a 3.5,3.5 0 1,0 7,0 a 3.5,3.5 0 1,0 -7,0" />
 </vector>
