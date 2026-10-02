@@ -307,9 +307,31 @@ class MusicPlayer @Inject constructor(
     private var sponsorBlockEnabled = true
     @Volatile
     private var skipMusicVideoIntros = true
+    private val skipSegmentsCache = java.util.concurrent.ConcurrentHashMap<String, List<com.lastwave.app.data.sponsorblock.SkipSegment>>()
     private var currentSkipSegments: List<com.lastwave.app.data.sponsorblock.SkipSegment> = emptyList()
     private var sponsorBlockJob: Job? = null
     private var lastSkippedSegmentStartMs: Long = -1L
+    private var transitionWatchdogJob: Job? = null
+
+    private fun startTransitionWatchdog() {
+        transitionWatchdogJob?.cancel()
+        transitionWatchdogJob = applicationScope.launch(Dispatchers.Main.immediate) {
+            delay(3500L)
+            if (player.playbackState == Player.STATE_BUFFERING && _state.value.current != null) {
+                android.util.Log.w("MusicPlayer", "Transition watchdog: player stuck buffering for >3.5s; force resuming playback")
+                cancelCrossfade()
+                runCatching { nativeAudioEngine.get().flushResampler() }
+                val pos = player.currentPosition.coerceAtLeast(0L)
+                player.seekTo(pos)
+                player.play()
+            }
+        }
+    }
+
+    private fun cancelTransitionWatchdog() {
+        transitionWatchdogJob?.cancel()
+        transitionWatchdogJob = null
+    }
     private var activePlayer: ExoPlayer? = null
     private var secondaryPlayer: ExoPlayer? = null
     private var secondaryNativeEngine: NativeAudioEngine? = null
@@ -439,9 +461,15 @@ class MusicPlayer @Inject constructor(
         override fun onEvents(player: Player, events: Player.Events) {
             if (player === this@MusicPlayer.player) refresh(player)
         }
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            if (playbackState == Player.STATE_READY || playbackState == Player.STATE_ENDED) {
+                cancelTransitionWatchdog()
+            }
+        }
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             outgoingPlayer?.playWhenReady = isPlaying
             if (isPlaying) {
+                cancelTransitionWatchdog()
                 unavailableSkipJob?.cancel()
                 unavailableSkipJob = null
                 player.currentMediaItem?.mediaId?.let(unavailableMediaIds::remove)
@@ -449,6 +477,7 @@ class MusicPlayer @Inject constructor(
         }
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             if (isCasting) return
+            startTransitionWatchdog()
             recordLocalListenSignal(reason)
             if (mediaItem != null) {
                 val currentTracks = sleepTimerRemainingTracks
@@ -476,13 +505,36 @@ class MusicPlayer @Inject constructor(
                 if (!videoId.isNullOrBlank() && sponsorBlockEnabled) {
                     sponsorBlockJob?.cancel()
                     sponsorBlockJob = applicationScope.launch(Dispatchers.Main.immediate) {
-                        val rawSegments = sponsorBlockRepository.getSkipSegments(videoId)
+                        var cached = skipSegmentsCache[videoId]
+                        if (cached == null) {
+                            val prevVol = player.volume
+                            player.volume = 0f
+                            cached = kotlinx.coroutines.withTimeoutOrNull(200L) {
+                                runCatching {
+                                    withContext(Dispatchers.IO) { sponsorBlockRepository.getSkipSegments(videoId) }
+                                }.getOrNull()
+                            }
+                            if (!cached.isNullOrEmpty()) {
+                                skipSegmentsCache[videoId] = cached
+                            }
+                            if (player.volume == 0f) {
+                                player.volume = prevVol
+                            }
+                        }
+                        val rawSegments = cached.orEmpty()
                         currentSkipSegments = if (skipMusicVideoIntros) {
                             rawSegments
                         } else {
                             rawSegments.filter { it.category != "intro" && it.category != "music_offtopic" }
                         }
                         lastSkippedSegmentStartMs = -1L
+
+                        val initialSegment = currentSkipSegments.firstOrNull { it.startMs <= 1000L }
+                        if (initialSegment != null) {
+                            android.util.Log.d("MusicPlayer", "SponsorBlock: pre-seeking from ${initialSegment.startMs}ms to ${initialSegment.endMs}ms before playback renders")
+                            player.seekTo(initialSegment.endMs)
+                            lastSkippedSegmentStartMs = initialSegment.startMs
+                        }
                     }
                 } else {
                     currentSkipSegments = emptyList()
@@ -1270,6 +1322,15 @@ class MusicPlayer @Inject constructor(
     }
 
     fun playNext(track: PlayableTrack) {
+        val videoId = track.videoId
+        if (!videoId.isNullOrBlank() && sponsorBlockEnabled && !skipSegmentsCache.containsKey(videoId)) {
+            applicationScope.launch(Dispatchers.IO) {
+                runCatching {
+                    val segments = sponsorBlockRepository.getSkipSegments(videoId)
+                    if (segments.isNotEmpty()) skipSegmentsCache[videoId] = segments
+                }
+            }
+        }
         applicationScope.launch {
             val enriched = runCatching { matchMetadata(track) }.getOrDefault(track)
             withContext(Dispatchers.Main.immediate) {
@@ -2268,6 +2329,15 @@ class MusicPlayer @Inject constructor(
 
     private fun preloadNextTrack(nextIndex: Int, nextTrack: PlayableTrack?) {
         if (nextTrack == null) return
+        val nextVid = nextTrack.videoId
+        if (!nextVid.isNullOrBlank() && sponsorBlockEnabled && !skipSegmentsCache.containsKey(nextVid)) {
+            applicationScope.launch(Dispatchers.IO) {
+                runCatching {
+                    val segments = sponsorBlockRepository.getSkipSegments(nextVid)
+                    if (segments.isNotEmpty()) skipSegmentsCache[nextVid] = segments
+                }
+            }
+        }
         if (nextTrack.playbackUrl != null) return
         warmArtwork(nextTrack)
         val expectedQueueKey = nextTrack.queueKey()
