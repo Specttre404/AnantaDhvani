@@ -395,9 +395,9 @@ class MusicPlayer @Inject constructor(
 
     private val mediaCache: Cache by lazy {
         val cacheDir = java.io.File(appContext.cacheDir, "media_stream_cache")
-        // Bounded playback buffer, not an offline library. LRU eviction keeps
-        // recent rewind/next-track data while preventing multi-GB growth.
-        val evictor = LeastRecentlyUsedCacheEvictor(MEDIA_STREAM_CACHE_BYTES)
+        val quotaMb = runCatching { kotlinx.coroutines.runBlocking { settingsPreferences.settings.first().cacheQuotaMb } }.getOrDefault(2048L)
+        val maxBytes = if (quotaMb < 0) Long.MAX_VALUE else (quotaMb * 1024 * 1024).coerceAtLeast(100 * 1024 * 1024)
+        val evictor = LeastRecentlyUsedCacheEvictor(maxBytes)
         val dbProvider = StandaloneDatabaseProvider(appContext)
         SimpleCache(cacheDir, evictor, dbProvider)
     }
@@ -770,12 +770,18 @@ class MusicPlayer @Inject constructor(
                 else -> dataSpec
             }
         }
+        val currentMisc = runCatching { kotlinx.coroutines.runBlocking { settingsPreferences.settings.first() } }.getOrNull()
+        val minBuf = currentMisc?.minBufferMs ?: 15_000
+        val maxBuf = currentMisc?.maxBufferMs ?: 50_000
+        val startBuf = currentMisc?.bufferForPlaybackMs ?: 2_500
+        val rebuf = currentMisc?.bufferForPlaybackAfterRebufferMs ?: 5_000
+
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                /* minBufferMs = */ if (handleAudioFocus) 45_000 else 15_000,
-                /* maxBufferMs = */ if (handleAudioFocus) 120_000 else 30_000,
-                /* bufferForPlaybackMs = */ 1_000,
-                /* bufferForPlaybackAfterRebufferMs = */ 2_000,
+                /* minBufferMs = */ minBuf,
+                /* maxBufferMs = */ maxBuf,
+                /* bufferForPlaybackMs = */ startBuf,
+                /* bufferForPlaybackAfterRebufferMs = */ rebuf,
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .setBackBuffer(15_000, true)

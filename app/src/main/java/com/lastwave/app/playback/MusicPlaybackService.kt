@@ -348,6 +348,24 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
             }
             sendBroadcast(extras(Intent("com.android.music.playstatechanged")))
             sendBroadcast(extras(Intent("com.htc.music.playstatechanged")))
+
+            // Standard Pano Scrobbler / Simple Last.fm Scrobbler broadcast
+            val scrobbleState = when {
+                track == null -> 3
+                playing -> 1
+                else -> 2
+            }
+            val panoIntent = Intent("com.adam.aslfms.notify.playstatechanged").apply {
+                putExtra("state", scrobbleState)
+                putExtra("app-name", "Ananta Dhvani")
+                putExtra("app-package", packageName)
+                putExtra("track", title)
+                putExtra("artist", artist)
+                putExtra("album", album)
+                putExtra("duration", (state.durationMs / 1000L).toInt())
+                putExtra("position", (state.positionMs / 1000L).toInt())
+            }
+            sendBroadcast(panoIntent)
         }.onFailure { error ->
             android.util.Log.w("MusicPlaybackService", "Legacy player broadcast failed", error)
         }

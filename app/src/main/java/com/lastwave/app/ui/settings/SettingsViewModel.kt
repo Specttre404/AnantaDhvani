@@ -516,6 +516,18 @@ class SettingsViewModel @Inject constructor(
         appIconManager.switchIcon(icon)
     }
 
+    fun setBufferTuning(minBufferMs: Int, maxBufferMs: Int, bufferForPlaybackMs: Int, bufferForPlaybackAfterRebufferMs: Int) = launchSettingsAction("update buffer tuning") {
+        settingsPreferences.setBufferTuning(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferMs)
+    }
+
+    fun setDynamicNotchSettings(enabled: Boolean, topMarginDp: Int, widthDp: Int, dismissSec: Int) = launchSettingsAction("update notch settings") {
+        settingsPreferences.setDynamicNotchSettings(enabled, topMarginDp, widthDp, dismissSec)
+    }
+
+    fun setCacheQuotaMb(quotaMb: Long) = launchSettingsAction("update cache quota") {
+        settingsPreferences.setCacheQuotaMb(quotaMb)
+    }
+
     // ── Experimental: 15-band equalizer ──
 
     fun setEqualizerEnabled(enabled: Boolean) {

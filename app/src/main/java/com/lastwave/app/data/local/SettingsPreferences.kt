@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -199,10 +200,20 @@ data class MiscSettings(
     /** Ids of Home tab sections the user hid ([HomeSection.id]).
      *  Empty = everything visible. Unknown ids are dropped on read. */
     val hiddenHomeSections: Set<String> = emptySet(),
-    /** Optional floating dynamic island capsule/notch overlay. */
+    /** Optional floating dynamic island capsule/notch overlay settings. */
     val enableDynamicIslandNotch: Boolean = false,
+    val notchTopMarginDp: Int = 4,
+    val notchCapsuleWidthDp: Int = 220,
+    val notchAutoDismissSec: Int = 4,
+    /** Local disk cache quota in MB (default 2048 MB, -1 for unlimited). */
+    val cacheQuotaMb: Long = 2048L,
     /** Active launcher app icon theme. */
     val appIconTheme: AppIconTheme = AppIconTheme.DARK,
+    /** ExoPlayer LoadControl buffer preferences (in milliseconds). */
+    val minBufferMs: Int = 15_000,
+    val maxBufferMs: Int = 50_000,
+    val bufferForPlaybackMs: Int = 2_500,
+    val bufferForPlaybackAfterRebufferMs: Int = 5_000,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -319,7 +330,15 @@ class SettingsPreferences @Inject constructor(
         val PRIMARY_ARTIST_ONLY = booleanPreferencesKey("lw_primary_artist_only")
         val HIDDEN_HOME_SECTIONS = stringSetPreferencesKey("lw_hidden_home_sections")
         val ENABLE_DYNAMIC_ISLAND_NOTCH = booleanPreferencesKey("lw_enable_dynamic_island_notch")
+        val NOTCH_TOP_MARGIN_DP = intPreferencesKey("lw_notch_top_margin_dp")
+        val NOTCH_CAPSULE_WIDTH_DP = intPreferencesKey("lw_notch_capsule_width_dp")
+        val NOTCH_AUTO_DISMISS_SEC = intPreferencesKey("lw_notch_auto_dismiss_sec")
         val APP_ICON_THEME = stringPreferencesKey("lw_app_icon_theme")
+        val CACHE_QUOTA_MB = longPreferencesKey("lw_cache_quota_mb")
+        val MIN_BUFFER_MS = intPreferencesKey("lw_min_buffer_ms")
+        val MAX_BUFFER_MS = intPreferencesKey("lw_max_buffer_ms")
+        val BUFFER_FOR_PLAYBACK_MS = intPreferencesKey("lw_buffer_for_playback_ms")
+        val BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = intPreferencesKey("lw_buffer_for_playback_after_rebuffer_ms")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -372,7 +391,15 @@ class SettingsPreferences @Inject constructor(
                     ?.filter { id -> HomeSection.entries.any { it.id == id } }?.toSet()
                     ?: emptySet(),
                 enableDynamicIslandNotch = p.readSafely(Keys.ENABLE_DYNAMIC_ISLAND_NOTCH) ?: false,
+                notchTopMarginDp = (p.readSafely(Keys.NOTCH_TOP_MARGIN_DP) ?: 4).coerceIn(0, 24),
+                notchCapsuleWidthDp = (p.readSafely(Keys.NOTCH_CAPSULE_WIDTH_DP) ?: 220).coerceIn(180, 320),
+                notchAutoDismissSec = (p.readSafely(Keys.NOTCH_AUTO_DISMISS_SEC) ?: 4).coerceIn(2, 6),
                 appIconTheme = AppIconTheme.fromId(p.readSafely(Keys.APP_ICON_THEME)),
+                cacheQuotaMb = p.readSafely(Keys.CACHE_QUOTA_MB) ?: 2048L,
+                minBufferMs = (p.readSafely(Keys.MIN_BUFFER_MS) ?: 15_000).coerceIn(5_000, 60_000),
+                maxBufferMs = (p.readSafely(Keys.MAX_BUFFER_MS) ?: 50_000).coerceIn(15_000, 120_000),
+                bufferForPlaybackMs = (p.readSafely(Keys.BUFFER_FOR_PLAYBACK_MS) ?: 2_500).coerceIn(500, 10_000),
+                bufferForPlaybackAfterRebufferMs = (p.readSafely(Keys.BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS) ?: 5_000).coerceIn(1_000, 15_000),
             )
         }
 
@@ -522,8 +549,30 @@ class SettingsPreferences @Inject constructor(
         dataStore.edit { it[Keys.APP_ICON_THEME] = icon.id }
     }
 
+    suspend fun setBufferTuning(minBufferMs: Int, maxBufferMs: Int, bufferForPlaybackMs: Int, bufferForPlaybackAfterRebufferMs: Int) {
+        dataStore.edit {
+            it[Keys.MIN_BUFFER_MS] = minBufferMs.coerceIn(5_000, 60_000)
+            it[Keys.MAX_BUFFER_MS] = maxBufferMs.coerceIn(15_000, 120_000)
+            it[Keys.BUFFER_FOR_PLAYBACK_MS] = bufferForPlaybackMs.coerceIn(500, 10_000)
+            it[Keys.BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS] = bufferForPlaybackAfterRebufferMs.coerceIn(1_000, 15_000)
+        }
+    }
+
     suspend fun setEnableDynamicIslandNotch(enabled: Boolean) {
         dataStore.edit { it[Keys.ENABLE_DYNAMIC_ISLAND_NOTCH] = enabled }
+    }
+
+    suspend fun setDynamicNotchSettings(enabled: Boolean, topMarginDp: Int, widthDp: Int, dismissSec: Int) {
+        dataStore.edit {
+            it[Keys.ENABLE_DYNAMIC_ISLAND_NOTCH] = enabled
+            it[Keys.NOTCH_TOP_MARGIN_DP] = topMarginDp.coerceIn(0, 24)
+            it[Keys.NOTCH_CAPSULE_WIDTH_DP] = widthDp.coerceIn(180, 320)
+            it[Keys.NOTCH_AUTO_DISMISS_SEC] = dismissSec.coerceIn(2, 6)
+        }
+    }
+
+    suspend fun setCacheQuotaMb(quotaMb: Long) {
+        dataStore.edit { it[Keys.CACHE_QUOTA_MB] = quotaMb }
     }
 
     suspend fun setPlayerBackgroundStyle(style: PlayerBackgroundStyle) {
