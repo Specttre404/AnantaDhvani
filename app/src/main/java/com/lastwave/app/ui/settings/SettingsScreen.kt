@@ -79,6 +79,9 @@ import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Headset
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.VolumeUp
@@ -875,6 +878,22 @@ fun SettingsScreen(
                     CacheQuotaCard(
                         currentQuotaMb = misc.cacheQuotaMb,
                         onSelectQuotaMb = viewModel::setCacheQuotaMb,
+                    )
+                    CrossfeedPresetsCard(
+                        enabled = misc.crossfeedEnabled,
+                        levelDb = misc.crossfeedLevelDb,
+                        cutoffHz = misc.crossfeedCutoffHz,
+                        onToggle = viewModel::setCrossfeedEnabled,
+                        onChange = { lvl, cut -> viewModel.setCrossfeedLevelDb(lvl); viewModel.setCrossfeedCutoffHz(cut) },
+                    )
+                    SilenceTrimmingCard(
+                        thresholdDb = misc.silenceThresholdDb,
+                        minDurationMs = misc.minSilenceDurationMs,
+                        onChange = viewModel::setSilenceSettings,
+                    )
+                    MiniPlayerSwipeCard(
+                        currentStyle = misc.miniPlayerSwipeStyle,
+                        onSelectStyle = viewModel::setMiniPlayerSwipeStyle,
                     )
                 }
             }
@@ -3153,6 +3172,127 @@ private fun CacheQuotaCard(
                         selected = isSelected,
                         onClick = { onSelectQuotaMb(mb) },
                         label = { Text(label, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CrossfeedPresetsCard(
+    enabled: Boolean,
+    levelDb: Float,
+    cutoffHz: Float,
+    onToggle: (Boolean) -> Unit,
+    onChange: (levelDb: Float, cutoffHz: Float) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Headset, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Binaural Headphone Crossfeed (BS2B)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Reduces fatigue by simulating acoustic room decay", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = enabled, onCheckedChange = onToggle)
+            }
+            if (enabled) {
+                val presets = listOf(
+                    "Bauer" to (4.5f to 700f),
+                    "Chu Moy" to (6.0f to 700f),
+                    "Jan Meier" to (9.5f to 650f),
+                    "Studio" to (3.5f to 800f),
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    presets.forEach { (name, pair) ->
+                        val isSelected = kotlin.math.abs(levelDb - pair.first) < 0.1f && kotlin.math.abs(cutoffHz - pair.second) < 10f
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { onChange(pair.first, pair.second) },
+                            label = { Text(name, style = MaterialTheme.typography.labelSmall) },
+                        )
+                    }
+                }
+                Text("Crossfeed Level: ${"%.1f".format(levelDb)} dB", style = MaterialTheme.typography.labelSmall)
+                Slider(
+                    value = levelDb,
+                    onValueChange = { onChange(it, cutoffHz) },
+                    valueRange = 3.0f..9.5f,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SilenceTrimmingCard(
+    thresholdDb: Float,
+    minDurationMs: Long,
+    onChange: (thresholdDb: Float, minDurationMs: Long) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.VolumeOff, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Silence Trimming Parameters", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Skip leading/trailing dead air in audio streams", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Text("Threshold: ${"%.1f".format(thresholdDb)} dB", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = thresholdDb,
+                onValueChange = { onChange(it, minDurationMs) },
+                valueRange = -60.0f..-25.0f,
+            )
+            Text("Min Silence Duration: ${minDurationMs} ms", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = minDurationMs.toFloat(),
+                onValueChange = { onChange(thresholdDb, it.toLong()) },
+                valueRange = 50f..1500f,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MiniPlayerSwipeCard(
+    currentStyle: com.lastwave.app.data.local.MiniPlayerSwipeStyle,
+    onSelectStyle: (com.lastwave.app.data.local.MiniPlayerSwipeStyle) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.TouchApp, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Mini Player Gesture Behavior", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Configure swipe gesture on dock bar", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                com.lastwave.app.data.local.MiniPlayerSwipeStyle.entries.forEach { style ->
+                    val isSelected = style == currentStyle
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onSelectStyle(style) },
+                        label = { Text(style.title, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

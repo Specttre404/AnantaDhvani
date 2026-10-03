@@ -484,6 +484,15 @@ class SettingsViewModel @Inject constructor(
     fun setShakeToSkipEnabled(enabled: Boolean) = launchSettingsAction("update Shake to Skip setting") {
         settingsPreferences.setShakeToSkipEnabled(enabled)
     }
+    fun setCrossfeedEnabled(enabled: Boolean) = launchSettingsAction("update crossfeed setting") {
+        settingsPreferences.setCrossfeedEnabled(enabled)
+    }
+    fun setCrossfeedLevelDb(levelDb: Float) = launchSettingsAction("update crossfeed level") {
+        settingsPreferences.setCrossfeedLevelDb(levelDb)
+    }
+    fun setCrossfeedCutoffHz(cutoffHz: Float) = launchSettingsAction("update crossfeed cutoff") {
+        settingsPreferences.setCrossfeedCutoffHz(cutoffHz)
+    }
     fun setPlayerStyle(style: com.lastwave.app.data.local.PlayerStyle) = launchSettingsAction("update player layout style") {
         settingsPreferences.setPlayerStyle(style)
     }
@@ -621,14 +630,6 @@ class SettingsViewModel @Inject constructor(
 
     fun setFilterQ(q: Float) = launchSettingsAction("update equalizer filter Q") {
         equalizerPreferences.setFilterQ(q)
-    }
-
-    fun setCrossfeedEnabled(enabled: Boolean) = launchSettingsAction("update crossfeed setting") {
-        settingsPreferences.setCrossfeedEnabled(enabled)
-    }
-
-    fun setCrossfeedLevelDb(levelDb: Float) = launchSettingsAction("update crossfeed level") {
-        settingsPreferences.setCrossfeedLevelDb(levelDb)
     }
 
     // ── Data management (§8.5) ──

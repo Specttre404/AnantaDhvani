@@ -583,6 +583,10 @@ class SettingsPreferences @Inject constructor(
         dataStore.edit { it[Keys.CROSSFEED_LEVEL_DB] = levelDb.coerceIn(3.0f, 9.5f) }
     }
 
+    suspend fun setCrossfeedCutoffHz(cutoffHz: Float) {
+        dataStore.edit { it[Keys.CROSSFEED_CUTOFF_HZ] = cutoffHz.coerceIn(300.0f, 1200.0f) }
+    }
+
     suspend fun setShakeToSkipEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.SHAKE_TO_SKIP_ENABLED] = enabled }
     }

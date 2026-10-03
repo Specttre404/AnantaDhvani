@@ -129,6 +129,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -2734,6 +2735,24 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             foreground = edgeButtonContent,
             iconSize = if (isTranslucent) 19.dp else 20.dp,
             modifier = Modifier.weight(1f).height(if (isTranslucent) 44.dp else 48.dp),
+        )
+    }
+    Row(
+        Modifier.fillMaxWidth().padding(top = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val isSlowed = state.speed == 0.85f
+        val isLofi = state.speed == 0.92f
+        FilterChip(
+            selected = isSlowed,
+            onClick = { player.setPlaybackSpeed(if (isSlowed) 1.0f else 0.85f) },
+            label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
+        )
+        FilterChip(
+            selected = isLofi,
+            onClick = { player.setPlaybackSpeed(if (isLofi) 1.0f else 0.92f) },
+            label = { Text("Lo-Fi Vintage", style = MaterialTheme.typography.labelSmall) },
         )
     }
     if (showSignalPath) {
