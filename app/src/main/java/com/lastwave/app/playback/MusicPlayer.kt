@@ -1892,8 +1892,9 @@ class MusicPlayer @Inject constructor(
         val ordered = if (state.shuffleEnabled) queue.indices.shuffled() else {
             (start until queue.size) + if (state.repeatMode == Player.REPEAT_MODE_ALL) (0 until start) else emptyList()
         }
-        return ordered.firstOrNull { it != state.currentIndex && queue[it].mediaIdKey() !in unavailableMediaIds }
-            ?: C.INDEX_UNSET
+        return ordered.firstOrNull {
+            it != state.currentIndex && queue[it].mediaIdKey() !in unavailableMediaIds && !isBlacklisted(queue[it])
+        } ?: C.INDEX_UNSET
     }
 
     private fun previousQueueIndex(state: MusicPlayerState): Int {

@@ -199,6 +199,18 @@ class ExploreGenreMenuViewModel @Inject constructor(private val genreExplorer: c
 }
 
 @HiltViewModel
+class BlacklistMenuViewModel @Inject constructor(
+    private val settingsPreferences: com.lastwave.app.data.local.SettingsPreferences,
+) : ViewModel() {
+    fun muteTrack(videoId: String) {
+        viewModelScope.launch { settingsPreferences.muteTrack(videoId) }
+    }
+    fun blockArtist(artist: String) {
+        viewModelScope.launch { settingsPreferences.blockArtist(artist) }
+    }
+}
+
+@HiltViewModel
 class EqualizerMenuViewModel @Inject constructor(
     val equalizerPreferences: com.lastwave.app.data.local.EqualizerPreferences,
 ) : ViewModel() {
@@ -302,6 +314,7 @@ fun TrackContextMenuSheet(
     downloadViewModel: DownloadMenuViewModel = hiltViewModel(),
     exclusionViewModel: RecommendationExclusionMenuViewModel = hiltViewModel(),
     artistAlbumViewModel: ArtistAlbumMenuViewModel = hiltViewModel(),
+    blacklistViewModel: BlacklistMenuViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
@@ -375,6 +388,7 @@ fun TrackContextMenuSheet(
 
     var showBlacklistDialog by remember { mutableStateOf(false) }
     if (showBlacklistDialog && target is TrackMenuTarget.Track) {
+        val playable = playableTrack ?: PlayableTrack(title = target.name, artist = target.artist)
         AlertDialog(
             onDismissRequest = { showBlacklistDialog = false },
             title = { Text("Block Artist / Mute Track") },
@@ -383,7 +397,12 @@ fun TrackContextMenuSheet(
                     Text("Select a restriction for this content:", style = MaterialTheme.typography.bodySmall)
                     OutlinedButton(
                         onClick = {
-                            android.widget.Toast.makeText(context, "Muted song: ${target.name}", android.widget.Toast.LENGTH_SHORT).show()
+                            val trackId = playable.videoId ?: playable.title
+                            blacklistViewModel.muteTrack(trackId)
+                            if (musicPlayer.state.value.current?.title == playable.title) {
+                                musicPlayer.next()
+                            }
+                            android.widget.Toast.makeText(context, "Muted ${playable.title} — song will be auto-skipped", android.widget.Toast.LENGTH_SHORT).show()
                             showBlacklistDialog = false
                             onDismiss()
                         },
@@ -393,7 +412,11 @@ fun TrackContextMenuSheet(
                     }
                     OutlinedButton(
                         onClick = {
-                            android.widget.Toast.makeText(context, "Blocked artist: ${target.artist}", android.widget.Toast.LENGTH_SHORT).show()
+                            blacklistViewModel.blockArtist(playable.artist)
+                            if (musicPlayer.state.value.current?.artist.equals(playable.artist, ignoreCase = true)) {
+                                musicPlayer.next()
+                            }
+                            android.widget.Toast.makeText(context, "Blocked ${playable.artist} — skipping artist", android.widget.Toast.LENGTH_SHORT).show()
                             showBlacklistDialog = false
                             onDismiss()
                         },

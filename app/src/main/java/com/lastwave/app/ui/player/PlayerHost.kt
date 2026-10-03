@@ -136,7 +136,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -1567,12 +1569,32 @@ private fun FullPlayer(
 
     val playerBackdrop = if (isLiquidGlassBackdropSupported()) rememberLayerBackdrop() else null
     var activeCanvasUrl by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(track?.videoId) {
+    LaunchedEffect(track.videoId) {
         activeCanvasUrl = null
-        val current = track ?: return@LaunchedEffect
+        val current = track
         activeCanvasUrl = runCatching {
             com.lastwave.app.data.canvas.CanvasRepository(okhttp3.OkHttpClient()).fetchCanvasLoop(current.title, current.artist)?.canvasUrl
         }.getOrNull()
+    }
+
+    val canvasPlayer = remember {
+        androidx.media3.exoplayer.ExoPlayer.Builder(context).build().apply {
+            volume = 0f
+            repeatMode = androidx.media3.common.Player.REPEAT_MODE_ALL
+        }
+    }
+    DisposableEffect(canvasPlayer) {
+        onDispose { canvasPlayer.release() }
+    }
+    LaunchedEffect(activeCanvasUrl) {
+        if (!activeCanvasUrl.isNullOrBlank()) {
+            canvasPlayer.setMediaItem(androidx.media3.common.MediaItem.fromUri(activeCanvasUrl!!))
+            canvasPlayer.prepare()
+            canvasPlayer.play()
+        } else {
+            canvasPlayer.stop()
+            canvasPlayer.clearMediaItems()
+        }
     }
 
     CompositionLocalProvider(

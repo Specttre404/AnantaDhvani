@@ -69,6 +69,7 @@ class PlaylistRepository @Inject constructor(
     private val exportEvents: PlaylistExportEvents,
     private val publicMirror: PlaylistPublicMirror,
     private val innerTube: InnerTubeMusicApi,
+    private val downloadedTrackDao: dagger.Lazy<com.lastwave.app.data.local.db.DownloadedTrackDao>,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
     private val _changes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -129,7 +130,61 @@ class PlaylistRepository @Inject constructor(
 
     suspend fun getById(id: Long): SavedPlaylist? {
         if (id < 0) {
-            return getSmartPlaylists().firstOrNull { it.id == id }
+            val smarts = getSmartPlaylists()
+            val base = smarts.firstOrNull { it.id == id } ?: return null
+            val localDownloads = runCatching { downloadedTrackDao.get().getAllList() }.getOrDefault(emptyList())
+            val resolvedTracks = when (id) {
+                -101L -> {
+                    localDownloads.map { dt ->
+                        GeneratedTrack(
+                            name = dt.title,
+                            artist = dt.artist,
+                            album = dt.album,
+                            artworkUrl = dt.artworkUrl,
+                            url = dt.filePath,
+                        )
+                    }.take(50)
+                }
+                -102L -> {
+                    val cutoff = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000L)
+                    localDownloads.filter { it.downloadedAtMillis >= cutoff }.map { dt ->
+                        GeneratedTrack(
+                            name = dt.title,
+                            artist = dt.artist,
+                            album = dt.album,
+                            artworkUrl = dt.artworkUrl,
+                            url = dt.filePath,
+                        )
+                    }
+                }
+                -103L -> {
+                    localDownloads.take(20).map { dt ->
+                        GeneratedTrack(
+                            name = dt.title,
+                            artist = dt.artist,
+                            album = dt.album,
+                            artworkUrl = dt.artworkUrl,
+                            url = dt.filePath,
+                        )
+                    }
+                }
+                -104L -> {
+                    localDownloads.filter { dt ->
+                        val path = dt.filePath.lowercase()
+                        path.endsWith(".flac") || path.endsWith(".alac") || path.endsWith(".wav") || dt.isLossless
+                    }.map { dt ->
+                        GeneratedTrack(
+                            name = dt.title,
+                            artist = dt.artist,
+                            album = dt.album,
+                            artworkUrl = dt.artworkUrl,
+                            url = dt.filePath,
+                        )
+                    }
+                }
+                else -> emptyList()
+            }
+            return base.copy(tracks = resolvedTracks)
         }
         return try {
             dao.getById(id)?.toDomain() ?: getAll().firstOrNull { it.id == id }
