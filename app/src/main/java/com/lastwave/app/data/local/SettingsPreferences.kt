@@ -89,7 +89,9 @@ enum class PlayerStyle(val id: String, val title: String, val description: Strin
     CLASSIC("classic", "Classic", "Centered square artwork with balanced linear controllers and full transport rows"),
     IMMERSIVE_FULLSCREEN("immersive_fullscreen", "Immersive Fullscreen", "Edge-to-edge artwork presentation with subtle semi-transparent controls"),
     MINIMALIST("minimalist", "Minimalist", "Typography-first distraction-free mode with essential controls only"),
-    COMPACT_DOCK("compact_dock", "Compact Dock", "One-handed reachability layout with controls closer to the bottom");
+    COMPACT_DOCK("compact_dock", "Compact Dock", "One-handed reachability layout with controls closer to the bottom"),
+    CAROUSEL("carousel", "Card Carousel", "Swipeable horizontal card stack with upcoming queue items"),
+    SPLIT_SCREEN("split_screen", "Split Screen Dual-Pane", "Dual-pane landscape/tablet layout displaying artwork & controls beside synchronized lyrics");
 
     companion object {
         fun fromId(id: String?): PlayerStyle =
@@ -258,6 +260,10 @@ data class MiscSettings(
     val dohProviderName: String = "System",
     /** ListenBrainz user token. */
     val listenBrainzToken: String = "",
+    /** Lyrics typography customization. */
+    val lyricsFontSize: Int = 24,
+    val lyricsLineSpacing: Int = 14,
+    val lyricsInactiveBlurRadius: Int = 3,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -394,6 +400,9 @@ class SettingsPreferences @Inject constructor(
         val INNERTUBE_CLIENT_NAME = stringPreferencesKey("lw_innertube_client_name")
         val DOH_PROVIDER_NAME = stringPreferencesKey("lw_doh_provider_name")
         val LISTENBRAINZ_TOKEN = stringPreferencesKey("lw_listenbrainz_token")
+        val LYRICS_FONT_SIZE = intPreferencesKey("lw_lyrics_font_size")
+        val LYRICS_LINE_SPACING = intPreferencesKey("lw_lyrics_line_spacing")
+        val LYRICS_INACTIVE_BLUR_RADIUS = intPreferencesKey("lw_lyrics_inactive_blur_radius")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -466,6 +475,9 @@ class SettingsPreferences @Inject constructor(
                 innerTubeClientName = p.readSafely(Keys.INNERTUBE_CLIENT_NAME) ?: "ANDROID_VR",
                 dohProviderName = p.readSafely(Keys.DOH_PROVIDER_NAME) ?: "System",
                 listenBrainzToken = p.readSafely(Keys.LISTENBRAINZ_TOKEN).orEmpty(),
+                lyricsFontSize = (p.readSafely(Keys.LYRICS_FONT_SIZE) ?: 24).coerceIn(18, 36),
+                lyricsLineSpacing = (p.readSafely(Keys.LYRICS_LINE_SPACING) ?: 14).coerceIn(8, 24),
+                lyricsInactiveBlurRadius = (p.readSafely(Keys.LYRICS_INACTIVE_BLUR_RADIUS) ?: 3).coerceIn(0, 8),
             )
         }
 
@@ -667,6 +679,14 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setListenBrainzToken(token: String) {
         dataStore.edit { it[Keys.LISTENBRAINZ_TOKEN] = token.trim() }
+    }
+
+    suspend fun setLyricsTypographySettings(fontSize: Int, lineSpacing: Int, blurRadius: Int) {
+        dataStore.edit {
+            it[Keys.LYRICS_FONT_SIZE] = fontSize.coerceIn(18, 36)
+            it[Keys.LYRICS_LINE_SPACING] = lineSpacing.coerceIn(8, 24)
+            it[Keys.LYRICS_INACTIVE_BLUR_RADIUS] = blurRadius.coerceIn(0, 8)
+        }
     }
 
     suspend fun setPreferredAudioCodec(codec: PreferredAudioCodec) {

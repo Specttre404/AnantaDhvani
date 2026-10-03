@@ -198,6 +198,45 @@ class PlaylistRepository @Inject constructor(
         leftVideoId == null || rightVideoId == null || leftVideoId == rightVideoId
     }
 
+    fun getSmartPlaylists(): List<SavedPlaylist> {
+        val now = System.currentTimeMillis()
+        return listOf(
+            SavedPlaylist(
+                id = -101L,
+                title = "Top 50 Most Played",
+                subtitle = "Your most played tracks of all time",
+                mode = "smart",
+                tracks = emptyList(),
+                createdAtMillis = now,
+                isPinned = true,
+            ),
+            SavedPlaylist(
+                id = -102L,
+                title = "Recently Added (30 Days)",
+                subtitle = "Recently downloaded and local tracks",
+                mode = "smart",
+                tracks = emptyList(),
+                createdAtMillis = now,
+            ),
+            SavedPlaylist(
+                id = -103L,
+                title = "Forgotten Favorites",
+                subtitle = "High play count tracks unplayed in >60 days",
+                mode = "smart",
+                tracks = emptyList(),
+                createdAtMillis = now,
+            ),
+            SavedPlaylist(
+                id = -104L,
+                title = "Hi-Res Lossless Only",
+                subtitle = "FLAC CD & Studio Master quality tracks",
+                mode = "smart",
+                tracks = emptyList(),
+                createdAtMillis = now,
+            ),
+        )
+    }
+
     suspend fun createCustom(title: String): SavedPlaylist {
         val cleanTitle = title.trim()
         if (cleanTitle.equals(LIKED_SONGS_TITLE, ignoreCase = true)) return ensureLikedSongs()

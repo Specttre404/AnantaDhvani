@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -242,6 +243,19 @@ class EqualizerPreferences @Inject constructor(
             val decoded = String(android.util.Base64.decode(code.trim(), android.util.Base64.NO_WRAP))
             decoded.split(",").mapNotNull { it.toFloatOrNull() }.takeIf { it.size == EQ_BAND_FREQS_HZ.size }
         }.getOrNull()
+    }
+
+    suspend fun setSingleBandQ(bandIndex: Int, q: Float) {
+        if (bandIndex !in 0 until EQ_BAND_FREQS_HZ.size) return
+        val currentQs = settings.first().bandQValues.toMutableList()
+        currentQs[bandIndex] = if (q.isFinite()) q.coerceIn(0.1f, 10.0f) else 1.414f
+        dataStore.edit { it[Keys.BAND_QS] = currentQs.joinToString(",") }
+    }
+
+    suspend fun setAllBandQValues(bandQs: List<Float>) {
+        if (bandQs.size != EQ_BAND_FREQS_HZ.size) return
+        val safeQs = bandQs.map { if (it.isFinite()) it.coerceIn(0.1f, 10.0f) else 1.414f }
+        dataStore.edit { it[Keys.BAND_QS] = safeQs.joinToString(",") }
     }
 
     suspend fun setFilterQ(q: Float) {
