@@ -582,6 +582,34 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(toastMessage = "Loaded IR profile: $name") }
     }
 
+    fun setConvolutionWetLevel(level: Float) = launchSettingsAction("update convolution wet level") {
+        settingsPreferences.setConvolutionWetLevel(level)
+    }
+
+    fun setInnerTubeClientName(name: String) = launchSettingsAction("update InnerTube client") {
+        settingsPreferences.setInnerTubeClientName(name)
+    }
+
+    fun setDohProviderName(name: String) = launchSettingsAction("update DoH provider") {
+        settingsPreferences.setDohProviderName(name)
+    }
+
+    fun setListenBrainzToken(token: String) = launchSettingsAction("update ListenBrainz token") {
+        settingsPreferences.setListenBrainzToken(token)
+    }
+
+    fun setAudiophilePalette(paletteName: String) = launchSettingsAction("update palette") {
+        val theme = com.lastwave.app.ui.theme.AudiophilePalettes.ALL_THEMES.firstOrNull {
+            it.name.contains(paletteName, ignoreCase = true)
+        } ?: com.lastwave.app.ui.theme.AudiophilePalettes.DYNAMIC_MONET
+        setManualAccent(theme.primaryColor)
+    }
+
+    fun restoreFromWebDav(serverUrl: String, user: String, pass: String, secretKey: String) = launchSettingsAction("WebDAV restore") {
+        val success = webDavSyncManager.restoreFromWebDav(serverUrl, user, pass, secretKey)
+        _uiState.update { it.copy(toastMessage = if (success) "WebDAV restore successful" else "WebDAV restore failed") }
+    }
+
     // ── Experimental: 15-band equalizer ──
 
     fun setEqualizerEnabled(enabled: Boolean) {

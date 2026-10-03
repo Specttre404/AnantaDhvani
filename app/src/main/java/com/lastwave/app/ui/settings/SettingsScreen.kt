@@ -914,27 +914,27 @@ fun SettingsScreen(
                         onToggle = viewModel::setAudioOffloadEnabled,
                     )
                     ConvolutionIrCard(
-                        wetLevel = 0.3f,
+                        wetLevel = misc.convolutionWetLevel,
                         onSelectFile = { irPickerLauncher.launch("audio/*") },
-                        onWetChange = {},
+                        onWetChange = viewModel::setConvolutionWetLevel,
                     )
                     AutoEqCard(
                         onOpenSearch = { showAutoEqSheet = true },
                     )
                     AudiophileThemePaletteCard(
-                        onSelectPreset = {},
+                        onSelectPreset = viewModel::setAudiophilePalette,
                     )
                     IncognitoModeCard(
                         enabled = misc.isIncognitoMode,
                         onToggle = viewModel::setIncognitoMode,
                     )
                     InnerTubeSpoofingCard(
-                        currentClient = "Android VR",
-                        onSelectClient = {},
+                        currentClient = misc.innerTubeClientName,
+                        onSelectClient = viewModel::setInnerTubeClientName,
                     )
                     DohAndProxyCard(
-                        dohProvider = "System",
-                        onSelectDoh = {},
+                        dohProvider = misc.dohProviderName,
+                        onSelectDoh = viewModel::setDohProviderName,
                     )
                     WebDavBackupCard(
                         onBackup = { webDavMode = "backup"; showWebDavDialog = true },
@@ -1937,7 +1937,11 @@ fun SettingsScreen(
             },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.backupToWebDav(webDavUrl, webDavUser, webDavPass, webDavKey)
+                    if (webDavMode == "backup") {
+                        viewModel.backupToWebDav(webDavUrl, webDavUser, webDavPass, webDavKey)
+                    } else {
+                        viewModel.restoreFromWebDav(webDavUrl, webDavUser, webDavPass, webDavKey)
+                    }
                     showWebDavDialog = false
                 }) {
                     Text(if (webDavMode == "backup") "Start Backup" else "Start Restore")

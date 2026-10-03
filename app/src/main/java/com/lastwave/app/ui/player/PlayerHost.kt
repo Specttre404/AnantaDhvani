@@ -2763,6 +2763,12 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             onClick = { player.setPlaybackSpeed(if (isLofi) 1.0f else 0.92f) },
             label = { Text("Lo-Fi Vintage", style = MaterialTheme.typography.labelSmall) },
         )
+        var showOscilloscope by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = showOscilloscope,
+            onClick = { showOscilloscope = !showOscilloscope },
+            label = { Text("Oscilloscope", style = MaterialTheme.typography.labelSmall) },
+        )
     }
     if (showSignalPath) {
         val dac = usbDac.dac

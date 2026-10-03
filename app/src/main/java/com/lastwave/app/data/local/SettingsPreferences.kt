@@ -250,6 +250,14 @@ data class MiscSettings(
     val minSilenceDurationMs: Long = 250L,
     /** Incognito / Private listening session. */
     val isIncognitoMode: Boolean = false,
+    /** Convolution IR wet level (0.0f to 1.0f). */
+    val convolutionWetLevel: Float = 0.35f,
+    /** InnerTube spoofing client name. */
+    val innerTubeClientName: String = "ANDROID_VR",
+    /** DoH provider name. */
+    val dohProviderName: String = "System",
+    /** ListenBrainz user token. */
+    val listenBrainzToken: String = "",
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -382,6 +390,10 @@ class SettingsPreferences @Inject constructor(
         val SILENCE_THRESHOLD_DB = floatPreferencesKey("lw_silence_threshold_db")
         val MIN_SILENCE_DURATION_MS = longPreferencesKey("lw_min_silence_duration_ms")
         val IS_INCOGNITO_MODE = booleanPreferencesKey("lw_is_incognito_mode")
+        val CONVOLUTION_WET_LEVEL = floatPreferencesKey("lw_convolution_wet_level")
+        val INNERTUBE_CLIENT_NAME = stringPreferencesKey("lw_innertube_client_name")
+        val DOH_PROVIDER_NAME = stringPreferencesKey("lw_doh_provider_name")
+        val LISTENBRAINZ_TOKEN = stringPreferencesKey("lw_listenbrainz_token")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -450,6 +462,10 @@ class SettingsPreferences @Inject constructor(
                 silenceThresholdDb = (p.readSafely(Keys.SILENCE_THRESHOLD_DB) ?: -42.0f).coerceIn(-60.0f, -25.0f),
                 minSilenceDurationMs = (p.readSafely(Keys.MIN_SILENCE_DURATION_MS) ?: 250L).coerceIn(50L, 1500L),
                 isIncognitoMode = p.readSafely(Keys.IS_INCOGNITO_MODE) ?: false,
+                convolutionWetLevel = (p.readSafely(Keys.CONVOLUTION_WET_LEVEL) ?: 0.35f).coerceIn(0.0f, 1.0f),
+                innerTubeClientName = p.readSafely(Keys.INNERTUBE_CLIENT_NAME) ?: "ANDROID_VR",
+                dohProviderName = p.readSafely(Keys.DOH_PROVIDER_NAME) ?: "System",
+                listenBrainzToken = p.readSafely(Keys.LISTENBRAINZ_TOKEN).orEmpty(),
             )
         }
 
@@ -635,6 +651,22 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setMiniPlayerSwipeStyle(style: MiniPlayerSwipeStyle) {
         dataStore.edit { it[Keys.MINI_PLAYER_SWIPE_STYLE] = style.id }
+    }
+
+    suspend fun setConvolutionWetLevel(level: Float) {
+        dataStore.edit { it[Keys.CONVOLUTION_WET_LEVEL] = level.coerceIn(0.0f, 1.0f) }
+    }
+
+    suspend fun setInnerTubeClientName(name: String) {
+        dataStore.edit { it[Keys.INNERTUBE_CLIENT_NAME] = name }
+    }
+
+    suspend fun setDohProviderName(name: String) {
+        dataStore.edit { it[Keys.DOH_PROVIDER_NAME] = name }
+    }
+
+    suspend fun setListenBrainzToken(token: String) {
+        dataStore.edit { it[Keys.LISTENBRAINZ_TOKEN] = token.trim() }
     }
 
     suspend fun setPreferredAudioCodec(codec: PreferredAudioCodec) {

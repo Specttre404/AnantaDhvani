@@ -362,6 +362,7 @@ fun TrackContextMenuSheet(
         com.lastwave.app.ui.local.TagEditorSheet(
             track = playable,
             onSave = { newTitle, newArtist, newAlbum ->
+                android.widget.Toast.makeText(context, "Metadata tags updated: $newTitle", android.widget.Toast.LENGTH_SHORT).show()
                 showTagEditorSheet = false
                 onDismiss()
             },

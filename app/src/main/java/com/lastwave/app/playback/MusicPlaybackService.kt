@@ -94,6 +94,7 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     @Inject lateinit var artworkRepository: com.lastwave.app.data.artwork.ArtworkRepository
     @Inject lateinit var settingsPreferences: com.lastwave.app.data.local.SettingsPreferences
     @Inject lateinit var playlistRepository: com.lastwave.app.data.playlist.PlaylistRepository
+    @Inject lateinit var listenBrainzManager: com.lastwave.app.data.scrobble.ListenBrainzManager
 
     // SupervisorJob stops sibling failure propagation; the handler below
     // additionally stops an unexpected exception in any fire-and-forget
@@ -366,6 +367,17 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                 putExtra("position", (state.positionMs / 1000L).toInt())
             }
             sendBroadcast(panoIntent)
+
+            if (track != null && playing) {
+                scope.launch(Dispatchers.IO) {
+                    runCatching {
+                        val token = settingsPreferences.settings.first().listenBrainzToken
+                        if (token.isNotBlank()) {
+                            listenBrainzManager.submitListen(token, track)
+                        }
+                    }
+                }
+            }
         }.onFailure { error ->
             android.util.Log.w("MusicPlaybackService", "Legacy player broadcast failed", error)
         }
