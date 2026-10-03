@@ -2089,6 +2089,13 @@ class MusicPlayer @Inject constructor(
         }
     }
 
+    fun isBlacklisted(track: PlayableTrack): Boolean {
+        val misc = runCatching { kotlinx.coroutines.runBlocking { settingsPreferences.settings.first() } }.getOrNull() ?: return false
+        val isMuted = track.videoId != null && track.videoId in misc.mutedTrackIds
+        val isBlocked = misc.blockedArtists.any { it.equals(track.artist.trim(), ignoreCase = true) }
+        return isMuted || isBlocked
+    }
+
     fun cycleSpeed() = onMain {
         val current = if (isCasting) _state.value.speed else if (playerDelegate.isInitialized()) player.playbackParameters.speed else 1f
         val next = when {

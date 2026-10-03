@@ -1566,6 +1566,15 @@ private fun FullPlayer(
     }
 
     val playerBackdrop = if (isLiquidGlassBackdropSupported()) rememberLayerBackdrop() else null
+    var activeCanvasUrl by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(track?.videoId) {
+        activeCanvasUrl = null
+        val current = track ?: return@LaunchedEffect
+        activeCanvasUrl = runCatching {
+            com.lastwave.app.data.canvas.CanvasRepository(okhttp3.OkHttpClient()).fetchCanvasLoop(current.title, current.artist)?.canvasUrl
+        }.getOrNull()
+    }
+
     CompositionLocalProvider(
         LocalLiquidGlassBackdrop provides playerBackdrop,
         LocalLiquidGlassOverlayBackdrop provides playerBackdrop,

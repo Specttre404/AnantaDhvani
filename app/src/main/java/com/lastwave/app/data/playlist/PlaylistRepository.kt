@@ -128,6 +128,9 @@ class PlaylistRepository @Inject constructor(
     }
 
     suspend fun getById(id: Long): SavedPlaylist? {
+        if (id < 0) {
+            return getSmartPlaylists().firstOrNull { it.id == id }
+        }
         return try {
             dao.getById(id)?.toDomain() ?: getAll().firstOrNull { it.id == id }
         } catch (error: CancellationException) {

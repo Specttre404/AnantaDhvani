@@ -250,16 +250,20 @@ fun PlaylistScreen(
                                 Text("Smart Auto-Playlists", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                     val smarts = listOf(
-                                        Triple("Top 50 Most Played", "Most played tracks", Icons.Filled.TrendingUp),
-                                        Triple("Recently Added", "Last 30 days", Icons.Filled.History),
-                                        Triple("Forgotten Favorites", "Unplayed in >60 days", Icons.Filled.AutoAwesome),
-                                        Triple("Hi-Res Lossless Only", "24-bit / 96kHz FLAC", Icons.Filled.HighQuality),
+                                        listOf(-101L, "Top 50 Most Played", "Most played tracks", Icons.Filled.TrendingUp),
+                                        listOf(-102L, "Recently Added", "Last 30 days", Icons.Filled.History),
+                                        listOf(-103L, "Forgotten Favorites", "Unplayed in >60 days", Icons.Filled.AutoAwesome),
+                                        listOf(-104L, "Hi-Res Lossless Only", "24-bit / 96kHz FLAC", Icons.Filled.HighQuality),
                                     )
-                                    items(smarts) { (title, sub, icon) ->
+                                    items(smarts) { item ->
+                                        val id = item[0] as Long
+                                        val title = item[1] as String
+                                        val sub = item[2] as String
+                                        val icon = item[3] as androidx.compose.ui.graphics.vector.ImageVector
                                         Surface(
                                             shape = RoundedCornerShape(16.dp),
                                             color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                            onClick = { },
+                                            onClick = { onOpenPlaylist(id) },
                                             modifier = Modifier.width(170.dp),
                                         ) {
                                             Column(Modifier.padding(14.dp)) {

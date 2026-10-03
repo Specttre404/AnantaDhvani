@@ -55,6 +55,7 @@ import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Card
@@ -370,6 +371,42 @@ fun TrackContextMenuSheet(
             onDismiss = { showTagEditorSheet = false },
         )
         return
+    }
+
+    var showBlacklistDialog by remember { mutableStateOf(false) }
+    if (showBlacklistDialog && target is TrackMenuTarget.Track) {
+        AlertDialog(
+            onDismissRequest = { showBlacklistDialog = false },
+            title = { Text("Block Artist / Mute Track") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Select a restriction for this content:", style = MaterialTheme.typography.bodySmall)
+                    OutlinedButton(
+                        onClick = {
+                            android.widget.Toast.makeText(context, "Muted song: ${target.name}", android.widget.Toast.LENGTH_SHORT).show()
+                            showBlacklistDialog = false
+                            onDismiss()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Never play this song again")
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            android.widget.Toast.makeText(context, "Blocked artist: ${target.artist}", android.widget.Toast.LENGTH_SHORT).show()
+                            showBlacklistDialog = false
+                            onDismiss()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Block artist from recommendations")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showBlacklistDialog = false }) { Text("Cancel") }
+            },
+        )
     }
 
     if (showEqualizerSheet) {

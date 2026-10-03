@@ -614,6 +614,14 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(toastMessage = if (success) "WebDAV restore successful" else "WebDAV restore failed") }
     }
 
+    fun muteTrack(videoId: String) = launchSettingsAction("mute track") {
+        settingsPreferences.muteTrack(videoId)
+    }
+
+    fun blockArtist(artist: String) = launchSettingsAction("block artist") {
+        settingsPreferences.blockArtist(artist)
+    }
+
     // ── Experimental: 15-band equalizer ──
 
     fun setEqualizerEnabled(enabled: Boolean) {

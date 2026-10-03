@@ -264,6 +264,9 @@ data class MiscSettings(
     val lyricsFontSize: Int = 24,
     val lyricsLineSpacing: Int = 14,
     val lyricsInactiveBlurRadius: Int = 3,
+    /** Blacklisted muted track IDs and blocked artists. */
+    val mutedTrackIds: Set<String> = emptySet(),
+    val blockedArtists: Set<String> = emptySet(),
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -403,6 +406,8 @@ class SettingsPreferences @Inject constructor(
         val LYRICS_FONT_SIZE = intPreferencesKey("lw_lyrics_font_size")
         val LYRICS_LINE_SPACING = intPreferencesKey("lw_lyrics_line_spacing")
         val LYRICS_INACTIVE_BLUR_RADIUS = intPreferencesKey("lw_lyrics_inactive_blur_radius")
+        val MUTED_TRACK_IDS = stringSetPreferencesKey("lw_muted_track_ids")
+        val BLOCKED_ARTISTS = stringSetPreferencesKey("lw_blocked_artists")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -478,6 +483,8 @@ class SettingsPreferences @Inject constructor(
                 lyricsFontSize = (p.readSafely(Keys.LYRICS_FONT_SIZE) ?: 24).coerceIn(18, 36),
                 lyricsLineSpacing = (p.readSafely(Keys.LYRICS_LINE_SPACING) ?: 14).coerceIn(8, 24),
                 lyricsInactiveBlurRadius = (p.readSafely(Keys.LYRICS_INACTIVE_BLUR_RADIUS) ?: 3).coerceIn(0, 8),
+                mutedTrackIds = p.readSafely(Keys.MUTED_TRACK_IDS) ?: emptySet(),
+                blockedArtists = p.readSafely(Keys.BLOCKED_ARTISTS) ?: emptySet(),
             )
         }
 
@@ -687,6 +694,17 @@ class SettingsPreferences @Inject constructor(
             it[Keys.LYRICS_LINE_SPACING] = lineSpacing.coerceIn(8, 24)
             it[Keys.LYRICS_INACTIVE_BLUR_RADIUS] = blurRadius.coerceIn(0, 8)
         }
+    }
+
+    suspend fun muteTrack(videoId: String) {
+        if (videoId.isBlank()) return
+        dataStore.edit { it[Keys.MUTED_TRACK_IDS] = (it[Keys.MUTED_TRACK_IDS] ?: emptySet()) + videoId }
+    }
+
+    suspend fun blockArtist(artist: String) {
+        val clean = artist.trim().lowercase()
+        if (clean.isBlank()) return
+        dataStore.edit { it[Keys.BLOCKED_ARTISTS] = (it[Keys.BLOCKED_ARTISTS] ?: emptySet()) + clean }
     }
 
     suspend fun setPreferredAudioCodec(codec: PreferredAudioCodec) {
