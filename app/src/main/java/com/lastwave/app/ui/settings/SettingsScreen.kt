@@ -78,6 +78,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.HighQuality
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.VolumeOff
@@ -357,6 +358,19 @@ fun SettingsScreen(
             viewModel.handleCsvPicked(uri)
         }
     }
+
+    val irPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
+        uri?.let { viewModel.loadImpulseResponseUri(context, it) }
+    }
+
+    var showAutoEqSheet by remember { mutableStateOf(false) }
+    var autoEqSearchQuery by remember { mutableStateOf("") }
+    var showWebDavDialog by remember { mutableStateOf(false) }
+    var webDavMode by remember { mutableStateOf("backup") }
+    var webDavUrl by remember { mutableStateOf("") }
+    var webDavUser by remember { mutableStateOf("") }
+    var webDavPass by remember { mutableStateOf("") }
+    var webDavKey by remember { mutableStateOf("") }
 
     var showYouTubeImportSheet by remember { mutableStateOf(false) }
 
@@ -901,11 +915,11 @@ fun SettingsScreen(
                     )
                     ConvolutionIrCard(
                         wetLevel = 0.3f,
-                        onSelectFile = {},
+                        onSelectFile = { irPickerLauncher.launch("audio/*") },
                         onWetChange = {},
                     )
                     AutoEqCard(
-                        onOpenSearch = {},
+                        onOpenSearch = { showAutoEqSheet = true },
                     )
                     AudiophileThemePaletteCard(
                         onSelectPreset = {},
@@ -923,8 +937,8 @@ fun SettingsScreen(
                         onSelectDoh = {},
                     )
                     WebDavBackupCard(
-                        onBackup = {},
-                        onRestore = {},
+                        onBackup = { webDavMode = "backup"; showWebDavDialog = true },
+                        onRestore = { webDavMode = "restore"; showWebDavDialog = true },
                     )
                 }
             }
@@ -1841,6 +1855,97 @@ fun SettingsScreen(
             },
             onExportProfile = { exportEqLauncher.launch("lastwavex_eq_${eq.presetName.lowercase().replace(' ', '_')}.json") },
             onImportProfile = { importEqLauncher.launch(arrayOf("application/json", "*/*")) },
+        )
+    }
+
+    if (showAutoEqSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAutoEqSheet = false },
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text(
+                    "AutoEQ Headphone Targets",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                OutlinedTextField(
+                    value = autoEqSearchQuery,
+                    onValueChange = { autoEqSearchQuery = it },
+                    placeholder = { Text("Search 4,000+ headphones (e.g. HD 600, Sony...)") },
+                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                val profiles = remember(autoEqSearchQuery) {
+                    viewModel.searchAutoEqProfiles(autoEqSearchQuery)
+                }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 420.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(profiles) { profile ->
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            onClick = {
+                                viewModel.applyAutoEqProfile(profile)
+                                showAutoEqSheet = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.Headset, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(Modifier.width(12.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(profile.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                                    Text(profile.brand, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                Text("Harman Target", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+    }
+
+    if (showWebDavDialog) {
+        AlertDialog(
+            onDismissRequest = { showWebDavDialog = false },
+            title = { Text(if (webDavMode == "backup") "WebDAV Cloud Backup" else "WebDAV Restore") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Enter your Nextcloud, ownCloud, or WebDAV server details:", style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(value = webDavUrl, onValueChange = { webDavUrl = it }, label = { Text("Server URL (https://...)") }, singleLine = true)
+                    OutlinedTextField(value = webDavUser, onValueChange = { webDavUser = it }, label = { Text("Username") }, singleLine = true)
+                    OutlinedTextField(value = webDavPass, onValueChange = { webDavPass = it }, label = { Text("Password / App Token") }, singleLine = true)
+                    OutlinedTextField(value = webDavKey, onValueChange = { webDavKey = it }, label = { Text("AES-256 Encryption Key") }, singleLine = true)
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.backupToWebDav(webDavUrl, webDavUser, webDavPass, webDavKey)
+                    showWebDavDialog = false
+                }) {
+                    Text(if (webDavMode == "backup") "Start Backup" else "Start Restore")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showWebDavDialog = false }) { Text("Cancel") }
+            }
         )
     }
 

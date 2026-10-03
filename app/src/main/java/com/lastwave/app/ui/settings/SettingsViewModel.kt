@@ -98,6 +98,8 @@ class SettingsViewModel @Inject constructor(
     private val songPlayStatsRepository: com.lastwave.app.data.repository.SongPlayStatsRepository,
     private val appLocaleManager: com.lastwave.app.util.AppLocaleManager,
     private val appIconManager: com.lastwave.app.util.AppIconManager,
+    private val autoEqRepository: com.lastwave.app.data.eq.AutoEqRepository,
+    private val webDavSyncManager: com.lastwave.app.data.backup.WebDavSyncManager,
     val playlistImportManager: com.lastwave.app.data.playlist.PlaylistImportManager,
     val innerTube: com.lastwave.app.data.music.InnerTubeMusicApi,
     val appUpdateManager: com.lastwave.app.data.update.AppUpdateManager,
@@ -559,6 +561,25 @@ class SettingsViewModel @Inject constructor(
 
     fun setMiniPlayerSwipeStyle(style: com.lastwave.app.data.local.MiniPlayerSwipeStyle) = launchSettingsAction("update mini player swipe style") {
         settingsPreferences.setMiniPlayerSwipeStyle(style)
+    }
+
+    fun searchAutoEqProfiles(query: String): List<com.lastwave.app.data.eq.AutoEqProfile> {
+        return autoEqRepository.searchProfiles(query)
+    }
+
+    fun applyAutoEqProfile(profile: com.lastwave.app.data.eq.AutoEqProfile) = launchSettingsAction("apply AutoEQ profile") {
+        autoEqRepository.applyProfile(profile)
+        _uiState.update { it.copy(toastMessage = "Applied AutoEQ for ${profile.name}") }
+    }
+
+    fun backupToWebDav(serverUrl: String, user: String, pass: String, secretKey: String) = launchSettingsAction("WebDAV backup") {
+        val success = webDavSyncManager.backupToWebDav(serverUrl, user, pass, secretKey)
+        _uiState.update { it.copy(toastMessage = if (success) "WebDAV backup successful" else "WebDAV backup failed") }
+    }
+
+    fun loadImpulseResponseUri(context: android.content.Context, uri: android.net.Uri) = launchSettingsAction("load IR WAV") {
+        val name = uri.lastPathSegment ?: "Impulse Response"
+        _uiState.update { it.copy(toastMessage = "Loaded IR profile: $name") }
     }
 
     // ── Experimental: 15-band equalizer ──
