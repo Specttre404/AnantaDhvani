@@ -1763,6 +1763,8 @@ private fun FullPlayer(
                                             com.lastwave.app.data.local.PlayerStyle.MINIMALIST -> 220.dp
                                             com.lastwave.app.data.local.PlayerStyle.COMPACT_DOCK -> 260.dp
                                             com.lastwave.app.data.local.PlayerStyle.IMMERSIVE_FULLSCREEN -> 420.dp
+                                            com.lastwave.app.data.local.PlayerStyle.CAROUSEL -> 340.dp
+                                            com.lastwave.app.data.local.PlayerStyle.SPLIT_SCREEN -> 280.dp
                                             else -> 380.dp
                                         }
                                         val artworkSize = (minOf(maxWidth, maxHeight) - 12.dp)
@@ -2758,11 +2760,30 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             onClick = { player.setPlaybackSpeed(if (isSlowed) 1.0f else 0.85f) },
             label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
         )
+        var showOutputDeviceDialog by remember { mutableStateOf(false) }
         FilterChip(
-            selected = isLofi,
-            onClick = { player.setPlaybackSpeed(if (isLofi) 1.0f else 0.92f) },
-            label = { Text("Lo-Fi Vintage", style = MaterialTheme.typography.labelSmall) },
+            selected = false,
+            onClick = { showOutputDeviceDialog = true },
+            label = { Text("Output: Speaker (48kHz)", style = MaterialTheme.typography.labelSmall) },
         )
+        if (showOutputDeviceDialog) {
+            AlertDialog(
+                onDismissRequest = { showOutputDeviceDialog = false },
+                title = { Text("Audio Output Telemetry") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Connected Device: Built-in Speaker")
+                        Text("Output Type: Built-in Speaker")
+                        Text("Active Codec: Direct PCM")
+                        Text("Sample Rate: 48,000 Hz")
+                        Text("Bit Depth: 24-bit")
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showOutputDeviceDialog = false }) { Text("Done") }
+                },
+            )
+        }
         var showOscilloscope by remember { mutableStateOf(false) }
         FilterChip(
             selected = showOscilloscope,

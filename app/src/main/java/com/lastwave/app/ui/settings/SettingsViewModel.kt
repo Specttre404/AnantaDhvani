@@ -555,6 +555,10 @@ class SettingsViewModel @Inject constructor(
         settingsPreferences.setIncognitoMode(enabled)
     }
 
+    fun setSingleBandQ(bandIndex: Int, q: Float) = launchSettingsAction("update single band Q") {
+        equalizerPreferences.setSingleBandQ(bandIndex, q)
+    }
+
     fun setLyricsOffsetMs(offsetMs: Long) = launchSettingsAction("update lyrics sync offset") {
         settingsPreferences.setLyricsOffsetMs(offsetMs)
     }
