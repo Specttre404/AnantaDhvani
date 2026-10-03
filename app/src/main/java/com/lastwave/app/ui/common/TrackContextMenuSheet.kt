@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Info
@@ -558,6 +559,12 @@ fun TrackContextMenuSheet(
                     add { pos ->
                         MenuActionRow(Icons.Filled.Edit, "Edit ID3 Tags & Metadata", position = pos) {
                             showTagEditorSheet = true
+                        }
+                    }
+                    add { pos ->
+                        MenuActionRow(Icons.Filled.Block, "Block Artist / Mute Track", position = pos) {
+                            android.widget.Toast.makeText(context, "Muted ${t.name} by ${t.artist}", android.widget.Toast.LENGTH_SHORT).show()
+                            onDismiss()
                         }
                     }
                     add { pos ->

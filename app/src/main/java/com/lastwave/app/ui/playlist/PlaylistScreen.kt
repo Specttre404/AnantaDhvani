@@ -35,8 +35,12 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -238,6 +242,35 @@ fun PlaylistScreen(
                         if (state.isGenerating) {
                             item(key = "generationProgress", contentType = "generationProgress") {
                                 com.lastwave.app.ui.common.GenerationProgressCard(message = state.generatingMessage)
+                            }
+                        }
+
+                        item(key = "smart_playlists") {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 8.dp)) {
+                                Text("Smart Auto-Playlists", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    val smarts = listOf(
+                                        Triple("Top 50 Most Played", "Most played tracks", Icons.Filled.TrendingUp),
+                                        Triple("Recently Added", "Last 30 days", Icons.Filled.History),
+                                        Triple("Forgotten Favorites", "Unplayed in >60 days", Icons.Filled.AutoAwesome),
+                                        Triple("Hi-Res Lossless Only", "24-bit / 96kHz FLAC", Icons.Filled.HighQuality),
+                                    )
+                                    items(smarts) { (title, sub, icon) ->
+                                        Surface(
+                                            shape = RoundedCornerShape(16.dp),
+                                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                            onClick = { },
+                                            modifier = Modifier.width(170.dp),
+                                        ) {
+                                            Column(Modifier.padding(14.dp)) {
+                                                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                Spacer(Modifier.height(8.dp))
+                                                Text(title, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1)
+                                                Text(sub, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 

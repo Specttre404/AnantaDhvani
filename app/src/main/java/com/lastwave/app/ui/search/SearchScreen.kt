@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Mic
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -258,8 +259,19 @@ fun SearchScreen(
                                         )
                                     }
                                 }
-
                                 var showAudioRecognitionSheet by remember { mutableStateOf(false) }
+
+                                IconButton(
+                                    onClick = { showAudioRecognitionSheet = true },
+                                    modifier = Modifier.size(28.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Mic,
+                                        contentDescription = "Recognize Music",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                }
 
                                 val voiceSearchLauncher = rememberLauncherForActivityResult(
                                     contract = ActivityResultContracts.StartActivityForResult(),
