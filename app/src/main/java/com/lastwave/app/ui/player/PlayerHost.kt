@@ -2744,6 +2744,15 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
     ) {
         val isSlowed = state.speed == 0.85f
         val isLofi = state.speed == 0.92f
+        var spatialActive by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = spatialActive,
+            onClick = {
+                spatialActive = !spatialActive
+                player.setSpatialAudio(spatialActive, 0.6f, 0.5f, 18.0f, 1.3f)
+            },
+            label = { Text("3D Spatial", style = MaterialTheme.typography.labelSmall) },
+        )
         FilterChip(
             selected = isSlowed,
             onClick = { player.setPlaybackSpeed(if (isSlowed) 1.0f else 0.85f) },

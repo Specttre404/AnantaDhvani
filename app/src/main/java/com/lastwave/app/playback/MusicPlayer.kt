@@ -2068,6 +2068,10 @@ class MusicPlayer @Inject constructor(
         persistPlaybackSession()
     }
 
+    fun setSpatialAudio(enabled: Boolean, roomSize: Float = 0.6f, damping: Float = 0.5f, haasDelayMs: Float = 18.0f, widthRatio: Float = 1.3f) {
+        runCatching { nativeAudioEngine.get().setSpatialAudio(enabled, roomSize, damping, haasDelayMs, widthRatio) }
+    }
+
     fun cycleSpeed() = onMain {
         val current = if (isCasting) _state.value.speed else if (playerDelegate.isInitialized()) player.playbackParameters.speed else 1f
         val next = when {

@@ -895,6 +895,37 @@ fun SettingsScreen(
                         currentStyle = misc.miniPlayerSwipeStyle,
                         onSelectStyle = viewModel::setMiniPlayerSwipeStyle,
                     )
+                    AudioOffloadCard(
+                        enabled = misc.audioOffloadEnabled,
+                        onToggle = viewModel::setAudioOffloadEnabled,
+                    )
+                    ConvolutionIrCard(
+                        wetLevel = 0.3f,
+                        onSelectFile = {},
+                        onWetChange = {},
+                    )
+                    AutoEqCard(
+                        onOpenSearch = {},
+                    )
+                    AudiophileThemePaletteCard(
+                        onSelectPreset = {},
+                    )
+                    IncognitoModeCard(
+                        enabled = misc.isIncognitoMode,
+                        onToggle = viewModel::setIncognitoMode,
+                    )
+                    InnerTubeSpoofingCard(
+                        currentClient = "Android VR",
+                        onSelectClient = {},
+                    )
+                    DohAndProxyCard(
+                        dohProvider = "System",
+                        onSelectDoh = {},
+                    )
+                    WebDavBackupCard(
+                        onBackup = {},
+                        onRestore = {},
+                    )
                 }
             }
 
@@ -3295,6 +3326,245 @@ private fun MiniPlayerSwipeCard(
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AudioOffloadCard(
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Hardware Audio Offload", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("Direct SoC DSP tunneling for ultra-low screen-off power", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = enabled, onCheckedChange = onToggle)
+        }
+    }
+}
+
+@Composable
+private fun ConvolutionIrCard(
+    wetLevel: Float,
+    onSelectFile: () -> Unit,
+    onWetChange: (Float) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.GraphicEq, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Impulse Response (IR) Convolution", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Load custom room/cabinet .wav profiles", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            OutlinedButton(onClick = onSelectFile, modifier = Modifier.fillMaxWidth()) {
+                Text("Import .wav IR Profile")
+            }
+            Text("Wet/Dry Mix: ${(wetLevel * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = wetLevel,
+                onValueChange = onWetChange,
+                valueRange = 0f..1f,
+            )
+        }
+    }
+}
+
+@Composable
+private fun IncognitoModeCard(
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.Visibility, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Incognito Listening Session", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("Pause history logging, taste signals & scrobblers", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = enabled, onCheckedChange = onToggle)
+        }
+    }
+}
+
+@Composable
+private fun InnerTubeSpoofingCard(
+    currentClient: String,
+    onSelectClient: (String) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("InnerTube Client Spoofing", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Bypass geographic blocks & throttling", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            val clients = listOf("Android VR", "Web Remix", "iOS", "Testsuite")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                clients.forEach { client ->
+                    val isSelected = client.equals(currentClient, ignoreCase = true)
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onSelectClient(client) },
+                        label = { Text(client, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DohAndProxyCard(
+    dohProvider: String,
+    onSelectDoh: (String) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("DNS-over-HTTPS (DoH)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Encrypted DNS resolvers for privacy", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            val providers = listOf("System", "Cloudflare", "Quad9", "AdGuard")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                providers.forEach { provider ->
+                    val isSelected = provider.equals(dohProvider, ignoreCase = true)
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onSelectDoh(provider) },
+                        label = { Text(provider, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AudiophileThemePaletteCard(
+    onSelectPreset: (String) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Audiophile Theme Palettes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Curated design systems and color palettes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            val palettes = listOf("Catppuccin", "Nord", "Dracula", "Tokyo Night", "Gruvbox", "OLED Black")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                palettes.forEach { palette ->
+                    FilterChip(
+                        selected = false,
+                        onClick = { onSelectPreset(palette) },
+                        label = { Text(palette, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WebDavBackupCard(
+    onBackup: () -> Unit,
+    onRestore: () -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.CloudSync, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Encrypted WebDAV Sync", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("AES-256 cloud database backup & restore", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = onBackup, modifier = Modifier.weight(1f)) {
+                    Text("Backup to Cloud")
+                }
+                OutlinedButton(onClick = onRestore, modifier = Modifier.weight(1f)) {
+                    Text("Restore")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AutoEqCard(
+    onOpenSearch: () -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("AutoEQ Headphone Targets (4,000+)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Apply calibrated Harman target curves", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            OutlinedButton(onClick = onOpenSearch, modifier = Modifier.fillMaxWidth()) {
+                Text("Browse Headphone Profiles")
             }
         }
     }
