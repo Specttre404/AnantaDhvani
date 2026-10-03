@@ -19,6 +19,54 @@ object AudiophilePalettes {
         primaryColor = Color(0xFF6750A4),
     )
 
+    val CATPPUCCIN_MOCHA = AudiophileAccentTheme(
+        id = "catppuccin_mocha",
+        name = "Catppuccin Mocha",
+        primaryHex = "#CBA6F7",
+        lightHex = "#F5E0DC",
+        primaryColor = Color(0xFFCBA6F7),
+    )
+
+    val NORD = AudiophileAccentTheme(
+        id = "nord",
+        name = "Nord Polar",
+        primaryHex = "#88C0D0",
+        lightHex = "#81A1C1",
+        primaryColor = Color(0xFF88C0D0),
+    )
+
+    val DRACULA = AudiophileAccentTheme(
+        id = "dracula",
+        name = "Dracula",
+        primaryHex = "#BD93F9",
+        lightHex = "#FF79C6",
+        primaryColor = Color(0xFFBD93F9),
+    )
+
+    val TOKYO_NIGHT = AudiophileAccentTheme(
+        id = "tokyo_night",
+        name = "Tokyo Night",
+        primaryHex = "#7DCFFF",
+        lightHex = "#7AA2F7",
+        primaryColor = Color(0xFF7DCFFF),
+    )
+
+    val GRUVBOX_DARK = AudiophileAccentTheme(
+        id = "gruvbox_dark",
+        name = "Gruvbox Dark",
+        primaryHex = "#FABD2F",
+        lightHex = "#FE8019",
+        primaryColor = Color(0xFFFABD2F),
+    )
+
+    val OLED_BLACK = AudiophileAccentTheme(
+        id = "oled_black",
+        name = "OLED Pitch Black",
+        primaryHex = "#000000",
+        lightHex = "#222222",
+        primaryColor = Color(0xFF000000),
+    )
+
     val ELECTRIC_CYAN = AudiophileAccentTheme(
         id = "electric_cyan",
         name = "Electric Cyan",
@@ -35,54 +83,15 @@ object AudiophilePalettes {
         primaryColor = Color(0xFF9D4EDD),
     )
 
-    val AMBER_TUBE = AudiophileAccentTheme(
-        id = "amber_tube",
-        name = "Amber Tube Warmth",
-        primaryHex = "#FFB703",
-        lightHex = "#FFD166",
-        primaryColor = Color(0xFFFFB703),
-    )
-
-    val OBSIDIAN_GOLD = AudiophileAccentTheme(
-        id = "obsidian_gold",
-        name = "Obsidian Gold",
-        primaryHex = "#D4AF37",
-        lightHex = "#F3E5AB",
-        primaryColor = Color(0xFFD4AF37),
-    )
-
-    val EMERALD_HIFI = AudiophileAccentTheme(
-        id = "emerald_hifi",
-        name = "Emerald Hifi",
-        primaryHex = "#06D6A0",
-        lightHex = "#80ED99",
-        primaryColor = Color(0xFF06D6A0),
-    )
-
-    val CYBER_MAGENTA = AudiophileAccentTheme(
-        id = "cyber_magenta",
-        name = "Cyber Magenta",
-        primaryHex = "#FF007F",
-        lightHex = "#FF66B2",
-        primaryColor = Color(0xFFFF007F),
-    )
-
-    val CRIMSON_PEAK = AudiophileAccentTheme(
-        id = "crimson_peak",
-        name = "Crimson Peak",
-        primaryHex = "#E63946",
-        lightHex = "#FF6B6B",
-        primaryColor = Color(0xFFE63946),
-    )
-
     val ALL_THEMES = listOf(
         DYNAMIC_MONET,
+        CATPPUCCIN_MOCHA,
+        NORD,
+        DRACULA,
+        TOKYO_NIGHT,
+        GRUVBOX_DARK,
+        OLED_BLACK,
         ELECTRIC_CYAN,
         NEON_AMETHYST,
-        AMBER_TUBE,
-        OBSIDIAN_GOLD,
-        EMERALD_HIFI,
-        CYBER_MAGENTA,
-        CRIMSON_PEAK,
     )
 }

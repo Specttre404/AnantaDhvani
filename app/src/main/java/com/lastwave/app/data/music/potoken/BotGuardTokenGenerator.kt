@@ -80,6 +80,11 @@ object BotGuardTokenGenerator {
         Log.d(TAG, "BotGuard Token Generator initialized")
     }
 
+    fun invalidateCache() {
+        playerTokenCache.evictAll()
+        cachedSessionToken = null
+    }
+
     suspend fun preWarm(sessionId: String = "lastwave_session") {
         val ctx = appContext ?: return
         if (permanentlyBroken || sessionId.isBlank() || !hasUsableWebView()) return

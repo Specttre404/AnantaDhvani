@@ -4466,9 +4466,9 @@ private fun EqualizerSheet(
                 }
             }
 
-            // Filter Q Slider (0.5 to 2.8)
+            // Filter Q Slider (0.1 to 10.0)
             var filterQ by androidx.compose.runtime.remember(eq.filterQ) {
-                androidx.compose.runtime.mutableFloatStateOf(eq.filterQ.coerceIn(0.5f, 2.8f))
+                androidx.compose.runtime.mutableFloatStateOf(eq.filterQ.coerceIn(0.1f, 10.0f))
             }
             Surface(
                 shape = RoundedCornerShape(20.dp),
@@ -4487,7 +4487,7 @@ private fun EqualizerSheet(
                     ) {
                         Column(Modifier.weight(1f)) {
                             Text("Filter Q (Bandwidth)", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-                            Text("Filter bell resonance (0.5 wide to 2.8 narrow)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Filter bell resonance (0.1 broad to 10.0 surgical)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Surface(
                             shape = RoundedCornerShape(8.dp),
@@ -4505,7 +4505,7 @@ private fun EqualizerSheet(
                     Slider(
                         value = filterQ,
                         onValueChange = { value -> filterQ = value },
-                        valueRange = 0.5f..2.8f,
+                        valueRange = 0.1f..10.0f,
                         enabled = eq.enabled,
                         modifier = Modifier.fillMaxWidth(),
                         onValueChangeFinished = { onFilterQChange(filterQ) },

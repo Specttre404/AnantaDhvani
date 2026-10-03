@@ -31,7 +31,9 @@ class YouTubeStreamExtractor @Inject constructor(
     @Volatile
     private var initialized = false
 
-    fun invalidateCache(@Suppress("UNUSED_PARAMETER") videoId: String) = Unit
+    fun invalidateCache(@Suppress("UNUSED_PARAMETER") videoId: String) {
+        com.lastwave.app.data.music.potoken.BotGuardTokenGenerator.invalidateCache()
+    }
 
     suspend fun resolveAudioStream(videoId: String, preferM4a: Boolean = false): YouTubeAudioStream = withContext(Dispatchers.IO) {
         val now = System.currentTimeMillis()

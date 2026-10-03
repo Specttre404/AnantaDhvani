@@ -74,6 +74,7 @@ class LyricsRepository @Inject constructor(
     private val betterLyricsApi: BetterLyricsApi,
     private val kugouApi: KugouLyricsApi,
     private val lrclibApi: LrclibLyricsApi,
+    private val musixmatchScraper: dagger.Lazy<MusixmatchScraper>,
     private val downloadedTrackDao: dagger.Lazy<com.lastwave.app.data.local.db.DownloadedTrackDao>,
 ) {
     private val cache = ConcurrentHashMap<String, LyricsResult>()
@@ -259,7 +260,25 @@ class LyricsRepository @Inject constructor(
                         requests.remove(request)
                         if (result?.isWordSynced == true) return@coroutineScope result
                         if (result != null && lineFallback == null) {
-                            lineFallback = result
+                            if (lineFallback == null) {
+                        runCatching {
+                            val mxText = musixmatchScraper.get().fetchLyrics(title, artist)
+                            if (!mxText.isNullOrBlank()) {
+                                val lines = parseLrc(mxText)
+                                if (lines.isNotEmpty()) {
+                                    val mxResult = LyricsResult.Success(
+                                        lines = lines,
+                                        isSynced = lines.any { it.timeMs > 0 },
+                                        isWordSynced = false,
+                                        plainLyrics = mxText,
+                                        source = "Musixmatch",
+                                    )
+                                    return@coroutineScope mxResult
+                                }
+                            }
+                        }
+                    }
+                    lineFallback = result
                             onPartialResult(result)
                         }
                     }
