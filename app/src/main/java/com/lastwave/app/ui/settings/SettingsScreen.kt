@@ -1847,6 +1847,7 @@ fun SettingsScreen(
             onPreampPreview = viewModel::previewPreampDb,
             onPreampChange = viewModel::setPreampDb,
             onFilterQChange = viewModel::setFilterQ,
+            onSingleBandQChange = viewModel::setSingleBandQ,
             onCopyEqCode = {
                 val json = viewModel.exportCustomEqJson()
                 val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
@@ -4295,6 +4296,7 @@ private fun EqualizerSheet(
     onPreampPreview: (Float) -> Unit,
     onPreampChange: (Float) -> Unit,
     onFilterQChange: (Float) -> Unit = {},
+    onSingleBandQChange: (Int, Float) -> Unit = { _, _ -> },
     onCopyEqCode: () -> Unit = {},
     onExportProfile: () -> Unit = {},
     onImportProfile: () -> Unit = {},
@@ -4620,6 +4622,20 @@ private fun EqualizerSheet(
                         )
                     }
 
+                    var showPerBandQ by remember { mutableStateOf(false) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("Individual Band Q Factors", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                        FilterChip(
+                            selected = showPerBandQ,
+                            onClick = { showPerBandQ = !showPerBandQ },
+                            label = { Text(if (showPerBandQ) "Hide Band Q" else "Expand Band Q", style = MaterialTheme.typography.labelSmall) },
+                        )
+                    }
+
                     Spacer(Modifier.height(10.dp))
 
                     // Scrollable Horizontal Row of Native Equalizer Faders
@@ -4632,16 +4648,37 @@ private fun EqualizerSheet(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         EQ_BAND_FREQS_HZ.forEachIndexed { index, hz ->
-                            EqNativeSlider(
-                                gainDb = gains[index],
-                                hz = hz,
-                                enabled = eq.enabled,
-                                onGainChange = { value ->
-                                    gains = gains.copyOf().also { it[index] = value }
-                                    onBandPreview(index, value)
-                                },
-                                onChangeFinished = { onBandChange(index, gains[index]) },
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                EqNativeSlider(
+                                    gainDb = gains[index],
+                                    hz = hz,
+                                    enabled = eq.enabled,
+                                    onGainChange = { value ->
+                                        gains = gains.copyOf().also { it[index] = value }
+                                        onBandPreview(index, value)
+                                    },
+                                    onChangeFinished = { onBandChange(index, gains[index]) },
+                                )
+                                if (showPerBandQ) {
+                                    val currentBandQ = eq.bandQValues.getOrElse(index) { 1.414f }
+                                    var bandQState by androidx.compose.runtime.remember(currentBandQ) { androidx.compose.runtime.mutableFloatStateOf(currentBandQ) }
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.width(60.dp).padding(top = 8.dp),
+                                    ) {
+                                        Text("Q: ${"%.2f".format(bandQState)}", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+                                        Slider(
+                                            value = bandQState,
+                                            onValueChange = {
+                                                bandQState = it
+                                                onSingleBandQChange(index, it)
+                                            },
+                                            valueRange = 0.1f..10.0f,
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }

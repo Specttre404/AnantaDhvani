@@ -194,7 +194,16 @@ class MusicPlayer @Inject constructor(
     private val songPlayStatsRepository: dagger.Lazy<com.lastwave.app.data.repository.SongPlayStatsRepository>,
     private val sponsorBlockRepository: com.lastwave.app.data.sponsorblock.SponsorBlockRepository,
     private val discordRpcManager: com.lastwave.app.data.discord.DiscordRpcManager,
+    private val audioDeviceManager: AudioDeviceManager,
 ) {
+    val deviceTelemetry: StateFlow<AudioDeviceTelemetry> = audioDeviceManager.telemetry
+
+    private val _keyLockEnabled = MutableStateFlow(false)
+    val keyLockEnabled: StateFlow<Boolean> = _keyLockEnabled.asStateFlow()
+
+    fun toggleKeyLock() = onMain {
+        _keyLockEnabled.value = !_keyLockEnabled.value
+    }
     private val appContext = context.applicationContext
     private val streamResolutionWakeLock by lazy {
         (appContext.getSystemService(Context.POWER_SERVICE) as? PowerManager)?.newWakeLock(

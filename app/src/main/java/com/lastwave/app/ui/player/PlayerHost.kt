@@ -125,6 +125,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -2760,11 +2762,74 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             onClick = { player.setPlaybackSpeed(if (isSlowed) 1.0f else 0.85f) },
             label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
         )
+        val keyLockOn by player.keyLockEnabled.collectAsStateWithLifecycle()
+        var pitchSemitones by remember { mutableFloatStateOf(0f) }
+        var showPitchDialog by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = pitchSemitones != 0f || keyLockOn,
+            onClick = { showPitchDialog = true },
+            label = {
+                Text(
+                    if (pitchSemitones == 0f) "Pitch: 0st" else "Pitch: ${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)}st",
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            },
+        )
+        if (showPitchDialog) {
+            AlertDialog(
+                onDismissRequest = { showPitchDialog = false },
+                title = { Text("Key Lock & Pitch Tuning") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text("WSOLA Key Lock", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text("Preserve musical key when changing speed", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(
+                                checked = keyLockOn,
+                                onCheckedChange = { player.toggleKeyLock() },
+                            )
+                        }
+                        Box(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text("Semitone Shift", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                            Text("${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)} st", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        }
+                        Slider(
+                            value = pitchSemitones,
+                            onValueChange = {
+                                pitchSemitones = it
+                                player.setPlaybackPitch(it)
+                            },
+                            valueRange = -12f..12f,
+                            steps = 47,
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            OutlinedButton(onClick = { pitchSemitones = 0f; player.setPlaybackPitch(0f) }, modifier = Modifier.weight(1f)) {
+                                Text("Reset")
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showPitchDialog = false }) { Text("Done") }
+                },
+            )
+        }
+        val telemetry by player.deviceTelemetry.collectAsStateWithLifecycle()
         var showOutputDeviceDialog by remember { mutableStateOf(false) }
         FilterChip(
             selected = false,
             onClick = { showOutputDeviceDialog = true },
-            label = { Text("Output: Speaker (48kHz)", style = MaterialTheme.typography.labelSmall) },
+            label = { Text("Output: ${telemetry.deviceType} (${telemetry.sampleRate / 1000}kHz)", style = MaterialTheme.typography.labelSmall) },
         )
         if (showOutputDeviceDialog) {
             AlertDialog(
@@ -2772,11 +2837,11 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 title = { Text("Audio Output Telemetry") },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Connected Device: Built-in Speaker")
-                        Text("Output Type: Built-in Speaker")
-                        Text("Active Codec: Direct PCM")
-                        Text("Sample Rate: 48,000 Hz")
-                        Text("Bit Depth: 24-bit")
+                        Text("Connected Device: ${telemetry.deviceName}")
+                        Text("Output Endpoint: ${telemetry.deviceType}")
+                        Text("Active Codec: ${telemetry.codec}")
+                        Text("Sample Rate: ${telemetry.sampleRate} Hz")
+                        Text("Hardware Bit Depth: ${telemetry.bitDepth}-bit")
                     }
                 },
                 confirmButton = {
