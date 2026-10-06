@@ -267,6 +267,8 @@ data class MiscSettings(
     /** Blacklisted muted track IDs and blocked artists. */
     val mutedTrackIds: Set<String> = emptySet(),
     val blockedArtists: Set<String> = emptySet(),
+    /** Visible bottom navigation bar tabs. */
+    val visibleNavTabs: Set<String> = setOf("feed", "discover", "playlists", "stats"),
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -408,6 +410,7 @@ class SettingsPreferences @Inject constructor(
         val LYRICS_INACTIVE_BLUR_RADIUS = intPreferencesKey("lw_lyrics_inactive_blur_radius")
         val MUTED_TRACK_IDS = stringSetPreferencesKey("lw_muted_track_ids")
         val BLOCKED_ARTISTS = stringSetPreferencesKey("lw_blocked_artists")
+        val VISIBLE_NAV_TABS = stringSetPreferencesKey("lw_visible_nav_tabs")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -485,6 +488,7 @@ class SettingsPreferences @Inject constructor(
                 lyricsInactiveBlurRadius = (p.readSafely(Keys.LYRICS_INACTIVE_BLUR_RADIUS) ?: 3).coerceIn(0, 8),
                 mutedTrackIds = p.readSafely(Keys.MUTED_TRACK_IDS) ?: emptySet(),
                 blockedArtists = p.readSafely(Keys.BLOCKED_ARTISTS) ?: emptySet(),
+                visibleNavTabs = p.readSafely(Keys.VISIBLE_NAV_TABS) ?: setOf("feed", "discover", "playlists", "stats"),
             )
         }
 
@@ -705,6 +709,10 @@ class SettingsPreferences @Inject constructor(
         val clean = artist.trim().lowercase()
         if (clean.isBlank()) return
         dataStore.edit { it[Keys.BLOCKED_ARTISTS] = (it[Keys.BLOCKED_ARTISTS] ?: emptySet()) + clean }
+    }
+
+    suspend fun setVisibleNavTabs(tabs: Set<String>) {
+        dataStore.edit { it[Keys.VISIBLE_NAV_TABS] = tabs }
     }
 
     suspend fun setPreferredAudioCodec(codec: PreferredAudioCodec) {

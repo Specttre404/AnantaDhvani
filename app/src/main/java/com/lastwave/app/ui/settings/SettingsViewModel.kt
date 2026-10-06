@@ -27,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -614,12 +615,26 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(toastMessage = if (success) "WebDAV restore successful" else "WebDAV restore failed") }
     }
 
+    fun setLyricsTypographySettings(fontSize: Int, lineSpacing: Int, blurRadius: Int) = launchSettingsAction("update lyrics typography") {
+        settingsPreferences.setLyricsTypographySettings(fontSize, lineSpacing, blurRadius)
+    }
+
     fun muteTrack(videoId: String) = launchSettingsAction("mute track") {
         settingsPreferences.muteTrack(videoId)
     }
 
     fun blockArtist(artist: String) = launchSettingsAction("block artist") {
         settingsPreferences.blockArtist(artist)
+    }
+
+    fun toggleNavTab(tabId: String) = launchSettingsAction("toggle nav tab") {
+        val current = settingsPreferences.settings.first().visibleNavTabs
+        val updated = if (tabId in current) {
+            if (current.size > 1) current - tabId else current
+        } else {
+            current + tabId
+        }
+        settingsPreferences.setVisibleNavTabs(updated)
     }
 
     // ── Experimental: 15-band equalizer ──

@@ -384,16 +384,25 @@ private fun LyricLine.toISyncedLine(isOverallRtl: Boolean = false): ISyncedLine 
     else if (syllables.isNotEmpty()) (syllables.last().timeMs + syllables.last().durationMs).toInt()
     else lineStart + 1500
 
-    val isLineRtl = isRtl || (isOverallRtl && (text.isBlank() || text == "♪"))
+    val rawText = text.trim()
+    val isSinger1 = rawText.startsWith("[Singer 1]:", ignoreCase = true) || rawText.startsWith("[1]:", ignoreCase = true) || rawText.startsWith("v:Singer1", ignoreCase = true) || rawText.startsWith("v:1", ignoreCase = true)
+    val isSinger2 = rawText.startsWith("[Singer 2]:", ignoreCase = true) || rawText.startsWith("[2]:", ignoreCase = true) || rawText.startsWith("v:Singer2", ignoreCase = true) || rawText.startsWith("v:2", ignoreCase = true)
+
+    val cleanedText = when {
+        isSinger1 || isSinger2 -> rawText.substringAfter(":").trim()
+        else -> text
+    }
+
+    val isLineRtl = isRtl || (isOverallRtl && (cleanedText.isBlank() || cleanedText == "♪"))
+    val lineAlignment = when {
+        isSinger1 -> KaraokeAlignment.Start
+        isSinger2 -> KaraokeAlignment.End
+        isLineRtl -> KaraokeAlignment.End
+        else -> KaraokeAlignment.Start
+    }
 
     return if (hasSyllables) {
-        // Word-sync providers (BetterLyrics TTML spans, LyricsPlus syllabus)
-        // store each word trimmed, so concatenating contents directly would
-        // render "Allthatglittersisgold". The trailing space carries no
-        // timing — it is purely visual and keeps sync exact. Only insert
-        // when the line itself contains spaces so CJK lines without spaces
-        // and already-spaced providers (Kugou KRC) are untouched.
-        val needsSpacing = text.contains(' ') || text.contains('\u00A0')
+        val needsSpacing = cleanedText.contains(' ') || cleanedText.contains('\u00A0')
         KaraokeLine.MainKaraokeLine(
             syllables = syllables.mapIndexed { index, syl ->
                 val sStart = syl.timeMs.toInt()
@@ -413,7 +422,7 @@ private fun LyricLine.toISyncedLine(isOverallRtl: Boolean = false): ISyncedLine 
             },
             translation = null,
             phonetic = transliteration,
-            alignment = if (isLineRtl) KaraokeAlignment.End else KaraokeAlignment.Start,
+            alignment = lineAlignment,
             start = lineStart,
             end = lineEnd.coerceAtLeast(lineStart),
         )
@@ -421,7 +430,7 @@ private fun LyricLine.toISyncedLine(isOverallRtl: Boolean = false): ISyncedLine 
         SyncedLine(
             start = lineStart,
             end = lineEnd.coerceAtLeast(lineStart),
-            content = text,
+            content = cleanedText,
             translation = transliteration,
         )
     }

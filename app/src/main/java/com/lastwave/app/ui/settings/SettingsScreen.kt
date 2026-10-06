@@ -909,6 +909,16 @@ fun SettingsScreen(
                         currentStyle = misc.miniPlayerSwipeStyle,
                         onSelectStyle = viewModel::setMiniPlayerSwipeStyle,
                     )
+                    LyricsTypographyCard(
+                        fontSize = misc.lyricsFontSize,
+                        lineSpacing = misc.lyricsLineSpacing,
+                        blurRadius = misc.lyricsInactiveBlurRadius,
+                        onChange = viewModel::setLyricsTypographySettings,
+                    )
+                    NavigationBarTabsCard(
+                        visibleTabs = misc.visibleNavTabs,
+                        onToggleTab = viewModel::toggleNavTab,
+                    )
                     AudioOffloadCard(
                         enabled = misc.audioOffloadEnabled,
                         onToggle = viewModel::setAudioOffloadEnabled,
@@ -2954,6 +2964,13 @@ private fun YouTubeAccountRow(
                 }
             }
             Spacer(Modifier.width(8.dp))
+            OutlinedButton(
+                onClick = onDisconnect,
+                shape = ExpressivePillShape,
+            ) {
+                Text("Switch")
+            }
+            Spacer(Modifier.width(4.dp))
             FilledTonalIconButton(
                 onClick = onDisconnect,
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
@@ -3434,6 +3451,83 @@ private fun MiniPlayerSwipeCard(
                         onClick = { onSelectStyle(style) },
                         label = { Text(style.title, style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LyricsTypographyCard(
+    fontSize: Int,
+    lineSpacing: Int,
+    blurRadius: Int,
+    onChange: (fontSize: Int, lineSpacing: Int, blurRadius: Int) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Lyrics, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Lyrics Typography & Blur", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Customize font size, line spacing & inactive line blur", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Text("Font Size: ${fontSize}sp", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = fontSize.toFloat(),
+                onValueChange = { onChange(it.toInt(), lineSpacing, blurRadius) },
+                valueRange = 18f..36f,
+            )
+            Text("Line Spacing: ${lineSpacing}dp", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = lineSpacing.toFloat(),
+                onValueChange = { onChange(fontSize, it.toInt(), blurRadius) },
+                valueRange = 8f..24f,
+            )
+            Text("Inactive Blur Radius: ${blurRadius}dp", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = blurRadius.toFloat(),
+                onValueChange = { onChange(fontSize, lineSpacing, it.toInt()) },
+                valueRange = 0f..8f,
+            )
+        }
+    }
+}
+
+@Composable
+private fun NavigationBarTabsCard(
+    visibleTabs: Set<String>,
+    onToggleTab: (String) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Dashboard, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Navigation Bar Tabs", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Toggle visibility of bottom navigation bar items", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            val allTabs = listOf("feed" to "Feed", "discover" to "Discover", "playlists" to "Playlists", "stats" to "Stats")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                allTabs.forEach { (id, label) ->
+                    val isVisible = id in visibleTabs
+                    FilterChip(
+                        selected = isVisible,
+                        onClick = { onToggleTab(id) },
+                        label = { Text(label, style = MaterialTheme.typography.labelSmall) },
                     )
                 }
             }
