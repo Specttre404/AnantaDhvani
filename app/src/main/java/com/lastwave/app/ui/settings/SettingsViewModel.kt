@@ -637,6 +637,14 @@ class SettingsViewModel @Inject constructor(
         settingsPreferences.setVisibleNavTabs(updated)
     }
 
+    fun setDownloadConcurrency(threads: Int) = launchSettingsAction("update download concurrency") {
+        settingsPreferences.setDownloadConcurrency(threads)
+    }
+
+    fun setDownloadWifiOnly(wifiOnly: Boolean) = launchSettingsAction("update download wifi setting") {
+        settingsPreferences.setDownloadWifiOnly(wifiOnly)
+    }
+
     // ── Experimental: 15-band equalizer ──
 
     fun setEqualizerEnabled(enabled: Boolean) {

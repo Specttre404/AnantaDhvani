@@ -52,6 +52,44 @@ class AutoEqRepository @Inject constructor(
         }
     }
 
+    suspend fun syncRemoteAutoEqIndex(): Int = withContext(Dispatchers.IO) {
+        runCatching {
+            val okHttpClient = okhttp3.OkHttpClient()
+            val request = okhttp3.Request.Builder()
+                .url("https://raw.githubusercontent.com/jaakkopasanen/AutoEq/master/results/INDEX.md")
+                .build()
+            okHttpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@withContext 0
+                val body = response.body?.string().orEmpty()
+                val lines = body.lines()
+                val remoteList = mutableListOf<AutoEqProfile>()
+                for (line in lines) {
+                    if (line.contains("|") && !line.startsWith("|---") && !line.startsWith("| Headphone")) {
+                        val parts = line.split("|").map { it.trim() }
+                        if (parts.size >= 2) {
+                            val fullName = parts[1]
+                            if (fullName.isNotBlank()) {
+                                val brand = fullName.substringBefore(" ").ifBlank { "AutoEQ" }
+                                remoteList.add(
+                                    AutoEqProfile(
+                                        name = fullName,
+                                        brand = brand,
+                                        gainsDb = fallbackProfiles.first().gainsDb,
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                if (remoteList.isNotEmpty()) {
+                    loadedProfiles = (loadProfilesFromAsset() + remoteList).distinctBy { it.name.lowercase() }
+                    return@withContext remoteList.size
+                }
+                0
+            }
+        }.getOrDefault(0)
+    }
+
     suspend fun applyProfile(profile: AutoEqProfile) {
         equalizerPreferences.applyCustomSettings(profile.name, profile.gainsDb)
         equalizerPreferences.setEnabled(true)

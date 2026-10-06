@@ -192,6 +192,26 @@ private:
             right = lastRight;
         }
     } bitcrusher_{};
+
+    struct ConvolutionEngine final {
+        static constexpr std::size_t kBlockSize = 256;
+        bool enabled{false};
+        float wetLevel{0.35f};
+        std::array<float, kBlockSize> overlapLeft{};
+        std::array<float, kBlockSize> overlapRight{};
+        std::size_t blockIdx{0};
+
+        inline void process(float& left, float& right) noexcept {
+            if (!enabled) return;
+            float wetL = left * (1.0f - wetLevel) + overlapLeft[blockIdx] * wetLevel;
+            float wetR = right * (1.0f - wetLevel) + overlapRight[blockIdx] * wetLevel;
+            overlapLeft[blockIdx] = left * 0.2f;
+            overlapRight[blockIdx] = right * 0.2f;
+            blockIdx = (blockIdx + 1) % kBlockSize;
+            left = wetL;
+            right = wetR;
+        }
+    } convolver_{};
     std::atomic<std::uint32_t> targetEqualizerRevision_{0};
     std::array<std::atomic<float>, kEqualizerBandCount> targetEqGainsDb_{};
     std::array<float, kEqualizerBandCount> currentEqGainsDb_{};

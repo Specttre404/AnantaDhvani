@@ -919,6 +919,12 @@ fun SettingsScreen(
                         visibleTabs = misc.visibleNavTabs,
                         onToggleTab = viewModel::toggleNavTab,
                     )
+                    DownloadConcurrencyCard(
+                        concurrency = misc.downloadConcurrency,
+                        wifiOnly = misc.downloadWifiOnly,
+                        onConcurrencyChange = viewModel::setDownloadConcurrency,
+                        onWifiOnlyChange = viewModel::setDownloadWifiOnly,
+                    )
                     AudioOffloadCard(
                         enabled = misc.audioOffloadEnabled,
                         onToggle = viewModel::setAudioOffloadEnabled,
@@ -3530,6 +3536,50 @@ private fun NavigationBarTabsCard(
                         label = { Text(label, style = MaterialTheme.typography.labelSmall) },
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DownloadConcurrencyCard(
+    concurrency: Int,
+    wifiOnly: Boolean,
+    onConcurrencyChange: (Int) -> Unit,
+    onWifiOnlyChange: (Boolean) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.CloudDownload, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Download Concurrency & Network", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Parallel download threads & Wi-Fi constraints", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Text("Parallel Download Threads", style = MaterialTheme.typography.labelSmall)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                listOf(1, 2, 3, 5).forEach { count ->
+                    val isSelected = count == concurrency
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onConcurrencyChange(count) },
+                        label = { Text("$count Threads", style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Download Over Wi-Fi Only", style = MaterialTheme.typography.bodyMedium)
+                Switch(checked = wifiOnly, onCheckedChange = onWifiOnlyChange)
             }
         }
     }

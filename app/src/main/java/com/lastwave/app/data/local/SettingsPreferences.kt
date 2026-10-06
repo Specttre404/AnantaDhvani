@@ -269,6 +269,9 @@ data class MiscSettings(
     val blockedArtists: Set<String> = emptySet(),
     /** Visible bottom navigation bar tabs. */
     val visibleNavTabs: Set<String> = setOf("feed", "discover", "playlists", "stats"),
+    /** Parallel download concurrency and network constraint. */
+    val downloadConcurrency: Int = 2,
+    val downloadWifiOnly: Boolean = false,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -411,6 +414,8 @@ class SettingsPreferences @Inject constructor(
         val MUTED_TRACK_IDS = stringSetPreferencesKey("lw_muted_track_ids")
         val BLOCKED_ARTISTS = stringSetPreferencesKey("lw_blocked_artists")
         val VISIBLE_NAV_TABS = stringSetPreferencesKey("lw_visible_nav_tabs")
+        val DOWNLOAD_CONCURRENCY = intPreferencesKey("lw_download_concurrency")
+        val DOWNLOAD_WIFI_ONLY = booleanPreferencesKey("lw_download_wifi_only")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -489,6 +494,8 @@ class SettingsPreferences @Inject constructor(
                 mutedTrackIds = p.readSafely(Keys.MUTED_TRACK_IDS) ?: emptySet(),
                 blockedArtists = p.readSafely(Keys.BLOCKED_ARTISTS) ?: emptySet(),
                 visibleNavTabs = p.readSafely(Keys.VISIBLE_NAV_TABS) ?: setOf("feed", "discover", "playlists", "stats"),
+                downloadConcurrency = (p.readSafely(Keys.DOWNLOAD_CONCURRENCY) ?: 2).coerceIn(1, 5),
+                downloadWifiOnly = p.readSafely(Keys.DOWNLOAD_WIFI_ONLY) ?: false,
             )
         }
 
@@ -713,6 +720,14 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setVisibleNavTabs(tabs: Set<String>) {
         dataStore.edit { it[Keys.VISIBLE_NAV_TABS] = tabs }
+    }
+
+    suspend fun setDownloadConcurrency(threads: Int) {
+        dataStore.edit { it[Keys.DOWNLOAD_CONCURRENCY] = threads.coerceIn(1, 5) }
+    }
+
+    suspend fun setDownloadWifiOnly(wifiOnly: Boolean) {
+        dataStore.edit { it[Keys.DOWNLOAD_WIFI_ONLY] = wifiOnly }
     }
 
     suspend fun setPreferredAudioCodec(codec: PreferredAudioCodec) {

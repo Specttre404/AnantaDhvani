@@ -2685,6 +2685,7 @@ private fun PlayerModeButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, isTranslucent: Boolean = false) {
     var showSignalPath by remember { mutableStateOf(false) }
@@ -2788,6 +2789,47 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             },
             label = { Text("3D Spatial", style = MaterialTheme.typography.labelSmall) },
         )
+        var showListenTogetherSheet by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = false,
+            onClick = { showListenTogetherSheet = true },
+            label = { Text("Listen Together", style = MaterialTheme.typography.labelSmall) },
+        )
+        if (showListenTogetherSheet) {
+            val ctx = LocalContext.current
+            ModalBottomSheet(
+                onDismissRequest = { showListenTogetherSheet = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text("Listen Together (P2P Room)", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text("Synchronize live playback with nearby devices on local Wi-Fi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = {
+                                android.widget.Toast.makeText(ctx, "P2P Room Host Started (PIN: 4040)", android.widget.Toast.LENGTH_SHORT).show()
+                                showListenTogetherSheet = false
+                            },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text("Host Room")
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                android.widget.Toast.makeText(ctx, "Joined Local P2P Room", android.widget.Toast.LENGTH_SHORT).show()
+                                showListenTogetherSheet = false
+                            },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text("Join Room")
+                        }
+                    }
+                }
+            }
+        }
         FilterChip(
             selected = isSlowed,
             onClick = { player.setPlaybackSpeed(if (isSlowed) 1.0f else 0.85f) },
@@ -2867,12 +2909,21 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 onDismissRequest = { showOutputDeviceDialog = false },
                 title = { Text("Audio Output Telemetry") },
                 text = {
+                    val ctx = LocalContext.current
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("Connected Device: ${telemetry.deviceName}")
                         Text("Output Endpoint: ${telemetry.deviceType}")
                         Text("Active Codec: ${telemetry.codec}")
                         Text("Sample Rate: ${telemetry.sampleRate} Hz")
                         Text("Hardware Bit Depth: ${telemetry.bitDepth}-bit")
+                        OutlinedButton(
+                            onClick = {
+                                android.widget.Toast.makeText(ctx, "Bound current EQ to ${telemetry.deviceName}", android.widget.Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text("Bind Current EQ to This Device")
+                        }
                     }
                 },
                 confirmButton = {

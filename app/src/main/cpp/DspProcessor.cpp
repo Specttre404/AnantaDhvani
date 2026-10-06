@@ -408,6 +408,8 @@ void DspProcessor::process(
             targetBitcrusherBits_.load(std::memory_order_acquire),
             targetBitcrusherDownsample_.load(std::memory_order_acquire));
 
+        convolver_.process(outputLeft, outputRight);
+
         // Analog soft-knee saturation: provides clean headroom without squashing the track
         auto softSaturate = [](float x) noexcept -> float {
             const float absX = std::abs(x);
