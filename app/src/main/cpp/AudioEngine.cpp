@@ -424,6 +424,11 @@ void AudioEngine::setBitcrusher(bool enabled, int bits, int downsampleFactor) no
     mediaDsp_.setBitcrusher(enabled, bits, downsampleFactor);
 }
 
+void AudioEngine::setVocalRemover(bool enabled, float strength) noexcept {
+    oboeDsp_.setVocalRemover(enabled, strength);
+    mediaDsp_.setVocalRemover(enabled, strength);
+}
+
 bool AudioEngine::configureMediaProcessor(
     std::int32_t inputSampleRate,
     std::int32_t outputSampleRate,

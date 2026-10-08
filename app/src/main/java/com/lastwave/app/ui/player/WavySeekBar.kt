@@ -353,55 +353,38 @@ fun WavySeekBar(
                         }
 
                         SeekbarStyle.STUDIO_CONSOLE -> {
-                            val trackH = 6.dp.toPx()
-                            // Top/Bottom calibration ticks
-                            val tickCount = 20
-                            for (i in 0..tickCount) {
-                                val tx = (width / tickCount) * i
-                                drawLine(
-                                    color = textColor.copy(alpha = 0.35f),
-                                    start = Offset(tx, centerY - 14.dp.toPx()),
-                                    end = Offset(tx, centerY - 8.dp.toPx()),
-                                    strokeWidth = 1.2.dp.toPx(),
-                                )
-                                drawLine(
-                                    color = textColor.copy(alpha = 0.35f),
-                                    start = Offset(tx, centerY + 8.dp.toPx()),
-                                    end = Offset(tx, centerY + 14.dp.toPx()),
-                                    strokeWidth = 1.2.dp.toPx(),
-                                )
-                            }
+                            val barCount = 64
+                            val gap = 2.dp.toPx()
+                            val totalGap = gap * (barCount - 1)
+                            val barWidth = (width - totalGap) / barCount
+                            val maxBarHeight = 34.dp.toPx()
 
-                            // Track
-                            drawRoundRect(
-                                color = inactiveColor,
-                                topLeft = Offset(0f, centerY - trackH / 2f),
-                                size = Size(width, trackH),
-                                cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx()),
-                            )
-                            if (thumbX > 0f) {
+                            for (i in 0 until barCount) {
+                                val seed = (trackKey?.hashCode() ?: 42) + i * 31
+                                val sinVal = kotlin.math.sin(i * 0.18) * 0.4 + 0.5
+                                val hashVal = (kotlin.math.abs(seed) % 100) / 100.0
+                                val amp = ((sinVal * 0.6 + hashVal * 0.4).toFloat() * 0.85f + 0.15f).coerceIn(0.15f, 1.0f)
+
+                                val barX = i * (barWidth + gap)
+                                val isPlayed = (barX + barWidth / 2f) <= thumbX
+                                val h = amp * maxBarHeight
+                                val barColor = if (isPlayed) primaryColor else textColor.copy(alpha = 0.35f)
+
                                 drawRoundRect(
-                                    color = primaryColor.copy(alpha = 0.85f),
-                                    topLeft = Offset(0f, centerY - trackH / 2f),
-                                    size = Size(thumbX, trackH),
-                                    cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx()),
+                                    color = barColor,
+                                    topLeft = Offset(barX, centerY - h / 2f),
+                                    size = Size(barWidth, h),
+                                    cornerRadius = CornerRadius(1.5.dp.toPx(), 1.5.dp.toPx()),
                                 )
                             }
 
-                            // Console Fader Knob
-                            val faderW = 16.dp.toPx()
-                            val faderH = 24.dp.toPx()
-                            drawRoundRect(
-                                color = Color(0xFF2A2A2E),
-                                topLeft = Offset(thumbX - faderW / 2f, centerY - faderH / 2f),
-                                size = Size(faderW, faderH),
-                                cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx()),
-                            )
-                            drawRoundRect(
+                            // Interactive playhead scrubber line
+                            drawLine(
                                 color = primaryColor,
-                                topLeft = Offset(thumbX - 1.5.dp.toPx(), centerY - faderH / 2f + 3.dp.toPx()),
-                                size = Size(3.dp.toPx(), faderH - 6.dp.toPx()),
-                                cornerRadius = CornerRadius(1.dp.toPx(), 1.dp.toPx()),
+                                start = Offset(thumbX, centerY - maxBarHeight / 2f - 2.dp.toPx()),
+                                end = Offset(thumbX, centerY + maxBarHeight / 2f + 2.dp.toPx()),
+                                strokeWidth = 2.5.dp.toPx(),
+                                cap = StrokeCap.Round,
                             )
                         }
 

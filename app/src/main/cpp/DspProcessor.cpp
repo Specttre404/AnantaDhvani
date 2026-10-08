@@ -410,6 +410,14 @@ void DspProcessor::process(
 
         convolver_.process(outputLeft, outputRight);
 
+        if (vocalRemoverEnabled_.load(std::memory_order_acquire) && channelCount == 2) {
+            // Center-channel phase cancellation: Lead vocals reside equally in L and R
+            float strength = vocalRemoverStrength_.load(std::memory_order_acquire);
+            float center = (outputLeft + outputRight) * 0.5f * strength;
+            outputLeft -= center;
+            outputRight -= center;
+        }
+
         // Analog soft-knee saturation: provides clean headroom without squashing the track
         auto softSaturate = [](float x) noexcept -> float {
             const float absX = std::abs(x);
@@ -621,6 +629,11 @@ void DspProcessor::setBitcrusher(
     targetBitcrusherEnabled_.store(enabled, std::memory_order_release);
     targetBitcrusherBits_.store(std::clamp(bits, 4, 16), std::memory_order_release);
     targetBitcrusherDownsample_.store(std::clamp(downsampleFactor, 1, 8), std::memory_order_release);
+}
+
+void DspProcessor::setVocalRemover(bool enabled, float strength) noexcept {
+    vocalRemoverEnabled_.store(enabled, std::memory_order_release);
+    vocalRemoverStrength_.store(std::clamp(strength, 0.0f, 1.0f), std::memory_order_release);
 }
 
 void DspProcessor::setEqualizerQ(float q) noexcept {

@@ -6,6 +6,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.exoplayer.audio.AudioSink
+import com.lastwave.app.playback.haptics.BassHapticDriver
 import java.io.File
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -32,6 +33,8 @@ class CapturingAudioSink(
     var framesWritten: Long = 0L
         private set
 
+    var bassHapticDriver: BassHapticDriver? = null
+
     private var output: OutputStream? = null
     private var bytesPerFrame: Int = 0
     private var ended: Boolean = false
@@ -39,6 +42,8 @@ class CapturingAudioSink(
     private var skipSilenceEnabled: Boolean = false
     private var audioAttributes: AudioAttributes = AudioAttributes.DEFAULT
     private var listener: AudioSink.Listener? = null
+
+    private var lpState = 0f
 
     fun isConfigured(): Boolean = output != null && sampleRate > 0 && channelCount > 0
 
@@ -82,6 +87,7 @@ class CapturingAudioSink(
 
     override fun handleBuffer(buffer: ByteBuffer, presentationTimeUs: Long, encodedAccessUnitCount: Int): Boolean {
         val out = output ?: return false
+        processSubBassHaptics(buffer)
         val bytes = if (pcmEncoding == C.ENCODING_PCM_FLOAT) {
             floatToS16Bytes(buffer)
         } else {
@@ -92,6 +98,54 @@ class CapturingAudioSink(
             framesWritten += bytes.size / bytesPerFrame.coerceAtLeast(1)
         }
         return false
+    }
+
+    private fun processSubBassHaptics(buffer: ByteBuffer) {
+        val dup = buffer.duplicate().order(ByteOrder.LITTLE_ENDIAN)
+        val rate = sampleRate.coerceAtLeast(8000)
+        val dt = 1f / rate
+        val rcLp = 1f / (2f * Math.PI.toFloat() * 80f)
+        val alphaLp = dt / (rcLp + dt)
+        val rcHp = 1f / (2f * Math.PI.toFloat() * 20f)
+        val alphaHp = rcHp / (rcHp + dt)
+
+        var sumSq = 0f
+        var count = 0
+
+        if (pcmEncoding == C.ENCODING_PCM_FLOAT) {
+            val floatBuf = dup.asFloatBuffer()
+            count = floatBuf.remaining()
+            var prevIn = 0f
+            var prevHp = 0f
+            while (floatBuf.hasRemaining()) {
+                val sample = floatBuf.get()
+                val hp = alphaHp * (prevHp + sample - prevIn)
+                prevIn = sample
+                prevHp = hp
+                lpState += alphaLp * (hp - lpState)
+                sumSq += lpState * lpState
+            }
+        } else if (pcmEncoding == C.ENCODING_PCM_16BIT) {
+            val shortBuf = dup.asShortBuffer()
+            count = shortBuf.remaining()
+            var prevIn = 0f
+            var prevHp = 0f
+            while (shortBuf.hasRemaining()) {
+                val sample = shortBuf.get() / 32768f
+                val hp = alphaHp * (prevHp + sample - prevIn)
+                prevIn = sample
+                prevHp = hp
+                lpState += alphaLp * (hp - lpState)
+                sumSq += lpState * lpState
+            }
+        }
+
+        if (count > 0) {
+            val rms = kotlin.math.sqrt((sumSq / count).toDouble()).toFloat()
+            val normalizedEnergy = (rms * 3.5f).coerceIn(0f, 1f)
+            val driver = bassHapticDriver ?: BassHapticDriver.instance
+            driver?.processLowFrequencyTransient(normalizedEnergy, enabled = true)
+        }
     }
 
     override fun playToEndOfStream() {

@@ -170,6 +170,18 @@ Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetBitcrusher(
     }
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetVocalRemover(
+    JNIEnv*,
+    jobject,
+    jlong handle,
+    jboolean enabled,
+    jfloat strength) {
+    if (auto* engine = fromHandle(handle); engine != nullptr) {
+        engine->setVocalRemover(enabled == JNI_TRUE, strength);
+    }
+}
+
 
 
 extern "C" JNIEXPORT void JNICALL

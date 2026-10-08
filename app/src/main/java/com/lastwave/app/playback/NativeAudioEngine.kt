@@ -332,6 +332,10 @@ class NativeAudioEngine @Inject constructor(
         withHandle(Unit) { nativeSetBitcrusher(it, enabled, bits, downsampleFactor) }
     }
 
+    fun setVocalRemover(enabled: Boolean, strength: Float = 0.85f) {
+        withHandle(Unit) { nativeSetVocalRemover(it, enabled, strength) }
+    }
+
     private external fun nativeCreate(): Long
     private external fun nativeDestroy(handle: Long)
     private external fun nativeStart(handle: Long, preferredOutputSampleRate: Int): Boolean
@@ -348,6 +352,7 @@ class NativeAudioEngine @Inject constructor(
     private external fun nativeSetEqualizerQ(handle: Long, filterQ: Float)
     private external fun nativeSetSpatialAudio(handle: Long, enabled: Boolean, roomSize: Float, damping: Float, haasDelayMs: Float, widthRatio: Float)
     private external fun nativeSetBitcrusher(handle: Long, enabled: Boolean, bits: Int, downsampleFactor: Int)
+    private external fun nativeSetVocalRemover(handle: Long, enabled: Boolean, strength: Float)
     private external fun nativeConfigureMediaProcessor(
         handle: Long,
         inputSampleRate: Int,

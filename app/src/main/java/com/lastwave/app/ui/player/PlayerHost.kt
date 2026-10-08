@@ -3,6 +3,7 @@
 package com.lastwave.app.ui.player
 
 import android.content.Context
+import com.lastwave.app.playback.haptics.BassHapticDriver
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -2371,7 +2372,7 @@ private fun SeekBar(
 ) {
     val progress by progressState.collectAsStateWithLifecycle()
 
-    if (wavyEnabled) {
+    if (wavyEnabled || seekbarStyle == com.lastwave.app.data.local.SeekbarStyle.STUDIO_CONSOLE) {
         WavySeekBar(
             positionMs = progress.positionMs,
             durationMs = progress.durationMs,
@@ -2780,6 +2781,26 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
     ) {
         val isSlowed = state.speed == 0.85f
         val isLofi = state.speed == 0.92f
+        val context = LocalContext.current
+        var bassHapticsEnabled by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = bassHapticsEnabled,
+            onClick = {
+                bassHapticsEnabled = !bassHapticsEnabled
+                val driver = BassHapticDriver.getInstance(context)
+                driver.enabled = bassHapticsEnabled
+            },
+            label = { Text("Bass Haptics", style = MaterialTheme.typography.labelSmall) },
+        )
+        var karaokeEnabled by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = karaokeEnabled,
+            onClick = {
+                karaokeEnabled = !karaokeEnabled
+                player.setVocalRemover(karaokeEnabled, 0.85f)
+            },
+            label = { Text("Karaoke / Vocal Cut", style = MaterialTheme.typography.labelSmall) },
+        )
         var spatialActive by remember { mutableStateOf(false) }
         FilterChip(
             selected = spatialActive,

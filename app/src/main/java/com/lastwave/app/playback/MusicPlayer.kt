@@ -2082,6 +2082,10 @@ class MusicPlayer @Inject constructor(
         runCatching { nativeAudioEngine.get().setSpatialAudio(enabled, roomSize, damping, haasDelayMs, widthRatio) }
     }
 
+    fun setVocalRemover(enabled: Boolean, strength: Float = 0.85f) {
+        runCatching { nativeAudioEngine.get().setVocalRemover(enabled, strength) }
+    }
+
     fun setPlaybackPitch(semitones: Float) = onMain {
         val factor = Math.pow(2.0, (semitones.coerceIn(-12f, 12f) / 12.0).toDouble()).toFloat()
         if (playerDelegate.isInitialized()) {

@@ -29,6 +29,7 @@ public:
     void setEqualizerQ(float q) noexcept;
     void setSpatialAudio(bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio) noexcept;
     void setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept;
+    void setVocalRemover(bool enabled, float strength = 0.85f) noexcept;
     void process(
         float* interleaved,
         std::int32_t frameCount,
@@ -148,6 +149,8 @@ private:
     std::atomic<bool> targetBitcrusherEnabled_{false};
     std::atomic<int> targetBitcrusherBits_{10};
     std::atomic<int> targetBitcrusherDownsample_{2};
+    std::atomic<bool> vocalRemoverEnabled_{false};
+    std::atomic<float> vocalRemoverStrength_{0.85f};
 
     struct SpatialReverb final {
         std::array<float, 4096> delayBufferLeft{};

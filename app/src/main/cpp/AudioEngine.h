@@ -66,6 +66,7 @@ public:
     void setEqualizerQ(float q) noexcept;
     void setSpatialAudio(bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio) noexcept;
     void setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept;
+    void setVocalRemover(bool enabled, float strength = 0.85f) noexcept;
 
     [[nodiscard]] bool configureMediaProcessor(
         std::int32_t inputSampleRate,

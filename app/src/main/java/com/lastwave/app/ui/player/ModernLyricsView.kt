@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -29,11 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Lyrics
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.SyncDisabled
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,18 +44,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
-import com.lastwave.app.ui.theme.LocalLiquidGlass
-import com.lastwave.app.ui.theme.LiquidGlassSurface
-import com.lastwave.app.ui.theme.liquidGlassChrome
-import com.lastwave.app.ui.theme.liquidGlassContainerColor
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -77,6 +69,10 @@ import com.lastwave.app.playback.MusicPlayerState
 import com.lastwave.app.playback.PlaybackProgressState
 import com.lastwave.app.ui.common.ExpressiveInlineLoadingIndicator
 import com.lastwave.app.ui.common.ExpressiveMotion
+import com.lastwave.app.ui.theme.LiquidGlassSurface
+import com.lastwave.app.ui.theme.LocalLiquidGlass
+import com.lastwave.app.ui.theme.liquidGlassChrome
+import com.lastwave.app.ui.theme.liquidGlassContainerColor
 import com.mocharealm.accompanist.lyrics.core.model.Artist
 import com.mocharealm.accompanist.lyrics.core.model.ISyncedLine
 import com.mocharealm.accompanist.lyrics.core.model.SyncedLyrics
@@ -87,6 +83,45 @@ import com.mocharealm.accompanist.lyrics.core.model.synced.SyncedLine
 import com.mocharealm.accompanist.lyrics.ui.composable.lyrics.KaraokeLyricsView
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
+
+private val noteNames = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+private val noteNamesFlat = arrayOf("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B")
+private val chordRegex = Regex("""^(?:[A-G][#b]?(?:m|maj|min|dim|aug|sus[24]?|[5-9]|11|13)?(?:/[A-G][#b]?)?\s*)+$""")
+
+private fun transposeChordToken(chord: String, semitones: Int): String {
+    if (semitones == 0) return chord
+    val rootRegex = Regex("""^([A-G][#b]?)""")
+    val match = rootRegex.find(chord) ?: return chord
+    val root = match.value
+    val rest = chord.substring(root.length)
+
+    var index = noteNames.indexOf(root)
+    if (index == -1) {
+        index = noteNamesFlat.indexOf(root)
+    }
+    if (index == -1) return chord
+
+    val newIndex = Math.floorMod(index + semitones, 12)
+    val newRoot = noteNames[newIndex]
+
+    val slashIndex = rest.indexOf('/')
+    if (slashIndex != -1) {
+        val mainRest = rest.substring(0, slashIndex)
+        val bassPart = rest.substring(slashIndex + 1)
+        val transposedBass = transposeChordToken(bassPart, semitones)
+        return newRoot + mainRest + "/" + transposedBass
+    }
+
+    return newRoot + rest
+}
+
+private fun transposeChordLine(line: String, semitones: Int): String {
+    if (semitones == 0) return line
+    val singleChordRegex = Regex("""[A-G][#b]?(?:m|maj|min|dim|aug|sus[24]?|[5-9]|11|13)?(?:/[A-G][#b]?)?""")
+    return singleChordRegex.replace(line) { match ->
+        transposeChordToken(match.value, semitones)
+    }
+}
 
 @Composable
 fun ModernLyricsPanel(
@@ -113,6 +148,7 @@ fun ModernLyricsPanel(
     var smoothedPositionMs by remember(track.videoId) { mutableLongStateOf(progress.positionMs) }
     var basePositionMs by remember(track.videoId) { mutableLongStateOf(progress.positionMs) }
     var lastSyncTime by remember(track.videoId) { mutableLongStateOf(SystemClock.elapsedRealtime()) }
+    var capoSemitones by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(progress.positionMs, state.isPlaying) {
         basePositionMs = progress.positionMs
@@ -200,10 +236,6 @@ fun ModernLyricsPanel(
                             onRetry = onRetry,
                         )
                     } else if (targetState.isSynced && targetState.lines.isNotEmpty()) {
-                        // Word-sync can fail (all providers down / LRCLIB line
-                        // fallback): huge karaoke type then overflows off-screen.
-                        // Fall back to a smaller line style, and sit the list a
-                        // little lower so the first line clears the header.
                         val isWordSynced = targetState.isWordSynced ||
                             remember(targetState.lines) { targetState.lines.any { it.hasSyllables } }
                         val isOverallRtl = remember(targetState.lines) {
@@ -211,8 +243,8 @@ fun ModernLyricsPanel(
                             if (meaningful.isEmpty()) false
                             else meaningful.count { it.isRtl } > meaningful.size / 2
                         }
-                        val syncedLyrics = remember(targetState.lines, track.title, track.artist, isOverallRtl) {
-                            targetState.lines.toSyncedLyrics(track.title, track.artist, isOverallRtl)
+                        val syncedLyrics = remember(targetState.lines, track.title, track.artist, isOverallRtl, capoSemitones) {
+                            targetState.lines.toSyncedLyrics(track.title, track.artist, isOverallRtl, capoSemitones)
                         }
 
                         val initialLineIndex by remember(syncedLyrics) {
@@ -225,8 +257,6 @@ fun ModernLyricsPanel(
                         val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialLineIndex)
 
                         val layoutDirection = if (isOverallRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
-                        // Short provider badge: makes it visible why words
-                        // animate (word-sync) or just scroll (line-sync).
                         val syncLabel = remember(targetState.source, isWordSynced) {
                             val provider = targetState.source
                                 ?.substringBefore(" (")
@@ -312,40 +342,71 @@ fun ModernLyricsPanel(
                                             )
                                         }
                                     }
+
+                                    Spacer(Modifier.width(6.dp))
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.65f),
+                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                        ) {
+                                            Text(
+                                                text = "Capo ${if (capoSemitones >= 0) "+$capoSemitones" else "$capoSemitones"}",
+                                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                            )
+                                            IconButton(
+                                                onClick = { if (capoSemitones > -6) capoSemitones-- },
+                                                modifier = Modifier.size(20.dp),
+                                            ) {
+                                                Text("−", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                            }
+                                            IconButton(
+                                                onClick = { if (capoSemitones < 6) capoSemitones++ },
+                                                modifier = Modifier.size(20.dp),
+                                            ) {
+                                                Text("+", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
                                 }
-                            KaraokeLyricsView(
-                                listState = listState,
-                                lyrics = syncedLyrics,
-                                showTranslation = showTranslation,
-                                showPhonetic = showPhonetic,
-                                currentPosition = { smoothedPositionMs.toInt() },
-                                onLineClicked = { line ->
-                                    player.seekTo(line.start.toLong())
-                                },
-                                onLinePressed = {
-                                    showLyricCardSheet = true
-                                },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
-                                offset = 84.dp,
-                                normalLineTextStyle = LocalTextStyle.current.copy(
-                                    fontSize = if (isWordSynced) 34.sp else 27.sp,
-                                    fontWeight = FontWeight.Black,
-                                    textMotion = TextMotion.Animated,
-                                ),
-                                accompanimentLineTextStyle = LocalTextStyle.current.copy(
-                                    fontSize = if (isWordSynced) 22.sp else 19.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    textMotion = TextMotion.Animated,
-                                ),
-                                textColor = Color.White,
-                            )
+                                KaraokeLyricsView(
+                                    listState = listState,
+                                    lyrics = syncedLyrics,
+                                    showTranslation = showTranslation,
+                                    showPhonetic = showPhonetic,
+                                    currentPosition = { smoothedPositionMs.toInt() },
+                                    onLineClicked = { line ->
+                                        player.seekTo(line.start.toLong())
+                                    },
+                                    onLinePressed = {
+                                        showLyricCardSheet = true
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
+                                    offset = 84.dp,
+                                    normalLineTextStyle = LocalTextStyle.current.copy(
+                                        fontSize = if (isWordSynced) 34.sp else 27.sp,
+                                        fontWeight = FontWeight.Black,
+                                        textMotion = TextMotion.Animated,
+                                    ),
+                                    accompanimentLineTextStyle = LocalTextStyle.current.copy(
+                                        fontSize = if (isWordSynced) 22.sp else 19.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        textMotion = TextMotion.Animated,
+                                    ),
+                                    textColor = Color.White,
+                                )
                             }
                         }
                     } else if (!targetState.plainLyrics.isNullOrBlank()) {
                         ModernPlainLyricsView(
                             plainLyrics = targetState.plainLyrics,
+                            capoSemitones = capoSemitones,
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
@@ -436,9 +497,34 @@ private fun LyricLine.toISyncedLine(isOverallRtl: Boolean = false): ISyncedLine 
     }
 }
 
-private fun List<LyricLine>.toSyncedLyrics(title: String, artist: String, isOverallRtl: Boolean = false): SyncedLyrics {
+private fun List<LyricLine>.toSyncedLyrics(
+    title: String,
+    artist: String,
+    isOverallRtl: Boolean = false,
+    capoSemitones: Int = 0,
+): SyncedLyrics {
+    val processedLines = mutableListOf<LyricLine>()
+    var i = 0
+    while (i < size) {
+        val currentLine = get(i)
+        val rawText = currentLine.text.trim()
+        if (chordRegex.matches(rawText) && i + 1 < size) {
+            val transposedChords = transposeChordLine(rawText, capoSemitones)
+            val nextLine = get(i + 1)
+            val combinedText = "$transposedChords\n${nextLine.text}"
+            processedLines.add(nextLine.copy(text = combinedText))
+            i += 2
+        } else if (chordRegex.matches(rawText)) {
+            val transposedChords = transposeChordLine(rawText, capoSemitones)
+            processedLines.add(currentLine.copy(text = transposedChords))
+            i++
+        } else {
+            processedLines.add(currentLine)
+            i++
+        }
+    }
     return SyncedLyrics(
-        lines = map { it.toISyncedLine(isOverallRtl) },
+        lines = processedLines.map { it.toISyncedLine(isOverallRtl) },
         title = title,
         artists = listOf(Artist(type = "artist", name = artist)),
     )
@@ -447,6 +533,7 @@ private fun List<LyricLine>.toSyncedLyrics(title: String, artist: String, isOver
 @Composable
 private fun ModernPlainLyricsView(
     plainLyrics: String,
+    capoSemitones: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     val isRtl = remember(plainLyrics) { isRtlText(plainLyrics) }
@@ -476,18 +563,35 @@ private fun ModernPlainLyricsView(
                 )
             }
 
-            Text(
-                text = plainLyrics,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 19.sp,
-                    lineHeight = 32.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 0.1.sp,
-                ),
-                textAlign = TextAlign.Start,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.94f),
-                modifier = Modifier.fillMaxWidth(),
-            )
+            val lines = plainLyrics.lines()
+            for (lineText in lines) {
+                val trimmed = lineText.trim()
+                if (trimmed.isNotEmpty() && chordRegex.matches(trimmed)) {
+                    val transposed = transposeChordLine(trimmed, capoSemitones)
+                    Text(
+                        text = transposed,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.5.sp,
+                        ),
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
+                    )
+                } else {
+                    Text(
+                        text = lineText,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 19.sp,
+                            lineHeight = 32.sp,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 0.1.sp,
+                        ),
+                        textAlign = TextAlign.Start,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.94f),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                    )
+                }
+            }
         }
     }
 }
@@ -649,60 +753,6 @@ private fun ModernLyricsControls(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(
-                    onClick = player::previous,
-                    modifier = Modifier
-                        .size(42.dp)
-                        .liquidGlassChrome(CircleShape, LocalLiquidGlass.current)
-                        .clip(CircleShape)
-                        .background(liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f))),
-                ) {
-                    Icon(
-                        Icons.Filled.SkipPrevious,
-                        "Previous",
-                        Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-
-                LiquidGlassSurface(
-                    glassModifier = Modifier.liquidGlassChrome(CircleShape, LocalLiquidGlass.current),
-                    onClick = player::togglePlayPause,
-                    shape = CircleShape,
-                    color = liquidGlassContainerColor(MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)),
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    tonalElevation = 0.dp,
-                    shadowElevation = 0.dp,
-                    modifier = Modifier.size(52.dp),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        if (state.isBuffering) {
-                            ExpressiveInlineLoadingIndicator(
-                                size = 22.dp,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                strokeWidth = 2.5.dp,
-                            )
-                        } else {
-                            AnimatedPlayPauseIcon(state.isPlaying, Modifier.size(28.dp))
-                        }
-                    }
-                }
-
-                IconButton(
-                    onClick = player::next,
-                    modifier = Modifier
-                        .size(42.dp)
-                        .liquidGlassChrome(CircleShape, LocalLiquidGlass.current)
-                        .clip(CircleShape)
-                        .background(liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f))),
-                ) {
-                    Icon(
-                        Icons.Filled.SkipNext,
-                        "Next",
-                        Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
             }
 
             Text(
