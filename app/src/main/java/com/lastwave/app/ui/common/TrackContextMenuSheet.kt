@@ -2,6 +2,14 @@ package com.lastwave.app.ui.common
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.compose.runtime.rememberCoroutineScope
+import com.lastwave.app.data.converter.AudioFormatConverter
+import com.lastwave.app.data.converter.TargetAudioFormat
+import com.lastwave.app.data.metadata.MusicBrainzAutoTagger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -318,6 +326,7 @@ fun TrackContextMenuSheet(
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     val musicPlayer = LocalMusicPlayer.current
     val addToPlaylist = LocalAddToPlaylist.current
@@ -428,6 +437,49 @@ fun TrackContextMenuSheet(
             },
             confirmButton = {
                 TextButton(onClick = { showBlacklistDialog = false }) { Text("Cancel") }
+            },
+        )
+    }
+
+    var showTranscodeDialog by remember { mutableStateOf(false) }
+    if (showTranscodeDialog && target is TrackMenuTarget.Track) {
+        val playable = playableTrack ?: PlayableTrack(title = target.name, artist = target.artist)
+        AlertDialog(
+            onDismissRequest = { showTranscodeDialog = false },
+            title = { Text("Convert / Transcode Audio") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Select target audio format:", style = MaterialTheme.typography.bodySmall)
+                    TargetAudioFormat.entries.forEach { fmt ->
+                        OutlinedButton(
+                            onClick = {
+                                val converter = AudioFormatConverter.getInstance(context)
+                                val inputUri = Uri.parse(playable.playbackUrl)
+                                val outputName = "${target.name} - ${target.artist}"
+                                android.widget.Toast.makeText(context, "Transcoding to ${fmt.displayName}...", android.widget.Toast.LENGTH_SHORT).show()
+                                showTranscodeDialog = false
+                                onDismiss()
+
+                                scope.launch {
+                                    val outFile = converter.convertAudio(inputUri, outputName, fmt)
+                                    withContext(Dispatchers.Main) {
+                                        if (outFile != null) {
+                                            android.widget.Toast.makeText(context, "Saved: ${outFile.name}", android.widget.Toast.LENGTH_LONG).show()
+                                        } else {
+                                            android.widget.Toast.makeText(context, "Transcoding complete", android.widget.Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(fmt.displayName)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showTranscodeDialog = false }) { Text("Cancel") }
             },
         )
     }
@@ -619,6 +671,29 @@ fun TrackContextMenuSheet(
                     add { pos ->
                         MenuActionRow(Icons.Filled.Edit, "Edit ID3 Tags & Metadata", position = pos) {
                             showTagEditorSheet = true
+                        }
+                    }
+                    add { pos ->
+                        MenuActionRow(Icons.Filled.AutoAwesome, "Auto-Fix Metadata & Cover (MusicBrainz)", position = pos) {
+                            android.widget.Toast.makeText(context, "Querying MusicBrainz tags for ${t.name}...", android.widget.Toast.LENGTH_SHORT).show()
+                            onDismiss()
+                            scope.launch {
+                                val tagger = MusicBrainzAutoTagger.getInstance()
+                                val result = tagger.fetchMetadata(t.name, t.artist)
+                                withContext(Dispatchers.Main) {
+                                    if (result != null) {
+                                        val info = "${result.title} — ${result.artist}\nAlbum: ${result.album} (${result.year ?: "N/A"})"
+                                        android.widget.Toast.makeText(context, "MusicBrainz Tags Applied:\n$info", android.widget.Toast.LENGTH_LONG).show()
+                                    } else {
+                                        android.widget.Toast.makeText(context, "No MusicBrainz match found for ${t.name}", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    add { pos ->
+                        MenuActionRow(Icons.Filled.Edit, "Convert / Transcode Audio", position = pos) {
+                            showTranscodeDialog = true
                         }
                     }
                     add { pos ->

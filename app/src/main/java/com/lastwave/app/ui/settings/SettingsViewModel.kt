@@ -1074,4 +1074,28 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+
+    fun addCustomScanFolder(folderPathOrUri: String) {
+        launchSettingsAction("add custom scan folder") {
+            settingsPreferences.addCustomScanFolder(folderPathOrUri)
+        }
+    }
+
+    fun removeCustomScanFolder(folderPathOrUri: String) {
+        launchSettingsAction("remove custom scan folder") {
+            settingsPreferences.removeCustomScanFolder(folderPathOrUri)
+        }
+    }
+
+    fun addCustomExcludedFolder(folderPathOrUri: String) {
+        launchSettingsAction("add custom excluded folder") {
+            settingsPreferences.addCustomExcludedFolder(folderPathOrUri)
+        }
+    }
+
+    fun removeCustomExcludedFolder(folderPathOrUri: String) {
+        launchSettingsAction("remove custom excluded folder") {
+            settingsPreferences.removeCustomExcludedFolder(folderPathOrUri)
+        }
+    }
 }

@@ -272,6 +272,9 @@ data class MiscSettings(
     /** Parallel download concurrency and network constraint. */
     val downloadConcurrency: Int = 2,
     val downloadWifiOnly: Boolean = false,
+    /** Whitelisted & blacklisted SAF library folders. */
+    val customScanFolders: Set<String> = emptySet(),
+    val customExcludedFolders: Set<String> = emptySet(),
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -416,6 +419,8 @@ class SettingsPreferences @Inject constructor(
         val VISIBLE_NAV_TABS = stringSetPreferencesKey("lw_visible_nav_tabs")
         val DOWNLOAD_CONCURRENCY = intPreferencesKey("lw_download_concurrency")
         val DOWNLOAD_WIFI_ONLY = booleanPreferencesKey("lw_download_wifi_only")
+        val CUSTOM_SCAN_FOLDERS = stringSetPreferencesKey("lw_custom_scan_folders")
+        val CUSTOM_EXCLUDED_FOLDERS = stringSetPreferencesKey("lw_custom_excluded_folders")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -496,6 +501,8 @@ class SettingsPreferences @Inject constructor(
                 visibleNavTabs = p.readSafely(Keys.VISIBLE_NAV_TABS) ?: setOf("feed", "discover", "playlists", "stats"),
                 downloadConcurrency = (p.readSafely(Keys.DOWNLOAD_CONCURRENCY) ?: 2).coerceIn(1, 5),
                 downloadWifiOnly = p.readSafely(Keys.DOWNLOAD_WIFI_ONLY) ?: false,
+                customScanFolders = p.readSafely(Keys.CUSTOM_SCAN_FOLDERS) ?: emptySet(),
+                customExcludedFolders = p.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet(),
             )
         }
 
@@ -833,6 +840,34 @@ class SettingsPreferences @Inject constructor(
         dataStore.edit { prefs ->
             val current = prefs.readSafely(Keys.PINNED_FRIENDS) ?: emptySet()
             prefs[Keys.PINNED_FRIENDS] = if (username in current) current - username else current + username
+        }
+    }
+
+    suspend fun addCustomScanFolder(folderPathOrUri: String) {
+        dataStore.edit { prefs ->
+            val current = prefs.readSafely(Keys.CUSTOM_SCAN_FOLDERS) ?: emptySet()
+            prefs[Keys.CUSTOM_SCAN_FOLDERS] = current + folderPathOrUri
+        }
+    }
+
+    suspend fun removeCustomScanFolder(folderPathOrUri: String) {
+        dataStore.edit { prefs ->
+            val current = prefs.readSafely(Keys.CUSTOM_SCAN_FOLDERS) ?: emptySet()
+            prefs[Keys.CUSTOM_SCAN_FOLDERS] = current - folderPathOrUri
+        }
+    }
+
+    suspend fun addCustomExcludedFolder(folderPathOrUri: String) {
+        dataStore.edit { prefs ->
+            val current = prefs.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet()
+            prefs[Keys.CUSTOM_EXCLUDED_FOLDERS] = current + folderPathOrUri
+        }
+    }
+
+    suspend fun removeCustomExcludedFolder(folderPathOrUri: String) {
+        dataStore.edit { prefs ->
+            val current = prefs.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet()
+            prefs[Keys.CUSTOM_EXCLUDED_FOLDERS] = current - folderPathOrUri
         }
     }
 

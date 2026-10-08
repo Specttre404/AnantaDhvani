@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import com.lastwave.app.playback.PlayableTrack
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,15 +14,21 @@ import javax.inject.Singleton
 @Singleton
 class LocalAudioScanner @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val settingsPreferences: SettingsPreferences,
 ) {
     suspend fun scanLocalTracks(): List<PlayableTrack> = withContext(Dispatchers.IO) {
         val tracks = mutableListOf<PlayableTrack>()
+        val settings = settingsPreferences.settings.first()
+        val whitelist = settings.customScanFolders
+        val blacklist = settings.customExcludedFolders
+
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.DATA,
         )
 
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
@@ -39,6 +46,7 @@ class LocalAudioScanner @Inject constructor(
                 val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
                 val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
                 val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val dataColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DATA)
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idColumn)
@@ -46,9 +54,18 @@ class LocalAudioScanner @Inject constructor(
                     val artist = cursor.getString(artistColumn).orEmpty().ifBlank { "Unknown Artist" }
                     val album = cursor.getString(albumColumn).orEmpty().ifBlank { "Unknown Album" }
                     val durationMs = cursor.getLong(durationColumn)
+                    val dataPath = if (dataColumn >= 0) cursor.getString(dataColumn).orEmpty() else ""
 
                     val excludedKeywords = listOf("whatsapp", "notification", "ringtone", "call_record", "voice_note")
-                    if (excludedKeywords.any { title.contains(it, ignoreCase = true) || album.contains(it, ignoreCase = true) }) {
+                    if (excludedKeywords.any { title.contains(it, ignoreCase = true) || album.contains(it, ignoreCase = true) || dataPath.contains(it, ignoreCase = true) }) {
+                        continue
+                    }
+
+                    if (blacklist.isNotEmpty() && blacklist.any { dataPath.contains(it, ignoreCase = true) }) {
+                        continue
+                    }
+
+                    if (whitelist.isNotEmpty() && !whitelist.any { dataPath.contains(it, ignoreCase = true) }) {
                         continue
                     }
 

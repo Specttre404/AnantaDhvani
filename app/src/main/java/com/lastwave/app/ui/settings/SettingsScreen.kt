@@ -1,7 +1,9 @@
 package com.lastwave.app.ui.settings
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.lastwave.app.data.local.MiscSettings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -54,8 +56,13 @@ import com.lastwave.app.util.BatteryOptimizationHelper
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.FolderSpecial
+import androidx.compose.material.icons.filled.Wifi
+import com.lastwave.app.playback.server.LocalMediaWebServer
 import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Delete
@@ -924,6 +931,16 @@ fun SettingsScreen(
                         wifiOnly = misc.downloadWifiOnly,
                         onConcurrencyChange = viewModel::setDownloadConcurrency,
                         onWifiOnlyChange = viewModel::setDownloadWifiOnly,
+                    )
+                    LocalWebRemoteCard(
+                        musicPlayer = playerViewModel.player,
+                    )
+                    LibraryFoldersAndExclusionCard(
+                        settings = misc,
+                        onAddScanFolder = viewModel::addCustomScanFolder,
+                        onRemoveScanFolder = viewModel::removeCustomScanFolder,
+                        onAddExcludedFolder = viewModel::addCustomExcludedFolder,
+                        onRemoveExcludedFolder = viewModel::removeCustomExcludedFolder,
                     )
                     AudioOffloadCard(
                         enabled = misc.audioOffloadEnabled,
@@ -3536,6 +3553,191 @@ private fun NavigationBarTabsCard(
                         label = { Text(label, style = MaterialTheme.typography.labelSmall) },
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LocalWebRemoteCard(
+    musicPlayer: com.lastwave.app.playback.MusicPlayer,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val webServer = remember { LocalMediaWebServer.getInstance(context, musicPlayer) }
+    var isServerRunning by remember { mutableStateOf(webServer.isRunning) }
+    val serverUrl = remember(isServerRunning) { webServer.getLocalServerUrl() }
+
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Wifi, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Local Web Remote & Streaming Server", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Control & stream live audio on PC browser via local Wi-Fi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(
+                    checked = isServerRunning,
+                    onCheckedChange = { checked ->
+                        if (checked) {
+                            isServerRunning = webServer.startServer()
+                        } else {
+                            webServer.stopServer()
+                            isServerRunning = false
+                        }
+                    },
+                )
+            }
+
+            if (isServerRunning) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = serverUrl,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                        OutlinedButton(
+                            onClick = {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                                val clip = android.content.ClipData.newPlainText("Ananta Web Remote", serverUrl)
+                                clipboard?.setPrimaryClip(clip)
+                                android.widget.Toast.makeText(context, "Copied $serverUrl", android.widget.Toast.LENGTH_SHORT).show()
+                            },
+                        ) {
+                            Text("Copy Link")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LibraryFoldersAndExclusionCard(
+    settings: MiscSettings,
+    onAddScanFolder: (String) -> Unit,
+    onRemoveScanFolder: (String) -> Unit,
+    onAddExcludedFolder: (String) -> Unit,
+    onRemoveExcludedFolder: (String) -> Unit,
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    val whitelistLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            val path = it.path ?: it.toString()
+            onAddScanFolder(path)
+            android.widget.Toast.makeText(context, "Added to Included Folders", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val blacklistLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            val path = it.path ?: it.toString()
+            onAddExcludedFolder(path)
+            android.widget.Toast.makeText(context, "Added to Excluded Folders", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.FolderSpecial, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Library Folders & Exclusion Manager", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Whitelist custom music folders & blacklist unwanted directories", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            Text("Included Folders (Whitelist)", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            if (settings.customScanFolders.isEmpty()) {
+                Text("All device music folders included (Default)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    settings.customScanFolders.forEach { folder ->
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            onClick = { onRemoveScanFolder(folder) }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(folder.substringAfterLast("/").ifBlank { folder }.take(24), style = MaterialTheme.typography.labelSmall)
+                                Icon(Icons.Filled.Close, contentDescription = "Remove", modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+                }
+            }
+            OutlinedButton(
+                onClick = { whitelistLauncher.launch(null) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Add Included Folder via SAF")
+            }
+
+            Spacer(Modifier.height(4.dp))
+
+            Text("Excluded Folders (Blacklist)", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            if (settings.customExcludedFolders.isEmpty()) {
+                Text("No custom folders excluded", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    settings.customExcludedFolders.forEach { folder ->
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            onClick = { onRemoveExcludedFolder(folder) }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(folder.substringAfterLast("/").ifBlank { folder }.take(24), style = MaterialTheme.typography.labelSmall)
+                                Icon(Icons.Filled.Close, contentDescription = "Remove", modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+                }
+            }
+            OutlinedButton(
+                onClick = { blacklistLauncher.launch(null) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Add Excluded Folder via SAF")
             }
         }
     }
