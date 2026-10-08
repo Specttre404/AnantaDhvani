@@ -95,6 +95,8 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     @Inject lateinit var settingsPreferences: com.lastwave.app.data.local.SettingsPreferences
     @Inject lateinit var playlistRepository: com.lastwave.app.data.playlist.PlaylistRepository
     @Inject lateinit var listenBrainzManager: com.lastwave.app.data.scrobble.ListenBrainzManager
+    @Inject lateinit var oreoNotificationDecorator: com.lastwave.app.playback.notification.OreoNotificationDecorator
+    @Inject lateinit var displaySleepPowerGuard: com.lastwave.app.playback.power.DisplaySleepPowerGuard
 
     // SupervisorJob stops sibling failure propagation; the handler below
     // additionally stops an unexpected exception in any fire-and-forget
@@ -142,9 +144,16 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     private var notificationPalette = NotificationPalette.default()
     private var playbackWakeLock: PowerManager.WakeLock? = null
     private var playbackWifiLock: WifiManager.WifiLock? = null
+    private var currentMiscSettings = com.lastwave.app.data.local.MiscSettings()
 
     override fun onCreate() {
         super.onCreate()
+        displaySleepPowerGuard.register()
+        scope.launch {
+            settingsPreferences.settings.collect { settings ->
+                currentMiscSettings = settings
+            }
+        }
         val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
         playbackWakeLock = powerManager?.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
@@ -486,6 +495,7 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     }
 
     override fun onDestroy() {
+        displaySleepPowerGuard.unregister()
         shakeDetector?.stop()
         shakeDetector = null
         runCatching { if (playbackWakeLock?.isHeld == true) playbackWakeLock?.release() }
@@ -928,6 +938,8 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         } else {
             @Suppress("DEPRECATION") Notification.Builder(this)
         }
+
+        oreoNotificationDecorator.decorateNotification(builder, art, currentMiscSettings.oreoNotificationsEnabled)
 
         // On Android 13+ (API 33+, Tiramisu), SystemUI / Samsung One UI 5/6/7
         // hosts the media player natively via MediaStyle and SecMediaHost.

@@ -239,5 +239,36 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <service
+            android:name=".service.tiles.EqualizerTileService"
+            android:exported="true"
+            android:label="Equalizer"
+            android:icon="@drawable/ic_equalizer_tile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.tiles.PlaybackSpeedTileService"
+            android:exported="true"
+            android:label="Playback Speed"
+            android:icon="@drawable/ic_speed_tile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.tiles.FavoriteTrackTileService"
+            android:exported="true"
+            android:label="Favorite Track"
+            android:icon="@drawable/ic_favorite_tile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
     </application>
 </manifest>

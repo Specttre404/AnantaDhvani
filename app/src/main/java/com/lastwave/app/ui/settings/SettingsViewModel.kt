@@ -1098,4 +1098,12 @@ class SettingsViewModel @Inject constructor(
             settingsPreferences.removeCustomExcludedFolder(folderPathOrUri)
         }
     }
+
+    fun setOreoNotificationsEnabled(enabled: Boolean) = launchSettingsAction("update notification style") {
+        settingsPreferences.setOreoNotificationsEnabled(enabled)
+    }
+
+    fun setScreenOffBatterySaver(enabled: Boolean) = launchSettingsAction("update power saver") {
+        settingsPreferences.setScreenOffBatterySaver(enabled)
+    }
 }

@@ -879,6 +879,12 @@ fun SettingsScreen(
                         currentTheme = misc.appIconTheme,
                         onSelectIcon = viewModel::setAppIconTheme,
                     )
+                    SystemIntegrationLockscreenCard(
+                        oreoNotificationsEnabled = misc.oreoNotificationsEnabled,
+                        screenOffBatterySaver = misc.screenOffBatterySaver,
+                        onOreoToggle = viewModel::setOreoNotificationsEnabled,
+                        onBatterySaverToggle = viewModel::setScreenOffBatterySaver,
+                    )
                     StreamBufferTuningCard(
                         minBufferMs = misc.minBufferMs,
                         maxBufferMs = misc.maxBufferMs,
@@ -3551,6 +3557,74 @@ private fun NavigationBarTabsCard(
                         selected = isVisible,
                         onClick = { onToggleTab(id) },
                         label = { Text(label, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SystemIntegrationLockscreenCard(
+    oreoNotificationsEnabled: Boolean,
+    screenOffBatterySaver: Boolean,
+    onOreoToggle: (Boolean) -> Unit,
+    onBatterySaverToggle: (Boolean) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.NotificationsActive, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("System Integration & Lockscreen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Notification styling, power guard & Quick Settings tiles", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text("Android 8.0 Saturated Notification", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Oreo full-bleed colorized media notification banner", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = oreoNotificationsEnabled, onCheckedChange = onOreoToggle)
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text("Screen-Off Battery Saver Guard", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Halts GPU visualizer clocks and throttles background FFTs when display sleeps", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = screenOffBatterySaver, onCheckedChange = onBatterySaverToggle)
+            }
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Icon(Icons.Filled.Tune, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(20.dp))
+                    Text(
+                        "Quick Settings Tiles available: Add Equalizer, Playback Speed, and Favorite Track tiles from your Android notification shade.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }

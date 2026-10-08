@@ -275,6 +275,9 @@ data class MiscSettings(
     /** Whitelisted & blacklisted SAF library folders. */
     val customScanFolders: Set<String> = emptySet(),
     val customExcludedFolders: Set<String> = emptySet(),
+    /** Oreo-style saturated notification & screen-off power guard. */
+    val oreoNotificationsEnabled: Boolean = false,
+    val screenOffBatterySaver: Boolean = true,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -421,6 +424,8 @@ class SettingsPreferences @Inject constructor(
         val DOWNLOAD_WIFI_ONLY = booleanPreferencesKey("lw_download_wifi_only")
         val CUSTOM_SCAN_FOLDERS = stringSetPreferencesKey("lw_custom_scan_folders")
         val CUSTOM_EXCLUDED_FOLDERS = stringSetPreferencesKey("lw_custom_excluded_folders")
+        val OREO_NOTIFICATIONS_ENABLED = booleanPreferencesKey("lw_oreo_notifications_enabled")
+        val SCREEN_OFF_BATTERY_SAVER = booleanPreferencesKey("lw_screen_off_battery_saver")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -503,6 +508,8 @@ class SettingsPreferences @Inject constructor(
                 downloadWifiOnly = p.readSafely(Keys.DOWNLOAD_WIFI_ONLY) ?: false,
                 customScanFolders = p.readSafely(Keys.CUSTOM_SCAN_FOLDERS) ?: emptySet(),
                 customExcludedFolders = p.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet(),
+                oreoNotificationsEnabled = p.readSafely(Keys.OREO_NOTIFICATIONS_ENABLED) ?: false,
+                screenOffBatterySaver = p.readSafely(Keys.SCREEN_OFF_BATTERY_SAVER) ?: true,
             )
         }
 
@@ -869,6 +876,14 @@ class SettingsPreferences @Inject constructor(
             val current = prefs.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet()
             prefs[Keys.CUSTOM_EXCLUDED_FOLDERS] = current - folderPathOrUri
         }
+    }
+
+    suspend fun setOreoNotificationsEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.OREO_NOTIFICATIONS_ENABLED] = enabled }
+    }
+
+    suspend fun setScreenOffBatterySaver(enabled: Boolean) {
+        dataStore.edit { it[Keys.SCREEN_OFF_BATTERY_SAVER] = enabled }
     }
 
     private companion object {
