@@ -118,7 +118,9 @@ fun ChartsScreen(
         }
 
         val displayEntries = remember(uiState.entries, top10Only) {
-            if (top10Only) uiState.entries.take(10) else uiState.entries
+            val allCharts = uiState.entries
+            val displayCharts = if (top10Only) allCharts.take(10) else allCharts // Limit display strictly to Top 10
+            displayCharts
         }
 
         PullToRefreshBox(
