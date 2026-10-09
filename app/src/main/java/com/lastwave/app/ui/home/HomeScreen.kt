@@ -235,19 +235,23 @@ fun HomeScreen(
                 )
             }
 
-            uiState.stats?.let { stats ->
-                StatsCard(
-                    scrobbles = stats.scrobbles,
-                    trackCount = stats.trackCount,
-                    artistCount = stats.artistCount,
-                    albumCount = stats.albumCount,
-                    // Honest label: local Room aggregates are plays, not global scrobbles.
-                    headlineLabel = if (uiState.isLocalStatsMode && !uiState.isViewingFriend) "Plays" else "Scrobbles",
-                    onOpenGenres = onOpenGenres,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 0.dp),
-                )
-                Spacer(Modifier.height(12.dp))
-            }
+            val stats = uiState.stats ?: com.lastwave.app.data.repository.HomeStats(
+                scrobbles = 0L,
+                trackCount = 0L,
+                artistCount = 0L,
+                albumCount = 0L,
+                avatarUrl = null,
+            )
+            StatsCard(
+                scrobbles = stats.scrobbles,
+                trackCount = stats.trackCount,
+                artistCount = stats.artistCount,
+                albumCount = stats.albumCount,
+                headlineLabel = if (uiState.isLocalStatsMode && !uiState.isViewingFriend) "Plays" else "Scrobbles",
+                onOpenGenres = onOpenGenres,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 0.dp),
+            )
+            Spacer(Modifier.height(12.dp))
 
             if (uiState.topArtists.isNotEmpty() || uiState.topAlbums.isNotEmpty() || uiState.topTags.isNotEmpty()) {
                 PodiumSection(
