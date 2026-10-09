@@ -261,18 +261,6 @@ fun SearchScreen(
                                 }
                                 var showAudioRecognitionSheet by remember { mutableStateOf(false) }
 
-                                IconButton(
-                                    onClick = { showAudioRecognitionSheet = true },
-                                    modifier = Modifier.size(28.dp),
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Mic,
-                                        contentDescription = "Recognize Music",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                }
-
                                 val voiceSearchLauncher = rememberLauncherForActivityResult(
                                     contract = ActivityResultContracts.StartActivityForResult(),
                                 ) { result ->
