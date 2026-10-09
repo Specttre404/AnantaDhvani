@@ -3,7 +3,13 @@
 package com.lastwave.app.ui.player
 
 import android.content.Context
+import android.content.res.Configuration
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.ui.platform.LocalConfiguration
 import com.lastwave.app.playback.haptics.BassHapticDriver
+import com.lastwave.app.ui.player.spatial.SpatialPanningPuckView
+import com.lastwave.app.ui.visualizer.OrbitalParticleSphereView
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -1714,6 +1720,67 @@ private fun FullPlayer(
 
                 if (!lyricsFullscreen) Spacer(Modifier.height(6.dp))
 
+                val configuration = LocalConfiguration.current
+                val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                val isTablet = configuration.screenWidthDp >= 600
+                val isSplitScreen = isLandscape || isTablet || playerStyle == com.lastwave.app.data.local.PlayerStyle.SPLIT_SCREEN
+
+                if (isSplitScreen && !lyricsFullscreen) {
+                    Row(
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(0.45f).fillMaxHeight(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().weight(1f),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                ArtworkImage(
+                                    name = track.title,
+                                    artist = track.artist,
+                                    embeddedUrl = track.artworkUrl,
+                                    fallbackIcon = Icons.Filled.MusicNote,
+                                    modifier = Modifier.size(200.dp).clip(RoundedCornerShape(24.dp)),
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(track.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(track.artist, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                            SeekBar(
+                                progressState = progressState,
+                                isPlaying = state.isPlaying,
+                                trackKey = track.videoId ?: "${track.artist}|${track.title}",
+                                wavyEnabled = wavySeekbarEnabled,
+                                seekbarStyle = seekbarStyle,
+                                onSeek = player::seekTo,
+                            )
+                            MainControls(state = state, player = player)
+                            PlayerUtilityControls(state = state, player = player)
+                        }
+                        Column(
+                            modifier = Modifier.weight(0.55f).fillMaxHeight(),
+                        ) {
+                            ModernLyricsPanel(
+                                state = state,
+                                player = player,
+                                lyricsState = lyricsState,
+                                progressState = progressState,
+                                wavySeekbarEnabled = wavySeekbarEnabled,
+                                showTranslation = showLyricsTranslation,
+                                showPhonetic = showLyricsPhonetic,
+                                onToggleTranslation = onToggleTranslation,
+                                onTogglePhonetic = onTogglePhonetic,
+                                onRetry = onRetryLyrics,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+                } else {
                 AnimatedContent(
                     targetState = currentTab,
                     modifier = Modifier.weight(1f).adaptiveContentWidth(maxWidth = 680.dp),
@@ -1845,6 +1912,50 @@ private fun FullPlayer(
                                             label = "tonearmAngle",
                                         )
 
+                                        if (playerStyle == com.lastwave.app.data.local.PlayerStyle.CAROUSEL) {
+                                            val queue = state.queue.ifEmpty { listOf(track) }
+                                            val initialPage = state.currentIndex.coerceIn(0, queue.lastIndex)
+                                            val pagerState = rememberPagerState(initialPage = initialPage) { queue.size }
+
+                                            LaunchedEffect(pagerState.currentPage) {
+                                                if (pagerState.currentPage > state.currentIndex) player.next()
+                                                else if (pagerState.currentPage < state.currentIndex) player.previous()
+                                            }
+
+                                            HorizontalPager(
+                                                state = pagerState,
+                                                modifier = Modifier.fillMaxWidth().height(artworkSize + 20.dp),
+                                                contentPadding = PaddingValues(horizontal = 36.dp),
+                                                pageSpacing = 16.dp,
+                                            ) { page ->
+                                                val itemTrack = queue.getOrNull(page) ?: track
+                                                val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                                                val depthScale = (1.0f - 0.12f * kotlin.math.abs(pageOffset)).coerceIn(0.85f, 1.0f)
+                                                val depthAlpha = (1.0f - 0.35f * kotlin.math.abs(pageOffset)).coerceIn(0.40f, 1.0f)
+
+                                                Surface(
+                                                    shape = RoundedCornerShape(28.dp),
+                                                    color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),
+                                                    tonalElevation = 6.dp,
+                                                    shadowElevation = if (state.isPlaying) 20.dp else 8.dp,
+                                                    modifier = Modifier
+                                                        .size(artworkSize)
+                                                        .graphicsLayer {
+                                                            scaleX = depthScale
+                                                            scaleY = depthScale
+                                                            alpha = depthAlpha
+                                                        },
+                                                ) {
+                                                    ArtworkImage(
+                                                        name = itemTrack.title,
+                                                        artist = itemTrack.artist,
+                                                        embeddedUrl = itemTrack.artworkUrl,
+                                                        fallbackIcon = Icons.Filled.MusicNote,
+                                                        modifier = Modifier.fillMaxSize(),
+                                                    )
+                                                }
+                                            }
+                                        } else {
                                         Surface(
                                             shape = if (isVinylMode) RoundedCornerShape(0.dp) else RoundedCornerShape(32.dp),
                                             color = if (isVinylMode) Color.Transparent else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),
@@ -2052,6 +2163,7 @@ private fun FullPlayer(
                                                 }
                                             }
                                         }
+                                        }
                                     }
 
                                     Spacer(Modifier.height(8.dp))
@@ -2235,6 +2347,7 @@ private fun FullPlayer(
                         }
                         }
                     }
+                }
                 }
                 state.error?.takeUnless { lyricsFullscreen }?.let { message ->
                     Surface(
@@ -2802,14 +2915,48 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             label = { Text("Karaoke / Vocal Cut", style = MaterialTheme.typography.labelSmall) },
         )
         var spatialActive by remember { mutableStateOf(false) }
+        var showSpatialPuckDialog by remember { mutableStateOf(false) }
         FilterChip(
             selected = spatialActive,
             onClick = {
                 spatialActive = !spatialActive
                 player.setSpatialAudio(spatialActive, 0.6f, 0.5f, 18.0f, 1.3f)
+                if (spatialActive) showSpatialPuckDialog = true
             },
             label = { Text("3D Spatial", style = MaterialTheme.typography.labelSmall) },
         )
+        var showOrbitalSphere by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = showOrbitalSphere,
+            onClick = { showOrbitalSphere = !showOrbitalSphere },
+            label = { Text("3D Orbital Sphere", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        if (showSpatialPuckDialog) {
+            AlertDialog(
+                onDismissRequest = { showSpatialPuckDialog = false },
+                title = { Text("3D Spatial Audio Panning Puck") },
+                text = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Drag puck to adjust azimuth width & room acoustic depth:", style = MaterialTheme.typography.bodySmall)
+                        SpatialPanningPuckView(
+                            currentHaasDelayMs = 18.0f,
+                            currentWidthRatio = 1.3f,
+                            onSpatialChanged = { haas, width ->
+                                player.setSpatialAudio(enabled = true, roomSize = 0.6f, damping = 0.5f, haasDelayMs = haas, widthRatio = width)
+                            },
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showSpatialPuckDialog = false }) { Text("Done") }
+                },
+            )
+        }
         var showListenTogetherSheet by remember { mutableStateOf(false) }
         FilterChip(
             selected = false,
