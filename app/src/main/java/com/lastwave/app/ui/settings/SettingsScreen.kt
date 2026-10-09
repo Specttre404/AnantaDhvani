@@ -4032,14 +4032,16 @@ private fun DohAndProxyCard(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AudiophileThemePaletteCard(
+    currentPalette: String = "",
     onSelectPreset: (String) -> Unit,
 ) {
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -4050,13 +4052,17 @@ private fun AudiophileThemePaletteCard(
                     Text("Curated design systems and color palettes", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            val palettes = listOf("Catppuccin", "Nord", "Dracula", "Tokyo Night", "Gruvbox", "OLED Black")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                palettes.forEach { palette ->
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val palettes = listOf("Dynamic Monet", "Catppuccin", "Nord", "Dracula", "Tokyo Night", "OLED Black")
+                palettes.forEach { name ->
                     FilterChip(
-                        selected = false,
-                        onClick = { onSelectPreset(palette) },
-                        label = { Text(palette, style = MaterialTheme.typography.labelSmall) },
+                        selected = currentPalette.equals(name, ignoreCase = true),
+                        onClick = { onSelectPreset(name) },
+                        label = { Text(name, style = MaterialTheme.typography.labelSmall) },
                     )
                 }
             }
