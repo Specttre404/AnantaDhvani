@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
@@ -55,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextMotion
@@ -69,6 +71,7 @@ import com.lastwave.app.playback.MusicPlayerState
 import com.lastwave.app.playback.PlaybackProgressState
 import com.lastwave.app.ui.common.ExpressiveInlineLoadingIndicator
 import com.lastwave.app.ui.common.ExpressiveMotion
+import com.lastwave.app.ui.player.chords.ChordDiagramSheet
 import com.lastwave.app.ui.theme.LiquidGlassSurface
 import com.lastwave.app.ui.theme.LocalLiquidGlass
 import com.lastwave.app.ui.theme.liquidGlassChrome
@@ -87,6 +90,46 @@ import kotlinx.coroutines.isActive
 private val noteNames = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 private val noteNamesFlat = arrayOf("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B")
 private val chordRegex = Regex("""^(?:[A-G][#b]?(?:m|maj|min|dim|aug|sus[24]?|[5-9]|11|13)?(?:/[A-G][#b]?)?\s*)+$""")
+
+private data class RubySegment(
+    val text: String,
+    val furigana: String? = null,
+)
+
+private fun parseRubyText(input: String): List<RubySegment> {
+    val segments = mutableListOf<RubySegment>()
+    val str = input.replace(Regex("""<ruby>([^<]+)<rt>([^<]+)</rt></ruby>""")) {
+        "[${it.groupValues[1]}|${it.groupValues[2]}]"
+    }
+
+    val bracketRegex = Regex("""\[([^|\]]+)\|([^\]]+)\]|\[([^\]]+)\]""")
+    var lastIdx = 0
+    bracketRegex.findAll(str).forEach { match ->
+        if (match.range.first > lastIdx) {
+            segments.add(RubySegment(str.substring(lastIdx, match.range.first)))
+        }
+        val group1 = match.groupValues[1]
+        val group2 = match.groupValues[2]
+        val group3 = match.groupValues[3]
+
+        if (group1.isNotEmpty() && group2.isNotEmpty()) {
+            segments.add(RubySegment(group1, group2))
+        } else if (group3.isNotEmpty()) {
+            val parts = group3.split("|", limit = 2)
+            if (parts.size == 2) {
+                segments.add(RubySegment(parts[0], parts[1]))
+            } else {
+                segments.add(RubySegment(group3))
+            }
+        }
+        lastIdx = match.range.last + 1
+    }
+    if (lastIdx < str.length) {
+        segments.add(RubySegment(str.substring(lastIdx)))
+    }
+
+    return segments
+}
 
 private fun transposeChordToken(chord: String, semitones: Int): String {
     if (semitones == 0) return chord
@@ -149,6 +192,8 @@ fun ModernLyricsPanel(
     var basePositionMs by remember(track.videoId) { mutableLongStateOf(progress.positionMs) }
     var lastSyncTime by remember(track.videoId) { mutableLongStateOf(SystemClock.elapsedRealtime()) }
     var capoSemitones by remember { mutableIntStateOf(0) }
+    var showFurigana by remember { mutableStateOf(true) }
+    var activeChordForDiagram by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(progress.positionMs, state.isPlaying) {
         basePositionMs = progress.positionMs
@@ -181,6 +226,13 @@ fun ModernLyricsPanel(
             artistName = track.artist,
             artworkUrl = track.artworkUrl,
             onDismiss = { showLyricCardSheet = false },
+        )
+    }
+
+    if (activeChordForDiagram != null) {
+        ChordDiagramSheet(
+            chordName = activeChordForDiagram!!,
+            onDismiss = { activeChordForDiagram = null },
         )
     }
 
@@ -324,23 +376,21 @@ fun ModernLyricsPanel(
                                         }
                                     }
 
-                                    if (onTogglePhonetic != null) {
-                                        Spacer(Modifier.width(6.dp))
-                                        Surface(
-                                            onClick = onTogglePhonetic,
-                                            shape = CircleShape,
-                                            color = if (showPhonetic) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
-                                            contentColor = if (showPhonetic) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        ) {
-                                            Text(
-                                                text = "Phonetic",
-                                                style = MaterialTheme.typography.labelSmall.copy(
-                                                    letterSpacing = 0.5.sp,
-                                                    fontWeight = if (showPhonetic) FontWeight.Bold else FontWeight.Medium,
-                                                ),
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                                            )
-                                        }
+                                    Spacer(Modifier.width(6.dp))
+                                    Surface(
+                                        onClick = { showFurigana = !showFurigana },
+                                        shape = CircleShape,
+                                        color = if (showFurigana) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        contentColor = if (showFurigana) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    ) {
+                                        Text(
+                                            text = "Furigana",
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                letterSpacing = 0.5.sp,
+                                                fontWeight = if (showFurigana) FontWeight.Bold else FontWeight.Medium,
+                                            ),
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                        )
                                     }
 
                                     Spacer(Modifier.width(6.dp))
@@ -407,6 +457,8 @@ fun ModernLyricsPanel(
                         ModernPlainLyricsView(
                             plainLyrics = targetState.plainLyrics,
                             capoSemitones = capoSemitones,
+                            showFurigana = showFurigana,
+                            onSelectChord = { activeChordForDiagram = it },
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
@@ -531,9 +583,55 @@ private fun List<LyricLine>.toSyncedLyrics(
 }
 
 @Composable
+private fun FuriganaRubyText(
+    text: String,
+    showFurigana: Boolean,
+    modifier: Modifier = Modifier,
+    baseTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+) {
+    if (!showFurigana || (!text.contains("|") && !text.contains("<ruby>"))) {
+        val cleanText = text.replace(Regex("""\[([^|\]]+)\|?([^\]]*)\]"""), "$1")
+        Text(cleanText, style = baseTextStyle, modifier = modifier)
+        return
+    }
+
+    val segments = remember(text) { parseRubyText(text) }
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        segments.forEach { seg ->
+            if (seg.furigana != null && showFurigana) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = seg.furigana,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = seg.text,
+                        style = baseTextStyle,
+                    )
+                }
+            } else {
+                Text(
+                    text = seg.text,
+                    style = baseTextStyle,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ModernPlainLyricsView(
     plainLyrics: String,
     capoSemitones: Int = 0,
+    showFurigana: Boolean = true,
+    onSelectChord: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isRtl = remember(plainLyrics) { isRtlText(plainLyrics) }
@@ -568,26 +666,40 @@ private fun ModernPlainLyricsView(
                 val trimmed = lineText.trim()
                 if (trimmed.isNotEmpty() && chordRegex.matches(trimmed)) {
                     val transposed = transposeChordLine(trimmed, capoSemitones)
-                    Text(
-                        text = transposed,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.5.sp,
-                        ),
-                        color = MaterialTheme.colorScheme.secondary,
+                    val tokens = transposed.split(Regex("""\s+""")).filter { it.isNotBlank() }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
-                    )
+                    ) {
+                        for (token in tokens) {
+                            Surface(
+                                onClick = { onSelectChord(token) },
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.85f),
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ) {
+                                Text(
+                                    text = token,
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 1.5.sp,
+                                    ),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                )
+                            }
+                        }
+                    }
                 } else {
-                    Text(
+                    FuriganaRubyText(
                         text = lineText,
-                        style = MaterialTheme.typography.bodyLarge.copy(
+                        showFurigana = showFurigana,
+                        baseTextStyle = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 19.sp,
                             lineHeight = 32.sp,
                             fontWeight = FontWeight.Medium,
                             letterSpacing = 0.1.sp,
                         ),
-                        textAlign = TextAlign.Start,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.94f),
                         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                     )
                 }

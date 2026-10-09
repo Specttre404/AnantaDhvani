@@ -278,6 +278,8 @@ data class MiscSettings(
     /** Oreo-style saturated notification & screen-off power guard. */
     val oreoNotificationsEnabled: Boolean = false,
     val screenOffBatterySaver: Boolean = true,
+    /** Windows Phone Metro-style panoramic interface. */
+    val metroHubEnabled: Boolean = false,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -426,6 +428,7 @@ class SettingsPreferences @Inject constructor(
         val CUSTOM_EXCLUDED_FOLDERS = stringSetPreferencesKey("lw_custom_excluded_folders")
         val OREO_NOTIFICATIONS_ENABLED = booleanPreferencesKey("lw_oreo_notifications_enabled")
         val SCREEN_OFF_BATTERY_SAVER = booleanPreferencesKey("lw_screen_off_battery_saver")
+        val METRO_HUB_ENABLED = booleanPreferencesKey("lw_metro_hub_enabled")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -510,6 +513,7 @@ class SettingsPreferences @Inject constructor(
                 customExcludedFolders = p.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet(),
                 oreoNotificationsEnabled = p.readSafely(Keys.OREO_NOTIFICATIONS_ENABLED) ?: false,
                 screenOffBatterySaver = p.readSafely(Keys.SCREEN_OFF_BATTERY_SAVER) ?: true,
+                metroHubEnabled = p.readSafely(Keys.METRO_HUB_ENABLED) ?: false,
             )
         }
 
@@ -884,6 +888,10 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setScreenOffBatterySaver(enabled: Boolean) {
         dataStore.edit { it[Keys.SCREEN_OFF_BATTERY_SAVER] = enabled }
+    }
+
+    suspend fun setMetroHubEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.METRO_HUB_ENABLED] = enabled }
     }
 
     private companion object {

@@ -1,5 +1,7 @@
 package com.lastwave.app.ui.home
 
+import com.lastwave.app.ui.metro.MetroPanoramicHub
+
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.animation.core.LinearEasing
@@ -152,6 +154,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val misc by viewModel.miscSettings.collectAsStateWithLifecycle(initialValue = com.lastwave.app.data.local.MiscSettings())
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(viewModel) {
@@ -180,6 +183,18 @@ fun HomeScreen(
             }
         },
     ) { scaffoldPadding ->
+        if (misc.metroHubEnabled) {
+            val musicPlayer = com.lastwave.app.ui.player.LocalMusicPlayer.current
+            MetroPanoramicHub(
+                musicPlayer = musicPlayer,
+                onOpenSettings = onOpenSettings,
+                onOpenPlaylists = onOpenDiscover,
+                onOpenDownloads = onOpenSettings,
+                modifier = Modifier.fillMaxSize().padding(scaffoldPadding),
+            )
+            return@Scaffold
+        }
+
         if (uiState.isLoading) {
             Box(
                 Modifier.fillMaxSize().padding(scaffoldPadding).safeHorizontalContentPadding(),

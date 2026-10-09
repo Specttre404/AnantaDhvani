@@ -2932,6 +2932,49 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             label = { Text("3D Orbital Sphere", style = MaterialTheme.typography.labelSmall) },
         )
 
+        val keyResult = remember(state.current?.title, state.current?.artist) {
+            val title = state.current?.title ?: "Unknown"
+            val artist = state.current?.artist ?: "Unknown"
+            com.lastwave.app.playback.analysis.HarmonicKeyAnalyzer.getInstance().analyzeTrackKey(title, artist)
+        }
+        var showCamelotSheet by remember { mutableStateOf(false) }
+
+        FilterChip(
+            selected = showCamelotSheet,
+            onClick = { showCamelotSheet = true },
+            label = { Text("${keyResult.camelotKey} • ${keyResult.bpm} BPM", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        if (showCamelotSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showCamelotSheet = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    Text("Camelot Wheel DJ Mix Key", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text("Current Track: ${keyResult.camelotKey} (${keyResult.musicalKey}) @ ${keyResult.bpm} BPM", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    Text("Harmonically Compatible Transition Keys:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        keyResult.compatibleCamelotKeys.forEach { key ->
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ) {
+                                Text(key, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp))
+                            }
+                        }
+                    }
+
+                    Text("• Same Code (${keyResult.camelotKey}): Perfect energy match\n• +1 / -1: Smooth energy shift (+1 boost, -1 drop)\n• Swap A/B: Relative Major/Minor harmonic shift", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+
         if (showSpatialPuckDialog) {
             AlertDialog(
                 onDismissRequest = { showSpatialPuckDialog = false },

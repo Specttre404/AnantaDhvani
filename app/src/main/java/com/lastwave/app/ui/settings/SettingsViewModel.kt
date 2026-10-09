@@ -1106,4 +1106,8 @@ class SettingsViewModel @Inject constructor(
     fun setScreenOffBatterySaver(enabled: Boolean) = launchSettingsAction("update power saver") {
         settingsPreferences.setScreenOffBatterySaver(enabled)
     }
+
+    fun setMetroHubEnabled(enabled: Boolean) = launchSettingsAction("update metro hub") {
+        settingsPreferences.setMetroHubEnabled(enabled)
+    }
 }

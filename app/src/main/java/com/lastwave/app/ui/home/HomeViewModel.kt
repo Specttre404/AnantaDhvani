@@ -212,6 +212,7 @@ class HomeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    val miscSettings = settingsPreferences.settings
     private val _listenElapsedSeconds = MutableStateFlow(0)
     val listenElapsedSeconds: StateFlow<Int> = _listenElapsedSeconds.asStateFlow()
 

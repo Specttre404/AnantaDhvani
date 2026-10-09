@@ -882,8 +882,10 @@ fun SettingsScreen(
                     SystemIntegrationLockscreenCard(
                         oreoNotificationsEnabled = misc.oreoNotificationsEnabled,
                         screenOffBatterySaver = misc.screenOffBatterySaver,
+                        metroHubEnabled = misc.metroHubEnabled,
                         onOreoToggle = viewModel::setOreoNotificationsEnabled,
                         onBatterySaverToggle = viewModel::setScreenOffBatterySaver,
+                        onMetroHubToggle = viewModel::setMetroHubEnabled,
                     )
                     StreamBufferTuningCard(
                         minBufferMs = misc.minBufferMs,
@@ -3568,8 +3570,10 @@ private fun NavigationBarTabsCard(
 private fun SystemIntegrationLockscreenCard(
     oreoNotificationsEnabled: Boolean,
     screenOffBatterySaver: Boolean,
+    metroHubEnabled: Boolean,
     onOreoToggle: (Boolean) -> Unit,
     onBatterySaverToggle: (Boolean) -> Unit,
+    onMetroHubToggle: (Boolean) -> Unit,
 ) {
     Card(
         shape = CardOuterShape,
@@ -3584,6 +3588,18 @@ private fun SystemIntegrationLockscreenCard(
                     Text("System Integration & Lockscreen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text("Notification styling, power guard & Quick Settings tiles", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text("Metro Panoramic Hub Interface", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Windows Phone Metro-style large typographic horizontal home screen", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = metroHubEnabled, onCheckedChange = onMetroHubToggle)
             }
 
             Row(
