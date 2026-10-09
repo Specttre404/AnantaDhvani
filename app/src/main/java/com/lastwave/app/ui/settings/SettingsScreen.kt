@@ -941,9 +941,6 @@ fun SettingsScreen(
                         onConcurrencyChange = viewModel::setDownloadConcurrency,
                         onWifiOnlyChange = viewModel::setDownloadWifiOnly,
                     )
-                    LocalWebRemoteCard(
-                        musicPlayer = playerViewModel.player,
-                    )
                     LibraryFoldersAndExclusionCard(
                         settings = misc,
                         onAddScanFolder = viewModel::addCustomScanFolder,
@@ -965,22 +962,6 @@ fun SettingsScreen(
                     )
                     AudiophileThemePaletteCard(
                         onSelectPreset = viewModel::setAudiophilePalette,
-                    )
-                    IncognitoModeCard(
-                        enabled = misc.isIncognitoMode,
-                        onToggle = viewModel::setIncognitoMode,
-                    )
-                    InnerTubeSpoofingCard(
-                        currentClient = misc.innerTubeClientName,
-                        onSelectClient = viewModel::setInnerTubeClientName,
-                    )
-                    DohAndProxyCard(
-                        dohProvider = misc.dohProviderName,
-                        onSelectDoh = viewModel::setDohProviderName,
-                    )
-                    WebDavBackupCard(
-                        onBackup = { webDavMode = "backup"; showWebDavDialog = true },
-                        onRestore = { webDavMode = "restore"; showWebDavDialog = true },
                     )
                 }
             }
@@ -3652,74 +3633,6 @@ private fun SystemIntegrationLockscreenCard(
     }
 }
 
-@Composable
-private fun LocalWebRemoteCard(
-    musicPlayer: com.lastwave.app.playback.MusicPlayer,
-) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val webServer = remember { LocalMediaWebServer.getInstance(context, musicPlayer) }
-    var isServerRunning by remember { mutableStateOf(webServer.isRunning) }
-    val serverUrl = remember(isServerRunning) { webServer.getLocalServerUrl() }
-
-    Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Wifi, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Local Web Remote & Streaming Server", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Control & stream live audio on PC browser via local Wi-Fi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(
-                    checked = isServerRunning,
-                    onCheckedChange = { checked ->
-                        if (checked) {
-                            isServerRunning = webServer.startServer()
-                        } else {
-                            webServer.stopServer()
-                            isServerRunning = false
-                        }
-                    },
-                )
-            }
-
-            if (isServerRunning) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(
-                            text = serverUrl,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                        OutlinedButton(
-                            onClick = {
-                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-                                val clip = android.content.ClipData.newPlainText("Ananta Web Remote", serverUrl)
-                                clipboard?.setPrimaryClip(clip)
-                                android.widget.Toast.makeText(context, "Copied $serverUrl", android.widget.Toast.LENGTH_SHORT).show()
-                            },
-                        ) {
-                            Text("Copy Link")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LibraryFoldersAndExclusionCard(
@@ -3939,99 +3852,6 @@ private fun ConvolutionIrCard(
     }
 }
 
-@Composable
-private fun IncognitoModeCard(
-    enabled: Boolean,
-    onToggle: (Boolean) -> Unit,
-) {
-    Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Filled.Visibility, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Text("Incognito Listening Session", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("Pause history logging, taste signals & scrobblers", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Switch(checked = enabled, onCheckedChange = onToggle)
-        }
-    }
-}
-
-@Composable
-private fun InnerTubeSpoofingCard(
-    currentClient: String,
-    onSelectClient: (String) -> Unit,
-) {
-    Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column {
-                    Text("InnerTube Client Spoofing", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Bypass geographic blocks & throttling", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            val clients = listOf("Android VR", "Web Remix", "iOS", "Testsuite")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                clients.forEach { client ->
-                    val isSelected = client.equals(currentClient, ignoreCase = true)
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { onSelectClient(client) },
-                        label = { Text(client, style = MaterialTheme.typography.labelSmall) },
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DohAndProxyCard(
-    dohProvider: String,
-    onSelectDoh: (String) -> Unit,
-) {
-    Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column {
-                    Text("DNS-over-HTTPS (DoH)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Encrypted DNS resolvers for privacy", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            val providers = listOf("System", "Cloudflare", "Quad9", "AdGuard")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                providers.forEach { provider ->
-                    val isSelected = provider.equals(dohProvider, ignoreCase = true)
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { onSelectDoh(provider) },
-                        label = { Text(provider, style = MaterialTheme.typography.labelSmall) },
-                    )
-                }
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AudiophileThemePaletteCard(
@@ -4064,37 +3884,6 @@ private fun AudiophileThemePaletteCard(
                         onClick = { onSelectPreset(name) },
                         label = { Text(name, style = MaterialTheme.typography.labelSmall) },
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WebDavBackupCard(
-    onBackup: () -> Unit,
-    onRestore: () -> Unit,
-) {
-    Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.CloudSync, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column {
-                    Text("Encrypted WebDAV Sync", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("AES-256 cloud database backup & restore", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = onBackup, modifier = Modifier.weight(1f)) {
-                    Text("Backup to Cloud")
-                }
-                OutlinedButton(onClick = onRestore, modifier = Modifier.weight(1f)) {
-                    Text("Restore")
                 }
             }
         }
@@ -4469,28 +4258,31 @@ private fun AboutCard(versionName: String) {
             Spacer(Modifier.height(14.dp))
 
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(20.dp),
                 color = MaterialTheme.colorScheme.surfaceContainerLow,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                tonalElevation = 1.dp,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp),
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = "Ananta Dhvani",
+                        text = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
                         text = "Version $versionName • Audiophile Edition",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     Text(
                         text = "Crafted with passion by Ishan",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,
                     )

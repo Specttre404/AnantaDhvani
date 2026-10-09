@@ -418,36 +418,6 @@ fun FeedScreen(
                     }
                     }
 
-                    item(key = "archive_org_concerts") {
-                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                            Text("Archive.org Live Concerts", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Text("Soundboard recordings from the Live Music Archive", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(Modifier.height(8.dp))
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                val sampleConcerts = listOf(
-                                    "Grateful Dead - Cornell '77" to "gd77-05-08",
-                                    "Smashing Pumpkins - 1993" to "sp1993-10-26",
-                                    "Jack Johnson - 2008 Live" to "jj2008-08-24"
-                                )
-                                items(sampleConcerts) { (title, _) ->
-                                    Surface(
-                                        shape = RoundedCornerShape(14.dp),
-                                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                        onClick = { onOpenSearch() },
-                                        modifier = Modifier.width(180.dp).padding(vertical = 4.dp),
-                                    ) {
-                                        Column(Modifier.padding(12.dp)) {
-                                            Icon(Icons.Filled.Album, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                                            Spacer(Modifier.height(6.dp))
-                                            Text(title, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                                            Text("Archive.org LMA", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                     if (isSectionVisible(HomeSection.FRESH_FINDS) && (activeFilter == FeedCategoryFilter.ALL || activeFilter == FeedCategoryFilter.QUICK_PICKS) && state.feedData.freshFinds.isNotEmpty()) {
                         item(key = "fresh_finds") {
                             FeedSectionHeader(

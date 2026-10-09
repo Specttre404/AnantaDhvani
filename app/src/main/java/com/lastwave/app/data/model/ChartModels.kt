@@ -1,8 +1,8 @@
 package com.lastwave.app.data.model
 
 enum class ChartScope(val id: String, val formValue: String, val glValue: String, val label: String) {
-    GLOBAL("global", "ZZ", "US", "Global"),
-    INDIA("IN", "IN", "IN", "India");
+    GLOBAL("global", "ZZ", "US", "Top 10 - Global"),
+    INDIA("IN", "IN", "IN", "Top 10 - India");
 
     companion object {
         fun fromId(id: String?): ChartScope =

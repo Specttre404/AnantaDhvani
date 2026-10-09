@@ -148,12 +148,13 @@ fun DynamicIslandCapsule(
 
     val insets = WindowInsets.displayCutout
     val density = LocalDensity.current
-    val topInset = with(density) { insets.asPaddingValues().calculateTopPadding() }
+    val cutoutTop = with(density) { insets.asPaddingValues().calculateTopPadding() }
+    val topPadding = if (cutoutTop > 0.dp) cutoutTop else 6.dp
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = if (topInset > 0.dp) topInset - 4.dp else 8.dp),
+            .padding(top = topPadding),
         contentAlignment = Alignment.TopCenter,
     ) {
         Surface(

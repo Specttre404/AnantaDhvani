@@ -2911,8 +2911,6 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val isSlowed = state.speed == 0.85f
-        val isLofi = state.speed == 0.92f
         val context = LocalContext.current
         var bassHapticsEnabled by remember { mutableStateOf(false) }
         FilterChip(
@@ -2923,46 +2921,6 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 driver.enabled = bassHapticsEnabled
             },
             label = { Text("Bass Haptics", style = MaterialTheme.typography.labelSmall) },
-        )
-        var karaokeEnabled by remember { mutableStateOf(false) }
-        FilterChip(
-            selected = karaokeEnabled,
-            onClick = {
-                karaokeEnabled = !karaokeEnabled
-                player.setVocalRemover(karaokeEnabled, 0.85f)
-            },
-            label = { Text("Karaoke / Vocal Cut", style = MaterialTheme.typography.labelSmall) },
-        )
-        var automixActive by remember { mutableStateOf(false) }
-        FilterChip(
-            selected = automixActive,
-            onClick = {
-                automixActive = !automixActive
-                val engine = com.lastwave.app.playback.automix.AutomixEngine.getInstance(
-                    context,
-                    player,
-                    com.lastwave.app.playback.analysis.HarmonicKeyAnalyzer.getInstance()
-                )
-                engine.automixActive = automixActive
-            },
-            label = { Text(if (automixActive) "Automix (8-Bar)" else "Automix Off", style = MaterialTheme.typography.labelSmall) },
-        )
-        var spatialActive by remember { mutableStateOf(false) }
-        var showSpatialPuckDialog by remember { mutableStateOf(false) }
-        FilterChip(
-            selected = spatialActive,
-            onClick = {
-                spatialActive = !spatialActive
-                player.setSpatialAudio(spatialActive, 0.6f, 0.5f, 18.0f, 1.3f)
-                if (spatialActive) showSpatialPuckDialog = true
-            },
-            label = { Text("3D Spatial", style = MaterialTheme.typography.labelSmall) },
-        )
-        var showOrbitalSphere by remember { mutableStateOf(false) }
-        FilterChip(
-            selected = showOrbitalSphere,
-            onClick = { showOrbitalSphere = !showOrbitalSphere },
-            label = { Text("3D Orbital Sphere", style = MaterialTheme.typography.labelSmall) },
         )
 
         val keyResult = remember(state.current?.title, state.current?.artist) {
@@ -2976,6 +2934,21 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             selected = showCamelotSheet,
             onClick = { showCamelotSheet = true },
             label = { Text("${keyResult.camelotKey} • ${keyResult.bpm} BPM", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        val keyLockOn by player.keyLockEnabled.collectAsStateWithLifecycle()
+        var pitchSemitones by remember { mutableFloatStateOf(0f) }
+        var showPitchDialog by remember { mutableStateOf(false) }
+
+        FilterChip(
+            selected = pitchSemitones != 0f || keyLockOn,
+            onClick = { showPitchDialog = true },
+            label = {
+                Text(
+                    if (pitchSemitones == 0f) "Pitch: 0st" else "Pitch: ${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)}st",
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            },
         )
 
         if (showCamelotSheet) {
@@ -3007,91 +2980,6 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 }
             }
         }
-
-        if (showSpatialPuckDialog) {
-            AlertDialog(
-                onDismissRequest = { showSpatialPuckDialog = false },
-                title = { Text("3D Spatial Audio Panning Puck") },
-                text = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("Drag puck to adjust azimuth width & room acoustic depth:", style = MaterialTheme.typography.bodySmall)
-                        SpatialPanningPuckView(
-                            currentHaasDelayMs = 18.0f,
-                            currentWidthRatio = 1.3f,
-                            onSpatialChanged = { haas, width ->
-                                player.setSpatialAudio(enabled = true, roomSize = 0.6f, damping = 0.5f, haasDelayMs = haas, widthRatio = width)
-                            },
-                        )
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showSpatialPuckDialog = false }) { Text("Done") }
-                },
-            )
-        }
-        var showListenTogetherSheet by remember { mutableStateOf(false) }
-        FilterChip(
-            selected = false,
-            onClick = { showListenTogetherSheet = true },
-            label = { Text("Listen Together", style = MaterialTheme.typography.labelSmall) },
-        )
-        if (showListenTogetherSheet) {
-            val ctx = LocalContext.current
-            ModalBottomSheet(
-                onDismissRequest = { showListenTogetherSheet = false },
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text("Listen Together (P2P Room)", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text("Synchronize live playback with nearby devices on local Wi-Fi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = {
-                                android.widget.Toast.makeText(ctx, "P2P Room Host Started (PIN: 4040)", android.widget.Toast.LENGTH_SHORT).show()
-                                showListenTogetherSheet = false
-                            },
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text("Host Room")
-                        }
-                        OutlinedButton(
-                            onClick = {
-                                android.widget.Toast.makeText(ctx, "Joined Local P2P Room", android.widget.Toast.LENGTH_SHORT).show()
-                                showListenTogetherSheet = false
-                            },
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text("Join Room")
-                        }
-                    }
-                }
-            }
-        }
-        FilterChip(
-            selected = isSlowed,
-            onClick = { player.setPlaybackSpeed(if (isSlowed) 1.0f else 0.85f) },
-            label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
-        )
-        val keyLockOn by player.keyLockEnabled.collectAsStateWithLifecycle()
-        var pitchSemitones by remember { mutableFloatStateOf(0f) }
-        var showPitchDialog by remember { mutableStateOf(false) }
-        FilterChip(
-            selected = pitchSemitones != 0f || keyLockOn,
-            onClick = { showPitchDialog = true },
-            label = {
-                Text(
-                    if (pitchSemitones == 0f) "Pitch: 0st" else "Pitch: ${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)}st",
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            },
-        )
         if (showPitchDialog) {
             AlertDialog(
                 onDismissRequest = { showPitchDialog = false },

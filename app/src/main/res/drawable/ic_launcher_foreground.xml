@@ -1,56 +1,13 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Specular Glass Ring -->
+    <!-- Minimalist continuous infinity soundwave loop -->
     <path
-        android:pathData="M 54,28 A 26,26 0 1,1 53.99,28 Z"
-        android:strokeWidth="2.5"
-        android:strokeColor="#40FFFFFF"
-        android:fillColor="#00000000" />
-
+        android:fillColor="#00E5FF"
+        android:pathData="M34,54 C34,44 44,40 54,54 C64,68 74,64 74,54 C74,44 64,40 54,54 C44,68 34,64 34,54 Z" />
     <path
-        android:pathData="M 54,28 A 26,26 0 0,1 78,44"
-        android:strokeWidth="3.5"
-        android:strokeLineCap="round">
-        <aapt:attr name="android:strokeColor">
-            <gradient
-                android:startX="54"
-                android:startY="28"
-                android:endX="78"
-                android:endY="44"
-                android:type="linear">
-                <item android:offset="0.0" android:color="#FFFFFFFF" />
-                <item android:offset="1.0" android:color="#00FFFFFF" />
-            </gradient>
-        </aapt:attr>
-    </path>
-
-    <!-- Refractive Resonance Prism Waveform -->
-    <path
-        android:pathData="M 24,54 C 30,54 34,36 42,36 C 50,36 53,72 61,72 C 69,72 72,42 79,42 C 82,42 84,54 88,54"
-        android:strokeWidth="6.5"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round">
-        <aapt:attr name="android:strokeColor">
-            <gradient
-                android:startX="24"
-                android:startY="36"
-                android:endX="88"
-                android:endY="72"
-                android:type="linear">
-                <item android:offset="0.0" android:color="#FF00E5FF" />
-                <item android:offset="0.5" android:color="#FF9D4EDD" />
-                <item android:offset="1.0" android:color="#FFFF007F" />
-            </gradient>
-        </aapt:attr>
-    </path>
-
-    <!-- Pulse Node -->
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M 61,72 m -3.5,0 a 3.5,3.5 0 1,0 7,0 a 3.5,3.5 0 1,0 -7,0" />
+        android:fillColor="#FFD700"
+        android:pathData="M52,44 h4 v20 h-4 z M44,48 h4 v12 h-4 z M60,48 h4 v12 h-4 z" />
 </vector>

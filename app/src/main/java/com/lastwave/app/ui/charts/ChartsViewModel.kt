@@ -63,7 +63,7 @@ class ChartsViewModel @Inject constructor(
                 is com.lastwave.app.data.model.ChartLoadResult.Success -> {
                     _uiState.update {
                         it.copy(
-                            entries = res.entries,
+                            entries = res.entries.take(10),
                             status = ChartStatus.SUCCESS,
                             error = null,
                         )
