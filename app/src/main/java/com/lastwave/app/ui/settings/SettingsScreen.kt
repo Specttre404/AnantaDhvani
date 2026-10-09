@@ -4446,10 +4446,10 @@ private fun AboutCard(versionName: String) {
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
         Column(
-            Modifier.fillMaxWidth().padding(vertical = 28.dp, horizontal = 20.dp),
+            Modifier.fillMaxWidth().padding(vertical = 24.dp, horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
@@ -4467,28 +4467,37 @@ private fun AboutCard(versionName: String) {
                 )
             }
             Spacer(Modifier.height(14.dp))
-            Text("Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(6.dp))
-            Text(
-                "Crafted with passion by Ishan",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.height(8.dp))
+
             Surface(
-                shape = ExpressivePillShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             ) {
-                Text(
-                    "Version $versionName",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "Ananta Dhvani",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "Version $versionName • Audiophile Edition",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "Crafted with passion by Ishan",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
             }
-            Spacer(Modifier.height(14.dp))
+
+            Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://x.com/Ishan____404"))
