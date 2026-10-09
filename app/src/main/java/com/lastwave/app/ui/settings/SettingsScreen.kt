@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -2635,6 +2636,7 @@ private fun ThemeModeSelectorCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .liquidGlassChrome(shape, liquidGlass),
     ) {
         Column(
@@ -2716,6 +2718,7 @@ private fun SettingsToggleCard(
         interactionSource = interactionSource,
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .scale(if (enabled) scale else 1f)
             .liquidGlassChrome(shape, liquidGlass),
     ) {
@@ -2923,6 +2926,7 @@ private fun SettingsActionCard(
         interactionSource = interactionSource,
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .scale(scale)
             .liquidGlassChrome(shape, liquidGlass),
     ) {
@@ -3057,7 +3061,7 @@ private fun LastFmIntegrationCard(
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth().animateContentSize(),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight().animateContentSize(),
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(
