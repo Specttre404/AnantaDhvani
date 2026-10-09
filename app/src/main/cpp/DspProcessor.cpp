@@ -609,6 +609,13 @@ void DspProcessor::setCrossfeed(bool enabled, float levelDb, float cutoffHz) noe
     crossfeed_.configure(sampleRate_, cutoffHz, levelDb);
 }
 
+void DspProcessor::setCrossfeedPreset(int presetId) noexcept {
+    if (presetId >= 0 && presetId <= 2) {
+        crossfeed_.setPreset(presetId, sampleRate_);
+        targetCrossfeedEnabled_.store(true, std::memory_order_release);
+    }
+}
+
 void DspProcessor::setSpatialAudio(
     bool enabled,
     float roomSize,

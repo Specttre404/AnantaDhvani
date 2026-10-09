@@ -419,6 +419,11 @@ void AudioEngine::setSpatialAudio(bool enabled, float roomSize, float damping, f
     mediaDsp_.setSpatialAudio(enabled, roomSize, damping, haasDelayMs, widthRatio);
 }
 
+void AudioEngine::setCrossfeedPreset(int presetId) noexcept {
+    oboeDsp_.setCrossfeedPreset(presetId);
+    mediaDsp_.setCrossfeedPreset(presetId);
+}
+
 void AudioEngine::setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept {
     oboeDsp_.setBitcrusher(enabled, bits, downsampleFactor);
     mediaDsp_.setBitcrusher(enabled, bits, downsampleFactor);

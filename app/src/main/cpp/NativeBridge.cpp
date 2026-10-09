@@ -218,6 +218,17 @@ Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetCrossfeed(
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetCrossfeedPreset(
+    JNIEnv*,
+    jobject,
+    jlong handle,
+    jint presetId) {
+    if (auto* engine = fromHandle(handle); engine != nullptr) {
+        engine->setCrossfeedPreset(presetId);
+    }
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_lastwave_app_playback_NativeAudioEngine_nativeSetEqualizerQ(
     JNIEnv*,
     jobject,

@@ -2072,6 +2072,13 @@ private fun FullPlayer(
                                                     isPlaying = state.isPlaying,
                                                 )
 
+                                                if (isVinylMode) {
+                                                    com.lastwave.app.ui.player.vinyl.TurntablePlatterView(
+                                                        musicPlayer = player,
+                                                        modifier = Modifier.fillMaxSize(),
+                                                    )
+                                                }
+
                                                 androidx.compose.animation.AnimatedVisibility(
                                                     visible = seekOverlayDirection == SeekDirection.REWIND,
                                                     enter = fadeIn(tween(100)) + scaleIn(ExpressiveMotion.spatialSpring(), initialScale = 0.88f),
@@ -2913,6 +2920,20 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 player.setVocalRemover(karaokeEnabled, 0.85f)
             },
             label = { Text("Karaoke / Vocal Cut", style = MaterialTheme.typography.labelSmall) },
+        )
+        var automixActive by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = automixActive,
+            onClick = {
+                automixActive = !automixActive
+                val engine = com.lastwave.app.playback.automix.AutomixEngine.getInstance(
+                    context,
+                    player,
+                    com.lastwave.app.playback.analysis.HarmonicKeyAnalyzer.getInstance()
+                )
+                engine.automixActive = automixActive
+            },
+            label = { Text(if (automixActive) "Automix (8-Bar)" else "Automix Off", style = MaterialTheme.typography.labelSmall) },
         )
         var spatialActive by remember { mutableStateOf(false) }
         var showSpatialPuckDialog by remember { mutableStateOf(false) }

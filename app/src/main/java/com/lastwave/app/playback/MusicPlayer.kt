@@ -2086,6 +2086,10 @@ class MusicPlayer @Inject constructor(
         runCatching { nativeAudioEngine.get().setVocalRemover(enabled, strength) }
     }
 
+    fun setCrossfeedPreset(presetId: Int) {
+        runCatching { nativeAudioEngine.get().setCrossfeedPreset(presetId) }
+    }
+
     fun setPlaybackPitch(semitones: Float) = onMain {
         val factor = Math.pow(2.0, (semitones.coerceIn(-12f, 12f) / 12.0).toDouble()).toFloat()
         if (playerDelegate.isInitialized()) {

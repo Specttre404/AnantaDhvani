@@ -336,6 +336,10 @@ class NativeAudioEngine @Inject constructor(
         withHandle(Unit) { nativeSetVocalRemover(it, enabled, strength) }
     }
 
+    fun setCrossfeedPreset(presetId: Int) {
+        withHandle(Unit) { nativeSetCrossfeedPreset(it, presetId) }
+    }
+
     private external fun nativeCreate(): Long
     private external fun nativeDestroy(handle: Long)
     private external fun nativeStart(handle: Long, preferredOutputSampleRate: Int): Boolean
@@ -349,6 +353,7 @@ class NativeAudioEngine @Inject constructor(
     private external fun nativeIsBitPerfect(handle: Long): Boolean
     private external fun nativeSetEqualizer(handle: Long, enabled: Boolean, preampDb: Float, gainsDb: FloatArray)
     private external fun nativeSetCrossfeed(handle: Long, enabled: Boolean, levelDb: Float, cutoffHz: Float)
+    private external fun nativeSetCrossfeedPreset(handle: Long, presetId: Int)
     private external fun nativeSetEqualizerQ(handle: Long, filterQ: Float)
     private external fun nativeSetSpatialAudio(handle: Long, enabled: Boolean, roomSize: Float, damping: Float, haasDelayMs: Float, widthRatio: Float)
     private external fun nativeSetBitcrusher(handle: Long, enabled: Boolean, bits: Int, downsampleFactor: Int)

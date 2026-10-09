@@ -1110,4 +1110,16 @@ class SettingsViewModel @Inject constructor(
     fun setMetroHubEnabled(enabled: Boolean) = launchSettingsAction("update metro hub") {
         settingsPreferences.setMetroHubEnabled(enabled)
     }
+
+    fun setCrossfeedPreset(preset: String) = launchSettingsAction("update crossfeed preset") {
+        settingsPreferences.setCrossfeedPreset(preset)
+    }
+
+    fun setAutomixEnabled(enabled: Boolean) = launchSettingsAction("update automix") {
+        settingsPreferences.setAutomixEnabled(enabled)
+    }
+
+    fun setAutomixPhraseBars(bars: Int) = launchSettingsAction("update automix phrase bars") {
+        settingsPreferences.setAutomixPhraseBars(bars)
+    }
 }

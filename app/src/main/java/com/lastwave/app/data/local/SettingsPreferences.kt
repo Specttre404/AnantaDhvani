@@ -280,6 +280,11 @@ data class MiscSettings(
     val screenOffBatterySaver: Boolean = true,
     /** Windows Phone Metro-style panoramic interface. */
     val metroHubEnabled: Boolean = false,
+    /** Bauer BS2B crossfeed preset ("bauer_default", "chu_moy", "jan_meier", "custom"). */
+    val crossfeedPreset: String = "bauer_default",
+    /** Beat Wave Phrase-Aligned DJ Automix. */
+    val automixEnabled: Boolean = false,
+    val automixPhraseBars: Int = 8,
 ) {
     val cellularQuality: Int get() = cellularStreamingQuality
     val wifiQuality: Int get() = wifiStreamingQuality
@@ -429,6 +434,9 @@ class SettingsPreferences @Inject constructor(
         val OREO_NOTIFICATIONS_ENABLED = booleanPreferencesKey("lw_oreo_notifications_enabled")
         val SCREEN_OFF_BATTERY_SAVER = booleanPreferencesKey("lw_screen_off_battery_saver")
         val METRO_HUB_ENABLED = booleanPreferencesKey("lw_metro_hub_enabled")
+        val CROSSFEED_PRESET = stringPreferencesKey("lw_crossfeed_preset")
+        val AUTOMIX_ENABLED = booleanPreferencesKey("lw_automix_enabled")
+        val AUTOMIX_PHRASE_BARS = intPreferencesKey("lw_automix_phrase_bars")
     }
 
     val settings: Flow<MiscSettings> = dataStore.data
@@ -514,6 +522,9 @@ class SettingsPreferences @Inject constructor(
                 oreoNotificationsEnabled = p.readSafely(Keys.OREO_NOTIFICATIONS_ENABLED) ?: false,
                 screenOffBatterySaver = p.readSafely(Keys.SCREEN_OFF_BATTERY_SAVER) ?: true,
                 metroHubEnabled = p.readSafely(Keys.METRO_HUB_ENABLED) ?: false,
+                crossfeedPreset = p.readSafely(Keys.CROSSFEED_PRESET) ?: "bauer_default",
+                automixEnabled = p.readSafely(Keys.AUTOMIX_ENABLED) ?: false,
+                automixPhraseBars = (p.readSafely(Keys.AUTOMIX_PHRASE_BARS) ?: 8).coerceIn(4, 16),
             )
         }
 
@@ -892,6 +903,18 @@ class SettingsPreferences @Inject constructor(
 
     suspend fun setMetroHubEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.METRO_HUB_ENABLED] = enabled }
+    }
+
+    suspend fun setCrossfeedPreset(preset: String) {
+        dataStore.edit { it[Keys.CROSSFEED_PRESET] = preset }
+    }
+
+    suspend fun setAutomixEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.AUTOMIX_ENABLED] = enabled }
+    }
+
+    suspend fun setAutomixPhraseBars(bars: Int) {
+        dataStore.edit { it[Keys.AUTOMIX_PHRASE_BARS] = bars.coerceIn(4, 16) }
     }
 
     private companion object {

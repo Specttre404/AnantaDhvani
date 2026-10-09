@@ -26,6 +26,7 @@ public:
         const float* gainsDb,
         std::size_t gainCount) noexcept;
     void setCrossfeed(bool enabled, float levelDb, float cutoffHz) noexcept;
+    void setCrossfeedPreset(int presetId) noexcept;
     void setEqualizerQ(float q) noexcept;
     void setSpatialAudio(bool enabled, float roomSize, float damping, float haasDelayMs, float widthRatio) noexcept;
     void setBitcrusher(bool enabled, int bits, int downsampleFactor) noexcept;
@@ -106,6 +107,15 @@ private:
         std::array<double, 2> previousInput{};
 
         void configure(double sampleRate, double cutoffHz, double levelDb) noexcept;
+
+        inline void setPreset(int presetId, double sampleRate) noexcept {
+            switch (presetId) {
+                case 0: configure(sampleRate, 700.0, 4.5); break; // BAUER_DEFAULT
+                case 1: configure(sampleRate, 700.0, 6.0); break; // CHU_MOY
+                case 2: configure(sampleRate, 650.0, 9.5); break; // JAN_MEIER
+                default: break;
+            }
+        }
 
         inline void process(float& left, float& right) noexcept {
             const double inputLeft = left;
