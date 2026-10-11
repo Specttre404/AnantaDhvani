@@ -4101,13 +4101,13 @@ private fun AboutCard(versionName: String) {
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = "Version $versionName • Pure Audiophile Edition",
+                        text = "Version $versionName • Pure Audiophile Workstation",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Crafted with passion by Ishan",
+                        text = "Handcrafted with acoustic precision by Ishan",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,
