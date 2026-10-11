@@ -2191,143 +2191,35 @@ private fun FullPlayer(
 
                                     // 2. Track Information & Actions Row (No Card)
                                     Row(
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
                                         verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                            Column(Modifier.weight(1f)) {
-                                                Text(
-                                                    track.title,
-                                                    style = MaterialTheme.typography.headlineSmall.copy(
-                                                        letterSpacing = (-0.35).sp,
-                                                        fontWeight = FontWeight.Bold,
-                                                    ),
-                                                    color = MaterialTheme.colorScheme.onSurface,
-                                                    maxLines = 1,
-                                                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
-                                                )
-                                                Spacer(Modifier.height(4.dp))
-                                                val splitArtists = remember(track.artist) {
-                                                    com.lastwave.app.util.ArtistHelper.splitArtists(track.artist)
-                                                }
-                                                FlowRow(
-                                                    horizontalArrangement = Arrangement.spacedBy(0.dp),
-                                                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                ) {
-                                                    splitArtists.forEachIndexed { index, artName ->
-                                                        Text(
-                                                            text = artName,
-                                                            style = MaterialTheme.typography.bodyMedium.copy(
-                                                                fontWeight = FontWeight.Medium,
-                                                            ),
-                                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.94f),
-                                                            modifier = Modifier
-                                                                .clickable(
-                                                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                                                    indication = null,
-                                                                ) { onOpenArtist(artName) },
-                                                        )
-                                                        if (index < splitArtists.lastIndex) {
-                                                            Text(
-                                                                text = ", ",
-                                                                style = MaterialTheme.typography.bodyMedium,
-                                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.60f),
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                                Spacer(Modifier.height(6.dp))
-                                                Surface(
-                                                    shape = CircleShape,
-                                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.60f),
-                                                ) {
-                                                    Text(
-                                                        text = "LOSSLESS • HIGH FIDELITY",
-                                                        style = MaterialTheme.typography.labelSmall,
-                                                        fontWeight = FontWeight.Bold,
-                                                        color = MaterialTheme.colorScheme.primary,
-                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                                    )
-                                                }
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = track.title,
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                maxLines = 1,
+                                                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                                            )
+                                            Spacer(Modifier.height(4.dp))
+                                            Text(
+                                                text = track.artist,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1
+                                            )
+                                        }
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                            IconButton(onClick = onToggleLiked) {
+                                                Icon(if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = "Favorite", tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
-
-                                            Spacer(Modifier.width(12.dp))
-
-                                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                                val likeInteraction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-                                                val isLikePressed by likeInteraction.collectIsPressedAsState()
-                                                val likeScale by animateFloatAsState(
-                                                    targetValue = if (isLikePressed) 0.78f else 1.0f,
-                                                    animationSpec = spring(
-                                                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                                                        stiffness = Spring.StiffnessMediumLow,
-                                                    ),
-                                                    label = "likeScale",
-                                                )
-                                                LiquidGlassSurface(
-                                                    glassModifier = Modifier.liquidGlassChrome(CircleShape, LocalLiquidGlass.current, LiquidGlassPreset.PlayerControls),
-                                                    onClick = onToggleLiked,
-                                                    interactionSource = likeInteraction,
-                                                    shape = CircleShape,
-                                                    color = liquidGlassContainerColor(if (isLiked) {
-                                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f)
-                                                    } else {
-                                                        MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)
-                                                    }),
-                                                    contentColor = if (isLiked) {
-                                                        MaterialTheme.colorScheme.onPrimaryContainer
-                                                    } else {
-                                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                                    },
-                                                    tonalElevation = 0.dp,
-                                                    shadowElevation = 0.dp,
-                                                    modifier = Modifier
-                                                        .size(46.dp)
-                                                        .graphicsLayer {
-                                                            scaleX = likeScale
-                                                            scaleY = likeScale
-                                                        },
-                                                ) {
-                                                    Box(contentAlignment = Alignment.Center) {
-                                                        Icon(
-                                                            if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                                            contentDescription = if (isLiked) "Unlike song" else "Like song",
-                                                            modifier = Modifier.size(24.dp),
-                                                        )
-                                                    }
-                                                }
-                                                val lyricsInteraction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-                                                val isLyricsPressed by lyricsInteraction.collectIsPressedAsState()
-                                                val lyricsScale by animateFloatAsState(
-                                                    targetValue = if (isLyricsPressed) 0.82f else 1.0f,
-                                                    animationSpec = ExpressiveMotion.spatialSpring(),
-                                                    label = "lyricsScale",
-                                                )
-                                                LiquidGlassSurface(
-                                                    glassModifier = Modifier.liquidGlassChrome(CircleShape, LocalLiquidGlass.current, LiquidGlassPreset.PlayerControls),
-                                                    onClick = { onTabChange(FullPlayerTab.LYRICS) },
-                                                    interactionSource = lyricsInteraction,
-                                                    shape = CircleShape,
-                                                    color = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
-                                                    contentColor = MaterialTheme.colorScheme.primary,
-                                                    tonalElevation = 0.dp,
-                                                    shadowElevation = 0.dp,
-                                                    modifier = Modifier
-                                                        .size(46.dp)
-                                                        .graphicsLayer {
-                                                            scaleX = lyricsScale
-                                                            scaleY = lyricsScale
-                                                        },
-                                                ) {
-                                                    Box(contentAlignment = Alignment.Center) {
-                                                        Icon(
-                                                            Icons.Filled.FormatQuote,
-                                                            contentDescription = "Show lyrics",
-                                                            modifier = Modifier.size(24.dp),
-                                                        )
-                                                    }
-                                                }
+                                            IconButton(onClick = { onTabChange(FullPlayerTab.LYRICS) }) {
+                                                Icon(Icons.Filled.FormatQuote, contentDescription = "Lyrics", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
                                         }
+                                    }
 
                                     Spacer(Modifier.height(12.dp))
 
