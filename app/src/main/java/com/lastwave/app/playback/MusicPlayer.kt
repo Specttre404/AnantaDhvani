@@ -2092,6 +2092,10 @@ class MusicPlayer @Inject constructor(
         runCatching { nativeAudioEngine.get().setBitcrusher(enabled, bits, downsampleFactor) }
     }
 
+    fun setDolbyVirtualizer(enabled: Boolean, strength: Int = 800) {
+        runCatching { nativeAudioEngine.get().setSpatialAudio(enabled, roomSize = 0.8f, damping = 0.3f, haasDelayMs = 24.0f, widthRatio = 1.8f) }
+    }
+
     fun setPlaybackPitch(semitones: Float) = onMain {
         val factor = Math.pow(2.0, (semitones.coerceIn(-12f, 12f) / 12.0).toDouble()).toFloat()
         if (playerDelegate.isInitialized()) {

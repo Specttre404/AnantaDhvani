@@ -398,7 +398,7 @@ fun SettingsScreen(
         ) {
         ExpressiveHeader(title = stringResource(R.string.settings), onBack = onBack)
 
-        val categoryTitles = listOf("Everyday", "Audio & Engine", "Integrations", "Personalization", "Diagnostics")
+        val categoryTitles = listOf("Everyday", "Audio & Engine", "Personalization", "Diagnostics")
         val pagerState = rememberPagerState(pageCount = { categoryTitles.size })
         val scope = rememberCoroutineScope()
 
@@ -433,7 +433,7 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxSize(),
         ) { page ->
             when (page) {
-                4 -> {
+                3 -> {
                     DiagnosticsScreen(
                         player = playerViewModel.player,
                         modifier = Modifier.fillMaxSize(),
@@ -3362,7 +3362,7 @@ private fun NavigationBarTabsCard(
                     Text("Toggle visibility of bottom navigation bar items", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            val allTabs = listOf("feed" to "Feed", "discover" to "Discover", "playlists" to "Playlists", "stats" to "Stats")
+            val allTabs = listOf("feed" to "Feed", "discover" to "Discover", "playlists" to "Playlists")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 allTabs.forEach { (id, label) ->
                     val isVisible = id in visibleTabs
@@ -4095,19 +4095,19 @@ private fun AboutCard(versionName: String) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = "Ananta Dhvani",
+                        text = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = "Version $versionName • Pure Audiophile Edition",
+                        text = "Version $versionName • Pure Audiophile Workstation",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Crafted with passion by Ishan",
+                        text = "Handcrafted with acoustic precision by Ishan",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,

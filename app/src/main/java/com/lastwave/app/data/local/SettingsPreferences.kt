@@ -268,7 +268,7 @@ data class MiscSettings(
     val mutedTrackIds: Set<String> = emptySet(),
     val blockedArtists: Set<String> = emptySet(),
     /** Visible bottom navigation bar tabs. */
-    val visibleNavTabs: Set<String> = setOf("feed", "discover", "playlists", "stats"),
+    val visibleNavTabs: Set<String> = setOf("feed", "discover", "playlists"),
     /** Parallel download concurrency and network constraint. */
     val downloadConcurrency: Int = 2,
     val downloadWifiOnly: Boolean = false,
@@ -514,7 +514,7 @@ class SettingsPreferences @Inject constructor(
                 lyricsInactiveBlurRadius = (p.readSafely(Keys.LYRICS_INACTIVE_BLUR_RADIUS) ?: 3).coerceIn(0, 8),
                 mutedTrackIds = p.readSafely(Keys.MUTED_TRACK_IDS) ?: emptySet(),
                 blockedArtists = p.readSafely(Keys.BLOCKED_ARTISTS) ?: emptySet(),
-                visibleNavTabs = p.readSafely(Keys.VISIBLE_NAV_TABS) ?: setOf("feed", "discover", "playlists", "stats"),
+                visibleNavTabs = p.readSafely(Keys.VISIBLE_NAV_TABS) ?: setOf("feed", "discover", "playlists"),
                 downloadConcurrency = (p.readSafely(Keys.DOWNLOAD_CONCURRENCY) ?: 2).coerceIn(1, 5),
                 downloadWifiOnly = p.readSafely(Keys.DOWNLOAD_WIFI_ONLY) ?: false,
                 customScanFolders = p.readSafely(Keys.CUSTOM_SCAN_FOLDERS) ?: emptySet(),

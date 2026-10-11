@@ -39,7 +39,7 @@ object PlaylistNamer {
         "Summit", "Valley", "Wildfire", "Monsoon", "Frost", "Ember", "Bloom", "Thicket",
         "Harbor", "Lagoon", "Prairie", "Oasis",
         // mythology
-        "Phoenix", "Oracle", "Siren", "Valkyrie", "Elysium", "Odyssey", "Atlas", "Titan",
+        "Phoenix", "Oracle", "Siren", "Valkyrie", "Elysium", "Odyssey", "Atlas",
         "Muse", "Chimera",
         // emotion / abstract
         "Echo", "Echoes", "Mirage", "Dreams", "Reverie", "Pulse", "Drift", "Wanderlust",

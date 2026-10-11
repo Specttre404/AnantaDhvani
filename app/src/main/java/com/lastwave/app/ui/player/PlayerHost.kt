@@ -2983,6 +2983,16 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
         )
 
+        var dolbyActive by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = dolbyActive,
+            onClick = {
+                dolbyActive = !dolbyActive
+                player.setDolbyVirtualizer(dolbyActive, 800)
+            },
+            label = { Text("Dolby Surround", style = MaterialTheme.typography.labelSmall) },
+        )
+
         if (showCamelotSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showCamelotSheet = false },
