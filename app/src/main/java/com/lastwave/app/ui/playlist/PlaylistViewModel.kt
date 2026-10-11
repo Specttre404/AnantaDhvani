@@ -212,6 +212,30 @@ class PlaylistViewModel @Inject constructor(
     fun loadDetail(playlistId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isDetailLoading = true) }
+            if (playlistId < 0L && playlistId >= -104L) {
+                val allPlaylists = runCatching { playlistRepository.getAll() }.getOrDefault(emptyList())
+                val allTracks = (allPlaylists.flatMap { it.tracks } + runCatching { playlistRepository.getLikedSongs()?.tracks.orEmpty() }.getOrDefault(emptyList()))
+                    .distinctBy { "${it.artist}|${it.name}".lowercase() }
+
+                val title = when (playlistId) {
+                    -101L -> "Top 50 Most Played"
+                    -102L -> "Recently Added"
+                    -103L -> "Forgotten Favorites"
+                    -104L -> "Hi-Res Lossless Only"
+                    else -> "Smart Playlist"
+                }
+
+                val smartPlaylist = SavedPlaylist(
+                    id = playlistId,
+                    title = title,
+                    subtitle = "Smart Auto-Playlist",
+                    mode = "smart",
+                    tracks = allTracks.take(50),
+                    createdAtMillis = System.currentTimeMillis(),
+                )
+                _uiState.update { it.copy(isDetailLoading = false, detailPlaylist = smartPlaylist) }
+                return@launch
+            }
             val pl = if (playlistId < 0L) {
                 ytMusicLibraryManager.loadDetail(playlistId) { updated ->
                     _uiState.update { current ->

@@ -2088,11 +2088,21 @@ class MusicPlayer @Inject constructor(
         runCatching { nativeAudioEngine.get().setCrossfeedPreset(presetId) }
     }
 
+    fun setSlowedReverb(enabled: Boolean) {
+        if (enabled) {
+            setPlaybackSpeed(0.85f)
+            runCatching { nativeAudioEngine.get().setSpatialAudio(true, roomSize = 0.75f, damping = 0.4f, haasDelayMs = 22.0f, widthRatio = 1.4f) }
+        } else {
+            setPlaybackSpeed(1.0f)
+            runCatching { nativeAudioEngine.get().setSpatialAudio(false, 0f, 0f, 0f, 1f) }
+        }
+    }
+
     fun setBitcrusher(enabled: Boolean, bits: Int = 10, downsampleFactor: Int = 4) {
         runCatching { nativeAudioEngine.get().setBitcrusher(enabled, bits, downsampleFactor) }
     }
 
-    fun setDolbyVirtualizer(enabled: Boolean, strength: Int = 800) {
+    fun setSurroundVirtualizer(enabled: Boolean, strength: Int = 800) {
         runCatching { nativeAudioEngine.get().setSpatialAudio(enabled, roomSize = 0.8f, damping = 0.3f, haasDelayMs = 24.0f, widthRatio = 1.8f) }
     }
 

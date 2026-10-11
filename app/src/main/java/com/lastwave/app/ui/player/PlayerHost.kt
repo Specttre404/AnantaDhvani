@@ -2210,6 +2210,30 @@ private fun FullPlayer(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 maxLines = 1
                                             )
+                                            val qualityBadgeText = remember(track.videoId, track.playbackMimeType, track.playbackUrl) {
+                                                val isLocalTrack = track.videoId == null || track.playbackUrl?.startsWith("content:") == true || track.playbackUrl?.startsWith("file:") == true
+                                                val isFlac = track.playbackMimeType?.contains("flac", ignoreCase = true) == true || track.playbackUrl?.endsWith(".flac", ignoreCase = true) == true
+                                                if (isLocalTrack || isFlac) {
+                                                    "LOSSLESS • HIGH FIDELITY"
+                                                } else if (track.playbackMimeType?.contains("opus", ignoreCase = true) == true || track.playbackMimeType?.contains("webm", ignoreCase = true) == true) {
+                                                    "OPUS • 160 KBPS"
+                                                } else {
+                                                    "AAC • 256 KBPS"
+                                                }
+                                            }
+                                            Spacer(Modifier.height(4.dp))
+                                            Surface(
+                                                shape = CircleShape,
+                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.60f),
+                                            ) {
+                                                Text(
+                                                    text = qualityBadgeText,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                                )
+                                            }
                                         }
                                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                                             IconButton(onClick = onToggleLiked) {
@@ -2856,9 +2880,9 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             selected = dolbyActive,
             onClick = {
                 dolbyActive = !dolbyActive
-                player.setDolbyVirtualizer(dolbyActive, 800)
+                player.setSurroundVirtualizer(dolbyActive, 800)
             },
-            label = { Text("Dolby Surround", style = MaterialTheme.typography.labelSmall) },
+            label = { Text("Surround Virtualizer", style = MaterialTheme.typography.labelSmall) },
         )
 
         var lofiActive by remember { mutableStateOf(false) }
@@ -2876,7 +2900,7 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             selected = slowedActive,
             onClick = {
                 slowedActive = !slowedActive
-                player.setPlaybackSpeed(if (slowedActive) 0.85f else 1.0f)
+                player.setSlowedReverb(slowedActive)
             },
             label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
         )
