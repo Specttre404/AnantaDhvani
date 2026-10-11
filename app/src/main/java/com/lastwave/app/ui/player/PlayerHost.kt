@@ -2189,16 +2189,11 @@ private fun FullPlayer(
 
                                     Spacer(Modifier.height(8.dp))
 
-                                    // 2. Track Information Card
-                                    Surface(
-                                        shape = RoundedCornerShape(24.dp),
-                                        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.70f),
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                                    // 2. Track Information & Actions Row (No Card)
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                        ) {
                                             Column(Modifier.weight(1f)) {
                                                 Text(
                                                     track.title,
@@ -2333,7 +2328,6 @@ private fun FullPlayer(
                                                 }
                                             }
                                         }
-                                    }
 
                                     Spacer(Modifier.height(12.dp))
 

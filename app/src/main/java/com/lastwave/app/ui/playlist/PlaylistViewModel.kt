@@ -263,8 +263,14 @@ class PlaylistViewModel @Inject constructor(
         }
     }
 
-    private fun sortPlaylists(playlists: List<SavedPlaylist>, mode: PlaylistSortMode): List<SavedPlaylist> =
-        playlists.sortedWith(
+    private fun sortPlaylists(playlists: List<SavedPlaylist>, mode: PlaylistSortMode): List<SavedPlaylist> {
+        val filtered = playlists.filterNot { pl ->
+            pl.title.equals("Titan", ignoreCase = true) ||
+            pl.title.contains("Titan", ignoreCase = true) ||
+            pl.title.contains("Episodes for Later", ignoreCase = true) ||
+            pl.title.contains("Podcast", ignoreCase = true)
+        }
+        return filtered.sortedWith(
             when (mode) {
                 PlaylistSortMode.DATE_DESC -> compareByDescending<SavedPlaylist> { it.mode == LIKED_SONGS_MODE && it.isPinned }
                     .thenByDescending { it.isPinned }
@@ -278,8 +284,9 @@ class PlaylistViewModel @Inject constructor(
                 PlaylistSortMode.TRACK_COUNT -> compareByDescending<SavedPlaylist> { it.mode == LIKED_SONGS_MODE && it.isPinned }
                     .thenByDescending { it.isPinned }
                     .thenByDescending { it.remoteTrackCount ?: it.tracks.size }
-            },
+            }
         )
+    }
 
     fun regenerateLatest() {
         val newest = _uiState.value.playlists.maxByOrNull { it.createdAtMillis } ?: return

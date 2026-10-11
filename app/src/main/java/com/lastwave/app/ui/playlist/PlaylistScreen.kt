@@ -226,6 +226,15 @@ fun PlaylistScreen(
                 },
             )
 
+            val visiblePlaylists = remember(state.playlists) {
+                state.playlists.filterNot { pl ->
+                    pl.title.equals("Titan", ignoreCase = true) ||
+                    pl.title.contains("Titan", ignoreCase = true) ||
+                    pl.title.contains("Episodes for Later", ignoreCase = true) ||
+                    pl.title.contains("Podcast", ignoreCase = true)
+                }
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -299,13 +308,13 @@ fun PlaylistScreen(
                             }
                         }
 
-                        itemsIndexed(state.playlists, key = { index, playlist -> "${playlist.id}_$index" }) { index, playlist ->
+                        itemsIndexed(visiblePlaylists, key = { index, playlist -> "${playlist.id}_$index" }) { index, playlist ->
                             val isNewest = playlist.id == state.newestId
                             Box(Modifier.animateItem()) {
                                 PlaylistCard(
                                     playlist = playlist,
                                     isNewest = isNewest,
-                                    position = com.lastwave.app.ui.common.groupPositionFor(index, state.playlists.size),
+                                    position = com.lastwave.app.ui.common.groupPositionFor(index, visiblePlaylists.size),
                                     isRegenerating = state.regeneratingId == playlist.id,
                                     currentTrack = playbackState.current,
                                     isPlaying = playbackState.isPlaying,
