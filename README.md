@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="app/src/main/res/drawable/ic_launcher_foreground.xml" width="130" height="130" alt="Ananta Dhvani Icon" />
+<img src=".github/assets/logo.svg" width="128" height="128" alt="Ananta Dhvani Icon" />
 
 # ANANTA DHVANI
 ### अनन्त-ध्वनि • অনন্ত ধ্বনি
