@@ -1,20 +1,36 @@
 <div align="center">
 
-<img src=".github/assets/logo.svg" width="128" height="128" alt="Ananta Dhvani Icon" />
+<br/>
 
-# ANANTA DHVANI
+<img src=".github/assets/logo.svg" width="130" height="130" alt="Ananta Dhvani Logo" />
+
+# Ananta Dhvani
 ### अनन्त-ध्वनि • অনন্ত ধ্বনি
-**Pure Audiophile Music Workstation for Android**
+**The Pure Audiophile Workstation for Android**
 
-[![Platform](https://img.shields.io/badge/Platform-Android_8.0+_(API_26+)-00E5FF?style=for-the-badge&logo=android&logoColor=0A0C10)](#)
-[![Audio Core](https://img.shields.io/badge/Audio_Core-Native_C++20_Oboe_AAudio-FFD700?style=for-the-badge&logo=cplusplus&logoColor=0A0C10)](#)
-[![Version](https://img.shields.io/badge/Release-v1.6.0_Pure_Audiophile-7F52FF?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-GPL_v3.0-3DDC84?style=for-the-badge)](#)
-[![VirusTotal](https://img.shields.io/badge/VirusTotal-100%25_Clean_(0%2F72)-00E5FF?style=for-the-badge&logo=virustotal&logoColor=0A0C10)](#virustotal-assurance--security)
+<p align="center">
+  <img src="https://img.shields.io/badge/Audio_Core-C++20_Oboe_/_AAudio-00E5FF?style=for-the-badge&logo=cplusplus&logoColor=0A0C10" alt="Audio Core" />
+  <img src="https://img.shields.io/badge/DSP-31--Band_PEQ_•_BS2B-FFD700?style=for-the-badge&logoColor=0A0C10" alt="DSP" />
+  <img src="https://img.shields.io/badge/Signal-Bit--Perfect_FLAC-7F52FF?style=for-the-badge" alt="Bit Perfect" />
+  <img src="https://img.shields.io/badge/Interface-Liquid_Glass_M3-3DDC84?style=for-the-badge&logo=android&logoColor=0A0C10" alt="Material 3" />
+  <img src="https://img.shields.io/badge/VirusTotal-100%25_Clean_(0/72)-00E5FF?style=for-the-badge&logo=virustotal&logoColor=0A0C10" alt="VirusTotal" />
+</p>
 
-*“Music in its purest state is not content to be consumed; it is an acoustic continuum to be experienced without compromise.”*
+<p align="center">
+  <b>Bit-Perfect Fidelity</b> • <b>Zero Telemetry</b> • <b>Anti-Podcast Architecture</b>
+</p>
 
-[Key Features](#-features-matrix) • [Architecture](#-architectural-blueprint) • [Philosophy](#-philosophy--the-anti-podcast-manifesto) • [Inspiration Pantheon](#-inspiration-pantheon--credits) • [Changelog](#-evolution-v130--v160) • [Installation](#-installation--downloads)
+> <i>"Music in its purest state is not content to be consumed; it is an acoustic continuum to be experienced without compromise."</i>
+
+---
+
+### 🎛️ Acoustic Architecture at a Glance
+
+| Precision Engine | Hardware Direct Link | Musician Suite | Soundstage Expansion |
+| :---: | :---: | :---: | :---: |
+| **31-Band Parametric EQ**<br/><sub>$Q \in [0.10, 10.00]$ • $\pm 12\text{ dB}$</sub> | **Dual-Clock Locking**<br/><sub>$44.1\text{k} / 48\text{k}$ Resample Isolation</sub> | **BitChord & BeatWave**<br/><sub>SVG Chords • Camelot Keys</sub> | **Bauer BS2B & 3D Spatial**<br/><sub>Calibrated Binaural Presets</sub> |
+
+---
 
 </div>
 
