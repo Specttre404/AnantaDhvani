@@ -2197,9 +2197,9 @@ private fun FullPlayer(
                                             Column(Modifier.weight(1f)) {
                                                 Text(
                                                     track.title,
-                                                    style = MaterialTheme.typography.titleLarge.copy(
+                                                    style = MaterialTheme.typography.headlineSmall.copy(
                                                         letterSpacing = (-0.35).sp,
-                                                        fontWeight = FontWeight.ExtraBold,
+                                                        fontWeight = FontWeight.Bold,
                                                     ),
                                                     color = MaterialTheme.colorScheme.onSurface,
                                                     maxLines = 1,
