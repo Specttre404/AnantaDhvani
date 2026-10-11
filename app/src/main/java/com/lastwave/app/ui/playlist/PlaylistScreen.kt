@@ -226,20 +226,20 @@ fun PlaylistScreen(
                 },
             )
 
-            val visiblePlaylists = remember(state.playlists) {
-                state.playlists.filterNot { pl ->
-                    pl.title.equals("Titan", ignoreCase = true) ||
-                    pl.title.contains("Titan", ignoreCase = true) ||
-                    pl.title.contains("Episodes for Later", ignoreCase = true) ||
-                    pl.title.contains("Podcast", ignoreCase = true)
-                }
-            }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
             ) {
+                val visiblePlaylists = remember(state.playlists) {
+                    state.playlists.filterNot { pl ->
+                        pl.title.equals("Titan", ignoreCase = true) ||
+                        pl.title.contains("Titan", ignoreCase = true) ||
+                        pl.title.contains("Episodes for Later", ignoreCase = true) ||
+                        pl.title.contains("Podcast", ignoreCase = true)
+                    }
+                }
+
                 when {
                     state.isLoading && state.playlists.isEmpty() && !state.isGenerating -> LoadingState()
                     state.playlists.isEmpty() && !state.isGenerating -> EmptyState()
