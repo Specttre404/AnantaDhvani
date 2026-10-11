@@ -4095,7 +4095,7 @@ private fun AboutCard(versionName: String) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = "Ananta Dhvani",
+                        text = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
