@@ -123,9 +123,14 @@ class PlaylistViewModel @Inject constructor(
                 val openRemoteId = _uiState.value.detailPlaylist
                     ?.takeIf { it.isYouTubeOnly }
                     ?.id
+                val filteredRemote = remote.filterNot { pl ->
+                    pl.title.contains("Titan", true) ||
+                    pl.title.contains("Episodes for Later", true) ||
+                    pl.title.contains("Podcast", true)
+                }
                 _uiState.update { current ->
                     val local = current.playlists.filterNot { it.isYouTubeOnly }
-                    current.copy(playlists = sortPlaylists(local + remote, current.sortMode))
+                    current.copy(playlists = sortPlaylists(local + filteredRemote, current.sortMode))
                 }
                 if (openRemoteId != null && remote.any { it.id == openRemoteId }) {
                     ytMusicLibraryManager.loadDetail(openRemoteId)?.let { refreshed ->
