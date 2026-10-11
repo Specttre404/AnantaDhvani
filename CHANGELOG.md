@@ -1,199 +1,56 @@
 # Changelog
 
-## Unreleased
+All notable changes to Ananta Dhvani will be documented in this file.
 
-### Author: musaibbhat120605
-**Date:** September 16, 2026
+## [1.6.0] - 2026-10-11
 
-###Musaib Bhat will step down as the developer of LastWave on 16 September 2026. His contributions have been invaluable, and his work will always remain a cornerstone for our community.
+### Pure Audiophile Edition Release
 
 #### Added
-- **SongPlayStatsEntity + SongPlayStatsDao** — local per-track listening stats (total play time, skip count, play count, last played).
-- **SongPlayStatsRepository** — records listened time and skips.
-- **LocalTasteSuggestionEngine** — local, Last.fm-free recommendation engine (ported scoring model: play time, skip penalty, liked bonus, recency, time-of-day), seeded via existing `InnerTubeMusicApi.fetchRelatedSongs`.
-- **Room migration 12 → 13** — creates `song_play_stats` table without wiping existing data.
+- **31-Band Parametric EQ**: Precision biquad filters with adjustable Q-factor (0.1–10.0) and ±12 dB gain per band.
+- **Bauer BS2B Headphone Crossfeed Presets**: Calibrated acoustic room simulation profiles (*Bauer Default*, *Chu Moy*, *Jan Meier*).
+- **Calibrated AutoEQ Profiles**: Added Harman Target headphone curves for **boAt Airdopes 131 Pro** and **Roseselsa - Aurora**.
+- **Studio Sound FX Suite**: Restored 3D Spatial Audio, Dolby Virtualizer, Lo-Fi Tape Machine (bitcrusher), and Slowed + Reverb.
+- **BeatWave Harmonic Key Engine**: Real-time Chroma feature extraction mapping tracks to 24 Camelot Wheel key codes (`1A`–`12B`) with harmonic transition recommendations.
+- **Phrase-Aligned DJ Automix**: Downbeat-aligned energy crossfading over 4, 8, or 16 bars with dynamic tempo matching.
+- **Interactive Vinyl Scratch Mode**: Touch-interactive turntable platter overlay enabling real-time scratching, backspins, and motor brake spin-up recovery.
+- **BitChord Interactive Chord Sheets**: Displays 6-String Guitar Fretboards and 12-Key Piano Keyboards on chord token taps.
+- **Japanese Furigana & Ruby Lyrics Annotations**: Renders Kanji readings in 10sp text directly above Kanji characters with toggle support.
+- **Metro Panoramic Hub**: Alternative Windows Phone Metro-inspired horizontal scrolling interface.
+- **Android 16/17 Expressive Notifications**: Material You dynamic palette matching with interactive seekbar scrub progress in notification shade.
+- **Safe Room Statistics Fallback**: Zero-plays onboarding state "Your Listening Journey Begins Here" preventing null crashes.
 
-#### Changed
-- **MusicPlayer.kt** — hooks `onMediaItemTransition` to record listened duration and detect skips (non-AUTO transition + <85% played).
-- **AppDatabase.kt / DatabaseModule.kt** — registers the new entity/DAO, bumps DB version, adds migration.
-- **FeedScreen.kt** — redesigned `QuickTilesGrid`/`QuickTileCard` (Liked Songs / Mix / New Releases): equal-width scrollable cards with per-type gradient icons, replacing the old grid-chunked layout that left an orphaned half-row.
+#### Changed / Fixed
+- **Player Layout Overhaul**: Prominent 300dp artwork stage with shadow elevation, marquee track titles, centered transport controls, and streamlined utility chips.
+- **Charts Section Fix**: Capped chart feeds strictly to Top 10 tracks ("Top 10 - Global" & "Top 10 - India") and removed segmented selector pills.
+- **Search Bar Polish**: Removed duplicate audio recognition mic buttons, retaining single Voice Search Mic and Acoustic Song Identification.
+- **Settings Layout Spacing**: Moved `StreamCodecCard` into "Audio & Engine" tab, removing empty void panels.
+- **Audiophile Theme Palettes**: Replaced horizontal scroll clipping box with auto-wrapping `FlowRow`.
+- **App Launcher Icons**: Updated adaptive icons to clean dark background (`#0A0C10`) with cyan/gold infinity soundwave foreground across dark and light mipmaps.
 
-#### Not yet wired
-- `LocalTasteSuggestionEngine.run()` isn't called from any screen yet — integration notes are in the file itself (Feed's discover section or as a Last.fm fallback in `GenerateRepository`).
+#### Removed (Bloat Pruning)
+- Scrapped Archive.org Live Concerts section.
+- Scrapped Local Web Remote (:8080) server.
+- Scrapped Discord Rich Presence (RPC).
+- Scrapped WebDAV Cloud Sync.
+- Scrapped DoH (DNS-over-HTTPS) provider selector.
+- Scrapped Incognito Mode.
+- Scrapped InnerTube Client Spoofing.
+- Scrapped Provider Modules (`.lwp`).
+- Scrapped Dynamic Island notch capsule.
 
-### Fixed
-- **Player state and cached track lost after leaving the app in the background with nothing playing.** (Fix by [@musaibbhat120605](https://github.com/musaibbhat120605))
+---
 
-  `MusicPlaybackService.onTaskRemoved()` unconditionally called
-  `musicPlayer.stopAndClear()` whenever the task left Recents — even when
-  nothing was playing. `stopAndClear()` wipes both the in-memory player
-  state and the persisted session in SharedPreferences
-  (`clearPersistedPlaybackSession()`), so the next launch had nothing to
-  restore: the player appeared closed and the last track wasn't cached,
-  regardless of battery-optimization settings.
-
-  Fixed by (1) skipping the stop entirely when something is actively
-  playing, so playback isn't killed just because the task left Recents,
-  and (2) giving `stopAndClear()` an optional `clearSession` parameter
-  (default `true`, unchanged for every other call site) so the
-  paused/idle case can stop the service without deleting the persisted
-  session — leaving it restorable on the next launch.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/playback/MusicPlaybackService.kt`,
-  `app/src/main/java/com/lastwave/app/playback/MusicPlayer.kt`
-
-- **Songs silently disappearing from the Home listing during background polling.** (Fix by [@musaibbhat120605](https://github.com/musaibbhat120605))
-
-  `HomeViewModel`'s 12-second background refresh loop merged newly
-  polled recent tracks with the existing in-memory history and then
-  truncated the **entire combined list** to `HOME_TRACK_HISTORY_CAP`
-  (500 entries). `loadNextPage()` (triggered by scrolling) appends
-  paginated tracks without any cap of its own — so once a user
-  scrolled far enough to load more than 500 tracks, the very next
-  background poll would silently drop everything past position 500,
-  including tracks the user had just scrolled into view seconds
-  earlier. This made songs appear to randomly vanish from the Home
-  listing with no user action to explain it.
-
-  Fixed by making the background poll's cap dynamic: it now only
-  bounds organic growth from polling (`max(HOME_TRACK_HISTORY_CAP,
-  currentListSize)`), so it can never truncate below what pagination
-  has already legitimately loaded into view.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/ui/home/HomeViewModel.kt`
-
-- **Duplicate/overlapping "now playing" notification on Android 10 (One UI 2.x).**
-  `buildNotification()` used `Notification.DecoratedMediaCustomViewStyle`
-  with a `MediaSession` attached, alongside a fully custom `RemoteViews`
-  player (own artwork, title, artist, transport buttons). On Android 10 +
-  Samsung One UI 2.x, SystemUI's older media-notification renderer drew
-  its own full media chrome as a second layer instead of just framing the
-  custom view, producing two overlapping players in the notification
-  shade/quick controls.
-
-  Now version-gated: Android 11+ keeps `DecoratedMediaCustomViewStyle`
-  with the session attached as before; Android 10 and below uses
-  `Notification.DecoratedCustomViewStyle` (no session tag on the
-  notification itself). Lock screen controls, Bluetooth, Android Auto,
-  and the in-app widget are unaffected, since they all read from
-  `mediaSession` directly rather than this notification's `Style` object.
+## [1.2.1] - 2026-09-16
 
 ### Added
-- **Offline playback priority across all screens (Fixes #31).**
-  `MusicPlayer.resolveTrackAudioStream()` now checks the local Room database (`DownloadedTrackDao`) and verifies file presence on disk before attempting remote network resolution (Lossless / YouTube Music / InnerTube). When a track has already been downloaded, LastWave plays the local media file directly without making network calls, enabling seamless offline playback across Home, Search, Playlists, Album, and Artist screens and saving cellular data when online.
+- **SongPlayStatsEntity + SongPlayStatsDao** — local per-track listening stats.
+- **SongPlayStatsRepository** — records listened time and skips.
+- **LocalTasteSuggestionEngine** — local recommendation engine.
 
-  Files changed:
-  `app/src/main/java/com/lastwave/app/playback/MusicPlayer.kt`
-
-- **Download state awareness and duplicate download prevention.**
-  - Added `DownloadedTrackDao.findByTrackKey` and deduplication checks in `TrackDownloadManager.downloadTrack` to prevent duplicate download jobs, redundant network requests, and duplicate files (e.g. `(1).flac`) in MediaStore.
-  - The 3-dot context menu sheet (`TrackContextMenuSheet`) now dynamically reflects the track's status (`Downloaded` with check icon, `Downloading…`, or `Download (Max Quality)`), giving instant visual feedback and preventing accidental re-downloads.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/data/local/db/DownloadedTrackDao.kt`
-  `app/src/main/java/com/lastwave/app/data/download/TrackDownloadManager.kt`
-  `app/src/main/java/com/lastwave/app/ui/common/TrackContextMenuSheet.kt`
-
-- **Direct navigation from download notifications to the Downloads screen.**
-  `TrackDownloadManager` now fires pending intents with `ACTION_VIEW_DOWNLOADS` targeting `DownloadsScreen` (`AppRoute.Downloads`). Integrated an `AppRouteNavigator` singleton and `AppRouteNavBridge` into `NavGraph` and `MainActivity` so tapping download notifications opens the Downloads screen directly instead of only bringing the app to the foreground.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/data/download/TrackDownloadManager.kt`
-  `app/src/main/java/com/lastwave/app/MainActivity.kt`
-  `app/src/main/java/com/lastwave/app/ui/navigation/AppRouteNavigator.kt`
-  `app/src/main/java/com/lastwave/app/ui/navigation/NavGraph.kt`
-
-## 2026-09-02 — musaibbhat120605
+### Changed
+- **MusicPlayer.kt** — hooks `onMediaItemTransition` to record listened duration and detect skips.
+- **FeedScreen.kt** — redesigned `QuickTilesGrid`/`QuickTileCard`.
 
 ### Fixed
-- **WebM/Opus downloads not showing metadata in external players/file managers.**
-  `AudioTagWriter.embedIntoWebm()` previously appended the `Tags`/`Attachments`
-  elements at the very end of the file, after all audio `Cluster` data. This
-  produced structurally valid EBML, but many players and file managers only
-  scan the header region of a WebM/Matroska file (stopping once they reach
-  audio data) instead of reading the whole file, so the tags were effectively
-  invisible outside the app.
-
-  Metadata is now spliced in right before the first `Cluster`, matching where
-  real muxers place it:
-  - Any existing `SeekHead` is dropped instead of left with stale offsets —
-    compliant readers fall back to a normal sequential scan when it's absent.
-  - Any existing `Tags`/`Attachments` elements are removed so duplicates
-    aren't left behind.
-  - The `Segment` size field is patched to match the new layout.
-  - If a `Cues` index is present (rare for YouTube's DASH audio, but possible
-    for other muxed sources), the old end-of-file append is used instead,
-    since rewriting `Cues` byte offsets safely is out of scope for this fix.
-
-  Files changed: `app/src/main/java/com/lastwave/app/data/download/AudioTagWriter.kt`
-
-### Fixed
-- **Home screen (Last.fm) lag / stutter.**
-  `HomeUiState.visibleRows()` (filters, day-groups, sorts, and dedupes the
-  full track history) was being recomputed inline inside a Compose
-  `remember` block, which runs on the UI thread. Last.fm's now-playing and
-  recent-tracks polling ticks every 12–30 seconds, so every time a track
-  scrobbled in, this fairly expensive rebuild ran right on the frame meant
-  to update the screen, causing a visible stutter tied directly to
-  scrobbling. On top of that, the "Recent" track list was never capped, so
-  it kept growing (and getting more expensive to rebuild) the longer Home
-  stayed open in a session.
-
-  - `HomeViewModel` now recomputes the row list on a background dispatcher
-    (`Dispatchers.Default`) and exposes it as its own `StateFlow`, so the UI
-    thread just collects a finished list instead of building it.
-  - The 30-second recent-tracks poll now caps the merged track history at
-    500 entries instead of growing it indefinitely.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/ui/home/HomeViewModel.kt`,
-  `app/src/main/java/com/lastwave/app/ui/home/HomeScreen.kt`
-
-### Fixed
-- **Downloaded tracks appearing twice in the Downloads list.**
-  `TrackDownloadManager.downloadTrack()` had no check against tracks that
-  were already downloaded — it only guarded against the *same* download
-  running twice concurrently (`activeKeys`), which is cleared as soon as a
-  download finishes. Re-downloading a track you already had correctly
-  overwrote the file on disk, but `downloadedTrackDao.insert()` always
-  created a brand-new row: `DownloadedTrackEntity.id` is an
-  autoincrement primary key with no other unique constraint, so
-  `OnConflictStrategy.REPLACE` never had anything to actually collide
-  with.
-
-  - Added a normalized `trackKey` column (`"${artist}_${title}"`,
-    lowercased/trimmed) with a **unique index**, so the database itself
-    can no longer hold two rows for the same track.
-  - Migration `10 → 11` backfills `trackKey` for existing rows, deletes
-    any duplicate rows already present (keeping the most recently
-    downloaded copy of each), then creates the unique index.
-  - `downloadTrack()` now checks the database first; if the track is
-    already downloaded and its file still exists, it skips re-downloading
-    entirely instead of re-fetching and duplicating. If the file was
-    removed outside the app, it falls through and re-downloads, and the
-    unique index makes that insert safely `REPLACE` the stale row instead
-    of duplicating it.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/data/local/db/DownloadedTrackEntity.kt`,
-  `app/src/main/java/com/lastwave/app/di/DatabaseModule.kt`,
-  `app/src/main/java/com/lastwave/app/data/download/TrackDownloadManager.kt`
-
-### Fixed
-- **Skipping to the next track did nothing when playing from Downloads.**
-  `DownloadsViewModel.playTrack()` started playback via `MusicPlayer.play()`,
-  which always builds a single-track queue (`listOf(track)`) regardless of
-  how many tracks are downloaded. So the moment you played anything from the
-  Downloads screen, the player's queue had exactly one item — there was
-  never a "next" track to advance to, so `next()` correctly found no
-  following item and silently did nothing.
-
-  `playTrack()` now builds the full queue from every currently downloaded
-  track (in the same order shown on screen), starting at the tapped
-  track's position, via `MusicPlayer.playQueue()` instead of `play()`.
-  Next/previous now move through the rest of your downloads normally.
-
-  Files changed:
-  `app/src/main/java/com/lastwave/app/ui/settings/DownloadsViewModel.kt`
+- **Player state and cached track lost after leaving the app in the background.**
