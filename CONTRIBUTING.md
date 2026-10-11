@@ -1,68 +1,56 @@
-# Contributing to LastWaveX
+# Contributing to Ananta Dhvani
 
-Thank you for your interest in contributing to **LastWaveX**. This document outlines the development workflow, coding standards, and submission guidelines.
-
----
-
-## Code of Conduct
-
-All contributors and community members are expected to adhere to our [Code of Conduct](CODE_OF_CONDUCT.md). Please report unacceptable behavior to maintainers.
+Thank you for your interest in contributing to Ananta Dhvani! We welcome contributions that align with our core focus: audiophile acoustic purism, musician-first utility, and clean Material 3 Expressive design.
 
 ---
 
-## Getting Started
+## 📜 Guiding Principles
 
-### Prerequisites
-* Android Studio Ladybug or newer (2024.2.1+)
-* JDK 17 (Temurin / Zulu recommended)
-* Android SDK (API 35) & NDK 26+
-* Git
+Before submitting a pull request, ensure your contribution respects our project rules:
+- **The Anti-Podcast Manifesto:** Do NOT submit pull requests adding podcasts, audiobooks, talk shows, spoken-word feeds, or social media integration.
+- **Audio Pipeline Integrity:** Any modification to `app/src/main/cpp/` or `MusicPlayer.kt` must preserve bit-perfect fidelity and must not introduce uncontrolled resampling.
+- **Zero Telemetry:** We do not accept PRs introducing tracking libraries, analytical crash reporters, or external cloud analytics.
 
-### Cloning the Repository
+---
+
+## 🛠️ Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Specttre404/AnantaDhvani.git
+   cd AnantaDhvani
+   ```
+2. **Open the project** in Android Studio Ladybug (2024.2+) or newer.
+3. **Ensure you have installed:**
+   - Android SDK Platform 35
+   - Android NDK 26.1.10909125 or newer
+   - CMake 3.22.1 or newer
+   - JDK 17
+
+---
+
+## 🧪 Testing & Verification
+
+Before pushing changes, all code must pass compilation and unit testing:
+
 ```bash
-git clone https://github.com/specttre404/LastWaveX.git
-cd LastWaveX
-```
+# Verify Kotlin compilation
+./gradlew app:compileDebugKotlin
 
----
-
-## Architecture Overview
-
-LastWaveX is built using clean architecture patterns and modern Android libraries:
-* **UI Layer:** Jetpack Compose, Material 3 Expressive, iOS LiquidGlass, Navigation Compose.
-* **Audio Engine:** AndroidX Media3 ExoPlayer, C++ Native Float32 DSP processing, `AudioEffectsEngine` (`LoudnessEnhancer`, Equalizer).
-* **Dependency Injection:** Dagger Hilt.
-* **Storage & Caching:** Room Database, DataStore Preferences.
-* **Networking:** Retrofit 2, OkHttp 4, Kotlinx Serialization.
-
----
-
-## Development Guidelines
-
-### Branching Strategy
-* `main` contains the latest stable development code.
-* Create feature or bugfix branches from `main` using descriptive names:
-  * `feat/your-feature-name`
-  * `fix/issue-description`
-
-### Code Style & Quality
-* Follow official Kotlin coding conventions and Android Architecture recommendations.
-* Keep composables focused and stateless where possible.
-* Ensure all native C++ code respects 16KB memory page alignment constraints for Android 15+.
-* Avoid embedding hardcoded API secrets or URLs directly in source files.
-
-### Testing
-Run local unit tests before opening a pull request:
-```bash
+# Run unit tests (must pass 24/24 tests)
 ./gradlew app:testDebugUnitTest
+
+# Assemble Release build
+./gradlew app:assembleRelease
 ```
 
 ---
 
-## Submitting a Pull Request
+## 🎨 Code Style
 
-1. Push your branch to your fork.
-2. Open a Pull Request against the `main` branch.
-3. Provide a concise summary of changes, problem analysis, and testing steps in the PR description.
-4. Ensure all 28 unit tests pass (`./gradlew app:testDebugUnitTest`).
-5. Address reviewer feedback promptly.
+- **Kotlin:** Follow official Kotlin coding conventions with Jetpack Compose best practices. Avoid unneeded re-compositions by using `@Stable` and `remember`.
+- **C++:** C++20 standard, formatted according to Google C++ Style Guide.
+
+---
+
+Handcrafted with acoustic precision by **Ishan**.

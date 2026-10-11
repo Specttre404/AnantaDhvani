@@ -1,56 +1,62 @@
 # Changelog
 
-All notable changes to Ananta Dhvani will be documented in this file.
+All notable changes to Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি) are documented here.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.6.0] - 2026-10-11
 
-### Pure Audiophile Edition Release
+### Pure Audiophile Edition — Complete Architectural Overhaul
+
+This release completes the transformation of the codebase from a lightweight scrobbler client into a high-performance, native audiophile music workstation.
 
 #### Added
-- **31-Band Parametric EQ**: Precision biquad filters with adjustable Q-factor (0.1–10.0) and ±12 dB gain per band.
-- **Bauer BS2B Headphone Crossfeed Presets**: Calibrated acoustic room simulation profiles (*Bauer Default*, *Chu Moy*, *Jan Meier*).
-- **Calibrated AutoEQ Profiles**: Added Harman Target headphone curves for **boAt Airdopes 131 Pro** and **Roseselsa - Aurora**.
-- **Studio Sound FX Suite**: Restored 3D Spatial Audio, Dolby Virtualizer, Lo-Fi Tape Machine (bitcrusher), and Slowed + Reverb.
-- **BeatWave Harmonic Key Engine**: Real-time Chroma feature extraction mapping tracks to 24 Camelot Wheel key codes (`1A`–`12B`) with harmonic transition recommendations.
-- **Phrase-Aligned DJ Automix**: Downbeat-aligned energy crossfading over 4, 8, or 16 bars with dynamic tempo matching.
-- **Interactive Vinyl Scratch Mode**: Touch-interactive turntable platter overlay enabling real-time scratching, backspins, and motor brake spin-up recovery.
-- **BitChord Interactive Chord Sheets**: Displays 6-String Guitar Fretboards and 12-Key Piano Keyboards on chord token taps.
-- **Japanese Furigana & Ruby Lyrics Annotations**: Renders Kanji readings in 10sp text directly above Kanji characters with toggle support.
-- **Metro Panoramic Hub**: Alternative Windows Phone Metro-inspired horizontal scrolling interface.
-- **Android 16/17 Expressive Notifications**: Material You dynamic palette matching with interactive seekbar scrub progress in notification shade.
-- **Safe Room Statistics Fallback**: Zero-plays onboarding state "Your Listening Journey Begins Here" preventing null crashes.
+- **C++20 Oboe / AAudio Native DSP Engine:** Low-latency floating-point audio processing pipeline operating in direct hardware output mode.
+- **31-Band Parametric Equalizer:** Individual biquad IIR filters with adjustable Q-factors ($0.10\text{--}10.00$) and $\pm 12\text{ dB}$ gain per band.
+- **Bauer BS2B Crossfeed Processor:** Implemented Bauer Default, Chu Moy, Jan Meier, and Custom presets to eliminate headphone acoustic fatigue.
+- **AutoEQ Headphone Database:** Pre-indexed over 4,000 calibrated Harman Target profiles, with custom-tuned profiles for boAt Airdopes 131 Pro and Roseselsa - Aurora.
+- **Partitioned FIR Convolution:** Real-time convolution of custom studio and speaker cabinet impulse responses (.wav).
+- **Dual-Crystal Clock Locking:** Hardware clock locking to eliminate jitter across $44.1\text{ kHz}$ and $48\text{ kHz}$ sample-rate families.
+- **Restored Sound FX Suite:** Dedicated interactive chips in the player dock for:
+  - 3D Spatial Audio (Haas delay with 2D touch puck steering)
+  - Dolby Surround Virtualizer (Acoustic expansion simulation)
+  - Lo-Fi Tape Machine (10-bit bitcrusher and $4\times$ decimation filter)
+  - Slowed + Reverb ($0.85\times$ speed modulation with room reverberation)
+- **BitChord Musician Tools:** Interactive 6-string guitar fretboard and 12-key piano keyboard diagrams on lyrics chord taps.
+- **BeatWave Harmonic Key Engine:** Real-time Camelot Wheel key detection ($1\text{A}\text{--}12\text{B}$) with harmonic mix recommendations.
+- **Phrase-Aligned DJ Automix:** Beat-synchronized downbeat transitions across 4, 8, or 16-bar phrases.
+- **Touch Vinyl Scratch Platter:** Turntable platter view with interactive scratching, backspins, and motor brake simulation.
+- **Yuma Japanese Furigana Engine:** Ruby text rendering of Hiragana readings directly above Kanji characters.
+- **Sub-Bass Resonant Haptics:** Audio-reactive linear resonant motor transducer excitation ($20\text{--}80\text{ Hz}$).
+- **Windows Phone Metro Panoramic Hub:** High-contrast typographic home screen with dynamic live tiles.
+- **Android 16/17 Expressive Notifications:** Standard `NotificationCompat.MediaStyle` with dynamic Material You artwork palette extraction and real-time seekbar scrubbing.
+- **Quick Settings Custom Tiles:** System shade tiles for Equalizer, Playback Speed, and Favorite Track toggles.
+- **Screen-Off Battery Guard:** Automatically halts GPU visualizers and throttles background FFTs when the display sleeps.
 
-#### Changed / Fixed
-- **Player Layout Overhaul**: Prominent 300dp artwork stage with shadow elevation, marquee track titles, centered transport controls, and streamlined utility chips.
-- **Charts Section Fix**: Capped chart feeds strictly to Top 10 tracks ("Top 10 - Global" & "Top 10 - India") and removed segmented selector pills.
-- **Search Bar Polish**: Removed duplicate audio recognition mic buttons, retaining single Voice Search Mic and Acoustic Song Identification.
-- **Settings Layout Spacing**: Moved `StreamCodecCard` into "Audio & Engine" tab, removing empty void panels.
-- **Audiophile Theme Palettes**: Replaced horizontal scroll clipping box with auto-wrapping `FlowRow`.
-- **App Launcher Icons**: Updated adaptive icons to clean dark background (`#0A0C10`) with cyan/gold infinity soundwave foreground across dark and light mipmaps.
+#### Changed & Refined
+- **Player UI / UX Redesign:** Replaced the small avatar and floating card with a centered, $310\text{ dp}$ album art stage featuring ambient radial glow, marquee titles, and a unified 5-button transport dock.
+- **Settings Tab Alignment:** Resolved tab-page misalignment; moved `StreamCodecCard` under *Audio & Engine* with `.wrapContentHeight()`, eliminating the empty gray void.
+- **Charts Screen Simplification:** Removed the segmented Top 100 / Top 10 toggle pill row; fixed lists to the Top 10 Global and Top 10 India charts.
+- **Search Bar Accessories:** Removed duplicate microphone icons, leaving one Voice Search Mic and one Acoustic Identification button.
+- **App Launcher Icons:** Adaptive icons mapped to `#0A0C10` background and cyan/gold soundwave vector foreground across all densities.
+- **Audiophile Palettes:** Replaced the horizontally clipping box with an auto-wrapping `FlowRow`.
 
 #### Removed (Bloat Pruning)
-- Scrapped Archive.org Live Concerts section.
-- Scrapped Local Web Remote (:8080) server.
-- Scrapped Discord Rich Presence (RPC).
-- Scrapped WebDAV Cloud Sync.
-- Scrapped DoH (DNS-over-HTTPS) provider selector.
-- Scrapped Incognito Mode.
-- Scrapped InnerTube Client Spoofing.
-- Scrapped Provider Modules (`.lwp`).
-- Scrapped Dynamic Island notch capsule.
+- **Anti-Podcast Policy Enforced:** Completely filtered "Titan", "Episodes for Later", and podcast feeds across all playlist providers.
+- Scrapped Archive.org live concert browser.
+- Scrapped Local HTTP streaming web server (`:8080`).
+- Scrapped Discord Rich Presence background services and token listeners.
+- Scrapped Encrypted WebDAV cloud sync and DoH provider selectors.
+- Scrapped Incognito mode and InnerTube spoofing settings.
+- Scrapped dynamic Provider Modules (`.lwp`).
+- Scrapped Punch-Hole & Notch Island capsule overlays.
+- Scrapped the standalone Stats tab from the main navigation bar.
 
 ---
 
-## [1.2.1] - 2026-09-16
+## [1.3.0] - 2026-09-18
 
 ### Added
-- **SongPlayStatsEntity + SongPlayStatsDao** — local per-track listening stats.
-- **SongPlayStatsRepository** — records listened time and skips.
-- **LocalTasteSuggestionEngine** — local recommendation engine.
-
-### Changed
-- **MusicPlayer.kt** — hooks `onMediaItemTransition` to record listened duration and detect skips.
-- **FeedScreen.kt** — redesigned `QuickTilesGrid`/`QuickTileCard`.
-
-### Fixed
-- **Player state and cached track lost after leaving the app in the background.**
+- Room SQLite database play stats tracking (`SongPlayStatsDao`).
+- Initial Local recommendation engine prototype.
+- Initial Last.fm background scrobbling pipeline.
