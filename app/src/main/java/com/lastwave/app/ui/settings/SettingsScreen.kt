@@ -3362,7 +3362,7 @@ private fun NavigationBarTabsCard(
                     Text("Toggle visibility of bottom navigation bar items", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            val allTabs = listOf("feed" to "Feed", "discover" to "Discover", "playlists" to "Playlists")
+            val allTabs = listOf("feed" to "Feed", "discover" to "Discover", "playlists" to "Playlists", "stats" to "Stats")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 allTabs.forEach { (id, label) ->
                     val isVisible = id in visibleTabs
@@ -4095,19 +4095,19 @@ private fun AboutCard(versionName: String) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
+                        text = "Ananta Dhvani",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = "Version $versionName • Pure Audiophile Workstation",
+                        text = "Version $versionName • Pure Audiophile Edition",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Handcrafted with acoustic precision by Ishan",
+                        text = "Crafted with passion by Ishan",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,

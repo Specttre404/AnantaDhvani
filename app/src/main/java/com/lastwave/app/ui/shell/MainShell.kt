@@ -103,6 +103,7 @@ class MainShellViewModel @Inject constructor(
 
 private enum class MainTab(val labelRes: Int) {
     FEED(com.lastwave.app.R.string.nav_feed),
+    STATS(com.lastwave.app.R.string.nav_stats),
     PLAYLISTS(com.lastwave.app.R.string.nav_playlists),
 }
 
@@ -176,6 +177,13 @@ fun MainShell(
                         onOpenFriendProfile = onOpenFriendProfile,
                         onOpenNewReleases = onOpenNewReleases,
                         onOpenCharts = onOpenCharts,
+                    )
+                    MainTab.STATS -> HomeScreen(
+                        onOpenSettings = onOpenSettings,
+                        onOpenSearch = onOpenSearch,
+                        onOpenDiscover = onOpenDiscover,
+                        onOpenGenres = onOpenGenres,
+                        onOpenFriends = onOpenFriends,
                     )
                     MainTab.PLAYLISTS -> PlaylistScreen(onOpenPlaylist = onOpenPlaylist)
                 }
@@ -359,5 +367,6 @@ private fun FloatingNavItem(
 
 private fun MainTab.icon(): ImageVector = when (this) {
     MainTab.FEED -> Icons.Filled.Home
+    MainTab.STATS -> Icons.Filled.Leaderboard
     MainTab.PLAYLISTS -> Icons.AutoMirrored.Filled.QueueMusic
 }
