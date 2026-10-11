@@ -478,12 +478,6 @@ class SettingsViewModel @Inject constructor(
     fun setSkipMusicVideoIntros(enabled: Boolean) = launchSettingsAction("update skip intros setting") {
         settingsPreferences.setSkipMusicVideoIntros(enabled)
     }
-    fun setDiscordRpcEnabled(enabled: Boolean) = launchSettingsAction("update Discord RPC setting") {
-        settingsPreferences.setDiscordRpcEnabled(enabled)
-    }
-    fun setDiscordUserToken(token: String) = launchSettingsAction("update Discord user token") {
-        settingsPreferences.setDiscordUserToken(token)
-    }
     fun setShakeToSkipEnabled(enabled: Boolean) = launchSettingsAction("update Shake to Skip setting") {
         settingsPreferences.setShakeToSkipEnabled(enabled)
     }
@@ -1099,8 +1093,8 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setOreoNotificationsEnabled(enabled: Boolean) = launchSettingsAction("update notification style") {
-        settingsPreferences.setOreoNotificationsEnabled(enabled)
+    fun setExpressiveNotificationEnabled(enabled: Boolean) = launchSettingsAction("update notification style") {
+        settingsPreferences.setExpressiveNotificationEnabled(enabled)
     }
 
     fun setScreenOffBatterySaver(enabled: Boolean) = launchSettingsAction("update power saver") {

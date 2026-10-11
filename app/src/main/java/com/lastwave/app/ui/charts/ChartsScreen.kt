@@ -97,30 +97,8 @@ fun ChartsScreen(
 
 
 
-        var top10Only by remember { mutableStateOf(false) }
-
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
-        ) {
-            FilterChip(
-                selected = !top10Only,
-                onClick = { top10Only = false },
-                label = { Text("Top 100") },
-            )
-            Spacer(Modifier.width(8.dp))
-            FilterChip(
-                selected = top10Only,
-                onClick = { top10Only = true },
-                label = { Text("Top 10") },
-            )
-        }
-
-        val displayEntries = remember(uiState.entries, top10Only) {
-            val allCharts = uiState.entries
-            val displayCharts = if (top10Only) allCharts.take(10) else allCharts // Limit display strictly to Top 10
-            displayCharts
+        val displayEntries = remember(uiState.entries) {
+            uiState.entries.take(10)
         }
 
         PullToRefreshBox(

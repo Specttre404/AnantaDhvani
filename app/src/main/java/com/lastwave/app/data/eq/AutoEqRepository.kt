@@ -96,6 +96,8 @@ class AutoEqRepository @Inject constructor(
     }
 
     private val fallbackProfiles = listOf(
+        AutoEqProfile("boAt Airdopes 131 Pro", "boAt", listOf(2.5f, 2.0f, 1.0f, 1.0f, -1.5f, -1.0f, 0f, 0f, 0f, 0f, 0.5f, 1.0f, 1.5f, 2.0f, 1.5f, 1.0f, 0.5f, 0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
+        AutoEqProfile("Roseselsa - Aurora", "Roseselsa", listOf(1.0f, 1.0f, 0.5f, 0f, 0f, 0.5f, 1.0f, 1.5f, 1.5f, 1.5f, 1.0f, 0.5f, 0f, -0.5f, -1.0f, -0.5f, 0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.0f, 1.5f, 1.0f, 0.5f, 0f, 0f, 0f, 0f, 0f, 0f)),
         AutoEqProfile("Sennheiser HD 600", "Sennheiser", listOf(0f, 0.5f, 1f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, -1.5f, -1f, -0.5f, 0f, 0.5f, 1f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, -1.5f, -1f, -0.5f, 0f, 0.5f, 1f, 0.5f, 0f, -0.5f, 0f)),
         AutoEqProfile("Sony WH-1000XM5", "Sony", listOf(1.5f, 2f, 2.5f, 2f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, -1.5f, -2f, -1.5f, -1f, -0.5f, 0f, 0.5f, 1f, 1.5f, 2f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, -0.5f, 0f, 0.5f, 1f, 0f)),
         AutoEqProfile("Moondrop Blessing 2", "Moondrop", listOf(-0.5f, 0f, 0.5f, 1f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, -0.5f, 0f, 0.5f, 1f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, -0.5f, 0f, 0.5f, 1f, 0.5f, 0f, -0.5f, 0f, 0.5f, 0f, 0f)),

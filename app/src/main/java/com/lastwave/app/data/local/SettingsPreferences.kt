@@ -275,8 +275,8 @@ data class MiscSettings(
     /** Whitelisted & blacklisted SAF library folders. */
     val customScanFolders: Set<String> = emptySet(),
     val customExcludedFolders: Set<String> = emptySet(),
-    /** Oreo-style saturated notification & screen-off power guard. */
-    val oreoNotificationsEnabled: Boolean = false,
+    /** Expressive Android 16/17 Media Notification & screen-off power guard. */
+    val expressiveNotificationEnabled: Boolean = true,
     val screenOffBatterySaver: Boolean = true,
     /** Windows Phone Metro-style panoramic interface. */
     val metroHubEnabled: Boolean = false,
@@ -431,7 +431,7 @@ class SettingsPreferences @Inject constructor(
         val DOWNLOAD_WIFI_ONLY = booleanPreferencesKey("lw_download_wifi_only")
         val CUSTOM_SCAN_FOLDERS = stringSetPreferencesKey("lw_custom_scan_folders")
         val CUSTOM_EXCLUDED_FOLDERS = stringSetPreferencesKey("lw_custom_excluded_folders")
-        val OREO_NOTIFICATIONS_ENABLED = booleanPreferencesKey("lw_oreo_notifications_enabled")
+        val EXPRESSIVE_NOTIFICATION_ENABLED = booleanPreferencesKey("lw_expressive_notification_enabled")
         val SCREEN_OFF_BATTERY_SAVER = booleanPreferencesKey("lw_screen_off_battery_saver")
         val METRO_HUB_ENABLED = booleanPreferencesKey("lw_metro_hub_enabled")
         val CROSSFEED_PRESET = stringPreferencesKey("lw_crossfeed_preset")
@@ -519,7 +519,7 @@ class SettingsPreferences @Inject constructor(
                 downloadWifiOnly = p.readSafely(Keys.DOWNLOAD_WIFI_ONLY) ?: false,
                 customScanFolders = p.readSafely(Keys.CUSTOM_SCAN_FOLDERS) ?: emptySet(),
                 customExcludedFolders = p.readSafely(Keys.CUSTOM_EXCLUDED_FOLDERS) ?: emptySet(),
-                oreoNotificationsEnabled = p.readSafely(Keys.OREO_NOTIFICATIONS_ENABLED) ?: false,
+                expressiveNotificationEnabled = p.readSafely(Keys.EXPRESSIVE_NOTIFICATION_ENABLED) ?: true,
                 screenOffBatterySaver = p.readSafely(Keys.SCREEN_OFF_BATTERY_SAVER) ?: true,
                 metroHubEnabled = p.readSafely(Keys.METRO_HUB_ENABLED) ?: false,
                 crossfeedPreset = p.readSafely(Keys.CROSSFEED_PRESET) ?: "bauer_default",
@@ -893,8 +893,8 @@ class SettingsPreferences @Inject constructor(
         }
     }
 
-    suspend fun setOreoNotificationsEnabled(enabled: Boolean) {
-        dataStore.edit { it[Keys.OREO_NOTIFICATIONS_ENABLED] = enabled }
+    suspend fun setExpressiveNotificationEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.EXPRESSIVE_NOTIFICATION_ENABLED] = enabled }
     }
 
     suspend fun setScreenOffBatterySaver(enabled: Boolean) {

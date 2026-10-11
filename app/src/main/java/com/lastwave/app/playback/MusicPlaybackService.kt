@@ -939,7 +939,7 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
             @Suppress("DEPRECATION") Notification.Builder(this)
         }
 
-        oreoNotificationDecorator.decorateNotification(builder, art, currentMiscSettings.oreoNotificationsEnabled)
+        oreoNotificationDecorator.decorateNotification(builder, art, currentMiscSettings.expressiveNotificationEnabled)
 
         // On Android 13+ (API 33+, Tiramisu), SystemUI / Samsung One UI 5/6/7
         // hosts the media player natively via MediaStyle and SecMediaHost.
@@ -978,7 +978,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                 .addAction(Notification.Action.Builder(if (state.isPlaying) R.drawable.ic_widget_pause else R.drawable.ic_widget_play, "Play or pause", serviceAction(ACTION_TOGGLE, 2)).build())
                 .addAction(Notification.Action.Builder(repeatIcon, repeatLabel, serviceAction(ACTION_REPEAT, 6)).build())
                 .addAction(Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel, "Stop", serviceAction(ACTION_STOP, 4)).build())
-                .setColorized(true)
                 .apply {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
@@ -1053,7 +1052,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
             )
             .addAction(Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel, "Stop", serviceAction(ACTION_STOP, 4)).build())
             .apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) setColorized(true)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
                 }

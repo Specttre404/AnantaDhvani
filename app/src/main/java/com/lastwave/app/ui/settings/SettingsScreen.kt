@@ -331,7 +331,6 @@ fun SettingsScreen(
     var showSyncPlaylistsSheet by remember { mutableStateOf(false) }
     var showYtLibraryVisibilitySheet by remember { mutableStateOf(false) }
     var showYtDisconnectConfirm by remember { mutableStateOf(false) }
-    var showDiscordTokenDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     val currentLanguage = remember(misc.appLanguageTag) { AppLanguage.fromTag(misc.appLanguageTag) }
 
@@ -696,57 +695,6 @@ fun SettingsScreen(
                 }
             }
 
-            item {
-                Card(
-                    onClick = onOpenModules,
-                    shape = RoundedCornerShape(22.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp).fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.secondary),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Filled.Extension,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSecondary,
-                                modifier = Modifier.size(22.dp),
-                            )
-                        }
-                        Spacer(Modifier.width(16.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                stringResource(R.string.settings_modules_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            )
-                            Spacer(Modifier.height(2.dp))
-                            Text(
-                                stringResource(R.string.settings_modules_sub),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
-                            )
-                        }
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowForwardIos,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f),
-                            modifier = Modifier.size(16.dp),
-                        )
-                    }
-                }
-            }
-
             }
 
             if (page == 2) {
@@ -881,10 +829,10 @@ fun SettingsScreen(
                         onSelectIcon = viewModel::setAppIconTheme,
                     )
                     SystemIntegrationLockscreenCard(
-                        oreoNotificationsEnabled = misc.oreoNotificationsEnabled,
+                        expressiveNotificationEnabled = misc.expressiveNotificationEnabled,
                         screenOffBatterySaver = misc.screenOffBatterySaver,
                         metroHubEnabled = misc.metroHubEnabled,
-                        onOreoToggle = viewModel::setOreoNotificationsEnabled,
+                        onExpressiveNotificationToggle = viewModel::setExpressiveNotificationEnabled,
                         onBatterySaverToggle = viewModel::setScreenOffBatterySaver,
                         onMetroHubToggle = viewModel::setMetroHubEnabled,
                     )
@@ -897,13 +845,6 @@ fun SettingsScreen(
                     StreamCodecCard(
                         currentCodec = misc.preferredAudioCodec,
                         onSelectCodec = viewModel::setPreferredAudioCodec,
-                    )
-                    NotchSettingsCard(
-                        enabled = misc.enableDynamicIslandNotch,
-                        topMarginDp = misc.notchTopMarginDp,
-                        widthDp = misc.notchCapsuleWidthDp,
-                        dismissSec = misc.notchAutoDismissSec,
-                        onNotchChange = viewModel::setDynamicNotchSettings,
                     )
                     CacheQuotaCard(
                         currentQuotaMb = misc.cacheQuotaMb,
@@ -1465,36 +1406,6 @@ fun SettingsScreen(
                     SectionLabel(stringResource(R.string.settings_section_integrations))
                     SettingsGroup(rowCount = 2) { index, position ->
                         when (index) {
-                            0 -> SettingsToggleCard(
-                                icon = Icons.Filled.CloudSync,
-                                iconContainer = MaterialTheme.colorScheme.primaryContainer,
-                                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                title = stringResource(R.string.settings_discord_rpc),
-                                subtitle = if (misc.discordRpcEnabled) {
-                                    if (misc.discordConnectedUsername.isNotBlank()) "Connected as @${misc.discordConnectedUsername}"
-                                    else "Sharing current track, artist & live progress in Discord"
-                                } else {
-                                    stringResource(R.string.settings_discord_rpc_sub)
-                                },
-                                checked = misc.discordRpcEnabled,
-                                onCheckedChange = viewModel::setDiscordRpcEnabled,
-                                position = position,
-                            )
-                            1 -> SettingsActionCard(
-                                icon = Icons.Filled.CloudSync,
-                                iconContainer = MaterialTheme.colorScheme.secondaryContainer,
-                                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                title = "Discord Account Gateway Token",
-                                subtitle = if (misc.discordConnectedUsername.isNotBlank()) {
-                                    "Connected as @${misc.discordConnectedUsername} • Tap to update token"
-                                } else if (misc.discordUserToken.isNotBlank()) {
-                                    "Token configured • Tap to update"
-                                } else {
-                                    "Paste user token to enable Mobile Discord Rich Presence"
-                                },
-                                onClick = { showDiscordTokenDialog = true },
-                                position = position,
-                            )
                         }
                     }
                 }
@@ -2125,46 +2036,6 @@ fun SettingsScreen(
             onToggleSync = viewModel::togglePlaylistSync,
             onSelectAll = viewModel::selectAllPlaylistsForSync,
             onDismiss = { showSyncPlaylistsSheet = false },
-        )
-    }
-
-    if (showDiscordTokenDialog) {
-        var tokenInput by remember { mutableStateOf(misc.discordUserToken) }
-        AlertDialog(
-            onDismissRequest = { showDiscordTokenDialog = false },
-            title = { Text("Discord Account Token") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(
-                        "Paste your Discord user authorization token to display live listening activity on your Discord mobile profile.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    OutlinedTextField(
-                        value = tokenInput,
-                        onValueChange = { tokenInput = it },
-                        label = { Text("User Token") },
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.setDiscordUserToken(tokenInput)
-                        showDiscordTokenDialog = false
-                    },
-                ) {
-                    Text("Save & Connect")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDiscordTokenDialog = false }) {
-                    Text("Cancel")
-                }
-            },
         )
     }
 
@@ -3276,50 +3147,6 @@ private fun StreamCodecCard(
 }
 
 @Composable
-private fun NotchSettingsCard(
-    enabled: Boolean,
-    topMarginDp: Int,
-    widthDp: Int,
-    dismissSec: Int,
-    onNotchChange: (enabled: Boolean, topMargin: Int, width: Int, dismiss: Int) -> Unit,
-) {
-    Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Apps, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Punch-Hole & Notch Island", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Floating dynamic island capsule", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(
-                    checked = enabled,
-                    onCheckedChange = { onNotchChange(it, topMarginDp, widthDp, dismissSec) },
-                )
-            }
-            if (enabled) {
-                Text("Top Offset: ${topMarginDp}dp", style = MaterialTheme.typography.labelSmall)
-                Slider(
-                    value = topMarginDp.toFloat(),
-                    onValueChange = { onNotchChange(enabled, it.toInt(), widthDp, dismissSec) },
-                    valueRange = 0f..24f,
-                )
-                Text("Capsule Width: ${widthDp}dp", style = MaterialTheme.typography.labelSmall)
-                Slider(
-                    value = widthDp.toFloat(),
-                    onValueChange = { onNotchChange(enabled, topMarginDp, it.toInt(), dismissSec) },
-                    valueRange = 180f..320f,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun CacheQuotaCard(
     currentQuotaMb: Long,
     onSelectQuotaMb: (Long) -> Unit,
@@ -3553,17 +3380,17 @@ private fun NavigationBarTabsCard(
 
 @Composable
 private fun SystemIntegrationLockscreenCard(
-    oreoNotificationsEnabled: Boolean,
+    expressiveNotificationEnabled: Boolean,
     screenOffBatterySaver: Boolean,
     metroHubEnabled: Boolean,
-    onOreoToggle: (Boolean) -> Unit,
+    onExpressiveNotificationToggle: (Boolean) -> Unit,
     onBatterySaverToggle: (Boolean) -> Unit,
     onMetroHubToggle: (Boolean) -> Unit,
 ) {
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -3581,10 +3408,10 @@ private fun SystemIntegrationLockscreenCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text("Metro Panoramic Hub Interface", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Windows Phone Metro-style large typographic horizontal home screen", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Android 16/17 Expressive Media Notification", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Material You dynamic palette matching album artwork & interactive seekbar scrub", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Switch(checked = metroHubEnabled, onCheckedChange = onMetroHubToggle)
+                Switch(checked = expressiveNotificationEnabled, onCheckedChange = onExpressiveNotificationToggle)
             }
 
             Row(
@@ -3593,10 +3420,10 @@ private fun SystemIntegrationLockscreenCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text("Android 8.0 Saturated Notification", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Oreo full-bleed colorized media notification banner", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Metro Panoramic Hub Interface", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Windows Phone Metro-style large typographic horizontal home screen", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Switch(checked = oreoNotificationsEnabled, onCheckedChange = onOreoToggle)
+                Switch(checked = metroHubEnabled, onCheckedChange = onMetroHubToggle)
             }
 
             Row(
@@ -4269,13 +4096,13 @@ private fun AboutCard(versionName: String) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
+                        text = "Ananta Dhvani",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Text(
-                        text = "Version $versionName • Audiophile Edition",
+                        text = "Version $versionName • Pure Audiophile Edition",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

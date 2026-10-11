@@ -2951,6 +2951,38 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             },
         )
 
+        var spatialActive by remember { mutableStateOf(false) }
+        var showSpatialPuckDialog by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = spatialActive,
+            onClick = {
+                spatialActive = !spatialActive
+                player.setSpatialAudio(spatialActive, 0.6f, 0.5f, 18.0f, 1.3f)
+                if (spatialActive) showSpatialPuckDialog = true
+            },
+            label = { Text("3D Spatial", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        var lofiActive by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = lofiActive,
+            onClick = {
+                lofiActive = !lofiActive
+                player.setBitcrusher(lofiActive, 10, 4)
+            },
+            label = { Text("Lo-Fi", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        var slowedActive by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = slowedActive,
+            onClick = {
+                slowedActive = !slowedActive
+                player.setPlaybackSpeed(if (slowedActive) 0.85f else 1.0f)
+            },
+            label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
+        )
+
         if (showCamelotSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showCamelotSheet = false },
