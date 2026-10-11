@@ -275,7 +275,6 @@ fun SettingsScreen(
     onLoggedOut: () -> Unit = {},
     onOpenChooseApps: () -> Unit = {},
     onOpenDownloads: () -> Unit = {},
-    onOpenModules: () -> Unit = {},
     onOpenHomeSections: () -> Unit = {},
     onOpenExcludedSongs: () -> Unit = {},
     onOpenYouTubeImport: () -> Unit = {},
