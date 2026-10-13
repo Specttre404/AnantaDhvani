@@ -104,9 +104,24 @@ Modern System Integration ──▶ Android 16/17 Expressive Media Style, Metro 
 
 ---
 
-## 🏛️ Inspiration Pantheon & Credits
+## 🏛️ Inspiration Pantheon, Foundational Roots & Creator's Note
 
-Ananta Dhvani stands on the shoulders of open-source audio innovators. We acknowledge and credit the following projects that inspired our design:
+### 💡 Creator's Vision & The Gemini Engine
+Ananta Dhvani is an independent, non-commercial passion project conceptualized and directed by Ishan.
+
+This entire fork is built 100% through Gemini as the primary software engineering engine. Ishan directs every design decision, guides the feature roadmap, dictates UI aesthetics, and oversees audio DSP implementations without writing raw code manually.
+
+### 🌟 Foundational Lineage: The Original LastWave
+Our deepest appreciation and foremost credit go to the original **LastWave** repository and its creators. LastWave served as the core foundation from which Ananta Dhvani originated before expanding into its current native C++20 Oboe DSP, Liquid Glass, and Material 3 Expressive workstation. We honor the original LastWave codebase as the bedrock of this project.
+
+### 🤝 Open Invitation to Upstream Authors & Maintainers
+To the creators of the projects that inspired this workstation:
+LastWave, BitChord, Metrolist, namida, BeatWave, Convx, orb, YumaPlayer, vivi-music, Obsidian-Music, OreoTunes, ArchiveTune, Nightly, PixelPlayer, MusicBeat, and VantaMusic.
+
+If any maintainer or author has any feedback, concerns, licensing notes, or wishes to connect, please reach out directly to Ishan on X or via GitHub discussions. Connecting with you is warmly encouraged, and any request will be deeply appreciated and immediately honored.
+
+### ⚖️ Updated Legal & Fair-Use Disclaimer
+Ananta Dhvani is released under the GNU General Public License v3.0 for personal, educational, and non-commercial audiophile use. It includes zero telemetry, zero analytics, zero advertisements, and zero monetized services. All third-party trademarks, product names, and original code snippets remain the intellectual property of their respective copyright owners.
 
 | Project | Author / Team | Architectural Inspiration in Ananta Dhvani |
 | :--- | :--- | :--- |

@@ -4095,7 +4095,7 @@ private fun AboutCard(versionName: String) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
+                        text = "Ananta Dhvani",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -4107,10 +4107,16 @@ private fun AboutCard(versionName: String) {
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "Handcrafted with acoustic precision by Ishan",
+                        text = "A personal passion project directed by Ishan",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "Engineered with Gemini • Built upon the foundational roots of LastWave",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
