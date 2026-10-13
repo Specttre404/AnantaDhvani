@@ -200,6 +200,13 @@ class MusicPlayer @Inject constructor(
     private val _keyLockEnabled = MutableStateFlow(false)
     val keyLockEnabled: StateFlow<Boolean> = _keyLockEnabled.asStateFlow()
 
+    private val hotCues = androidx.compose.runtime.mutableStateMapOf<Int, Long>()
+    val activeHotCues: Map<Int, Long> get() = hotCues
+
+    private var loopStartMs: Long = -1L
+    private var loopEndMs: Long = -1L
+    private var isLooping: Boolean = false
+
     fun toggleKeyLock() = onMain {
         _keyLockEnabled.value = !_keyLockEnabled.value
     }
@@ -975,6 +982,9 @@ class MusicPlayer @Inject constructor(
                     val dur = player.duration.takeIf { value -> value > 0 } ?: _state.value.durationMs
                     val rawPos = player.currentPosition.coerceAtLeast(0)
                     val pos = if (dur > 0) rawPos.coerceIn(0L, dur) else rawPos
+                    if (isLooping && loopEndMs > loopStartMs && pos >= loopEndMs) {
+                        player.seekTo(loopStartMs)
+                    }
                     val buf = player.bufferedPosition.coerceAtLeast(0)
                     val sleepRemaining = remaining?.coerceAtLeast(0)
 
@@ -2106,6 +2116,53 @@ class MusicPlayer @Inject constructor(
 
     fun setSurroundVirtualizer(enabled: Boolean, strength: Int = 800) {
         runCatching { nativeAudioEngine.get().setSpatialAudio(enabled, roomSize = 0.8f, damping = 0.3f, haasDelayMs = 24.0f, widthRatio = 1.8f) }
+    }
+
+    fun setHotCue(index: Int) {
+        val currentPos = player.currentPosition
+        hotCues[index] = currentPos
+    }
+
+    fun jumpToHotCue(index: Int) {
+        hotCues[index]?.let { targetPos ->
+            seekTo(targetPos)
+        }
+    }
+
+    fun clearHotCue(index: Int) {
+        hotCues.remove(index)
+    }
+
+    fun startPhraseLoop(bars: Int, bpm: Float) {
+        val currentPos = player.currentPosition
+        val barDurationMs = if (bpm > 0f) ((60_000f / bpm) * 4f).toLong() else 2000L
+        loopStartMs = currentPos
+        loopEndMs = currentPos + (bars * barDurationMs)
+        isLooping = true
+    }
+
+    fun exitLoop() {
+        isLooping = false
+        loopStartMs = -1L
+        loopEndMs = -1L
+    }
+
+    fun nudgePlayback(forward: Boolean) {
+        val currentSpeed = player.playbackParameters.speed
+        val nudgeFactor = if (forward) 1.03f else 0.97f
+        player.setPlaybackSpeed(currentSpeed * nudgeFactor)
+        applicationScope.launch {
+            kotlinx.coroutines.delay(350)
+            player.setPlaybackSpeed(currentSpeed)
+        }
+    }
+
+    fun setChannelBalance(pan: Float) {
+        val clampedPan = pan.coerceIn(-1.0f, 1.0f)
+        val angle = (clampedPan + 1.0f) * (Math.PI.toFloat() / 4.0f)
+        val leftVol = kotlin.math.cos(angle)
+        val rightVol = kotlin.math.sin(angle)
+        runCatching { nativeAudioEngine.get().setSpatialAudio(true, roomSize = 0.5f, damping = 0.5f, haasDelayMs = 0f, widthRatio = rightVol / (leftVol.coerceAtLeast(0.01f))) }
     }
 
     fun setPlaybackPitch(semitones: Float) = onMain {

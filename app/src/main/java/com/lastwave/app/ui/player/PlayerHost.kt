@@ -2905,6 +2905,21 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
         )
 
+        var showDjSheet by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = showDjSheet,
+            onClick = { showDjSheet = true },
+            label = { Text("DJ Studio", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        if (showDjSheet) {
+            DjStudioSheet(
+                player = player,
+                bpm = keyResult.bpm.toFloat(),
+                onDismiss = { showDjSheet = false },
+            )
+        }
+
         if (showCamelotSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showCamelotSheet = false },
@@ -3382,3 +3397,86 @@ private fun PlayableTrack.toGeneratedTrack() = com.lastwave.app.data.generate.Ge
     album = album,
     url = videoId?.let { "https://music.youtube.com/watch?v=$it" }.orEmpty(),
 )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DjStudioSheet(
+    player: MusicPlayer,
+    bpm: Float,
+    onDismiss: () -> Unit,
+) {
+    var balancePan by remember { mutableFloatStateOf(0f) }
+    val hotCues = player.activeHotCues
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text("DJ Studio Controls", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+
+            Text("Hot Cues (Tap to jump • Long-press to set)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                (1..4).forEach { cueIdx ->
+                    val hasCue = hotCues.containsKey(cueIdx)
+                    Surface(
+                        onClick = {
+                            if (hasCue) player.jumpToHotCue(cueIdx) else player.setHotCue(cueIdx)
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (hasCue) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 12.dp)) {
+                            Text("C$cueIdx${if (hasCue) " ✓" else ""}", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            Text("Phrase Loopers", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                listOf(1, 2, 4, 8).forEach { bars ->
+                    OutlinedButton(
+                        onClick = { player.startPhraseLoop(bars, bpm) },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("${bars}B", style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+                Button(
+                    onClick = { player.exitLoop() },
+                    modifier = Modifier.weight(1.2f),
+                ) {
+                    Text("Exit", style = MaterialTheme.typography.labelSmall)
+                }
+            }
+
+            Text("Pitch Nudge", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(onClick = { player.nudgePlayback(false) }, modifier = Modifier.weight(1f)) {
+                    Text("[-] Nudge")
+                }
+                OutlinedButton(onClick = { player.nudgePlayback(true) }, modifier = Modifier.weight(1f)) {
+                    Text("[+] Nudge")
+                }
+            }
+
+            Text("Stereo Channel Balance (${"%.2f".format(balancePan)})", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Slider(
+                value = balancePan,
+                onValueChange = {
+                    balancePan = it
+                    player.setChannelBalance(it)
+                },
+                valueRange = -1.0f..1.0f,
+            )
+        }
+    }
+}
