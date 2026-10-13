@@ -2165,6 +2165,31 @@ class MusicPlayer @Inject constructor(
         runCatching { nativeAudioEngine.get().setSpatialAudio(true, roomSize = 0.5f, damping = 0.5f, haasDelayMs = 0f, widthRatio = rightVol / (leftVol.coerceAtLeast(0.01f))) }
     }
 
+    fun setConvolutionParams(
+        preDelayMs: Float,
+        tailTrimPercent: Float,
+        stereoWidth: Float,
+        lowCutHz: Float,
+        highCutHz: Float
+    ) {
+        runCatching {
+            nativeAudioEngine.get().setSpatialAudio(
+                true,
+                roomSize = tailTrimPercent.coerceIn(0.1f, 1.0f),
+                damping = (highCutHz / 20000f).coerceIn(0.1f, 0.9f),
+                haasDelayMs = preDelayMs.coerceIn(0f, 100f),
+                widthRatio = stereoWidth.coerceIn(0.5f, 2.5f)
+            )
+        }
+    }
+
+    fun setDecoupledSpeedAndPitch(speed: Float, pitchSemitones: Float) = onMain {
+        val pitchFactor = Math.pow(2.0, (pitchSemitones.coerceIn(-12f, 12f) / 12.0).toDouble()).toFloat()
+        if (playerDelegate.isInitialized()) {
+            player.playbackParameters = androidx.media3.common.PlaybackParameters(speed.coerceIn(0.5f, 2.0f), pitchFactor)
+        }
+    }
+
     fun setPlaybackPitch(semitones: Float) = onMain {
         val factor = Math.pow(2.0, (semitones.coerceIn(-12f, 12f) / 12.0).toDouble()).toFloat()
         if (playerDelegate.isInitialized()) {
