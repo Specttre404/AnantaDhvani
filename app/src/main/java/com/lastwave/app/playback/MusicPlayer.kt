@@ -412,15 +412,17 @@ class MusicPlayer @Inject constructor(
 
     private val cacheDataSourceFactory: CacheDataSource.Factory by lazy {
         val httpUpstream = DefaultHttpDataSource.Factory()
-            .setUserAgent(YOUTUBE_WEB_USER_AGENT)
+            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(20_000)
-            .setReadTimeoutMs(20_000)
+            .setConnectTimeoutMs(15000)
+            .setReadTimeoutMs(20000)
             .setContentTypePredicate(HttpDataSource.REJECT_PAYWALL_TYPES)
             .setDefaultRequestProperties(
                 mapOf(
                     "Accept" to "audio/*,*/*;q=0.8",
                     "Accept-Encoding" to "identity",
+                    "Origin" to "https://music.youtube.com",
+                    "Referer" to "https://music.youtube.com/",
                 ),
             )
         val defaultDataSourceFactory = androidx.media3.datasource.DefaultDataSource.Factory(appContext, httpUpstream)

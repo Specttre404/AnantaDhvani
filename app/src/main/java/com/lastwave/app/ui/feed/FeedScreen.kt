@@ -150,7 +150,6 @@ fun FeedScreen(
     onOpenFriends: () -> Unit = {},
     onOpenFriendProfile: (username: String, displayName: String?, avatarUrl: String?) -> Unit = { _, _, _ -> },
     onOpenNewReleases: () -> Unit = {},
-    onOpenCharts: () -> Unit = {},
     viewModel: FeedViewModel = hiltViewModel(),
     artistAlbumNavigator: ArtistAlbumNavigator = hiltViewModel<ArtistAlbumNavBridgeFeed>().navigator,
 ) {
@@ -211,7 +210,6 @@ fun FeedScreen(
             ExpressiveHeader(
                 title = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
                 actions = {
-                    HeaderActionIcon(Icons.Filled.TrendingUp, "Charts & Rankings", onOpenCharts)
                     HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
                     HeaderActionIcon(Icons.Filled.Search, "Search", onOpenSearch)
                     HeaderActionIcon(Icons.Filled.Settings, "Settings", onOpenSettings)

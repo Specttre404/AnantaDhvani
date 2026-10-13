@@ -276,21 +276,7 @@ fun LastWaveNavHost(
                 onOpenNewReleases = {
                     navController.navigate(Screen.NewReleases.route)
                 },
-                onOpenCharts = {
-                    navController.navigate(Screen.Charts.route)
-                },
             )
-        }
-
-        composable(Screen.Charts.route) {
-            PredictiveBackScreen(onBack = { navController.popBackStack() }) {
-                com.lastwave.app.ui.charts.ChartsScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenArtist = { artistName, browseId ->
-                        navController.navigate(Screen.ArtistDetail.createRoute(artistName, browseId = browseId))
-                    },
-                )
-            }
         }
 
         composable(Screen.Create.route) {
