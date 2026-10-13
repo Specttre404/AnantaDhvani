@@ -217,8 +217,6 @@ fun FeedScreen(
             )
 
             var activeFilter by remember { mutableStateOf(FeedCategoryFilter.ALL) }
-            var selectedCountry by remember { mutableStateOf("Global") }
-            var showCountryMenu by remember { mutableStateOf(false) }
 
             LazyRow(
                 modifier = Modifier
@@ -227,27 +225,6 @@ fun FeedScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                item {
-                    Box {
-                        FilterChip(
-                            selected = selectedCountry != "Global",
-                            onClick = { showCountryMenu = true },
-                            label = { Text("Charts: $selectedCountry", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold) },
-                            shape = CircleShape,
-                        )
-                        DropdownMenu(expanded = showCountryMenu, onDismissRequest = { showCountryMenu = false }) {
-                            listOf("Global", "US", "UK", "JP", "KR", "IN", "DE", "FR", "BR").forEach { country ->
-                                DropdownMenuItem(
-                                    text = { Text(country) },
-                                    onClick = {
-                                        selectedCountry = country
-                                        showCountryMenu = false
-                                    },
-                                )
-                            }
-                        }
-                    }
-                }
                 items(FeedCategoryFilter.entries) { filter ->
                     val selected = filter == activeFilter
                     FilterChip(
