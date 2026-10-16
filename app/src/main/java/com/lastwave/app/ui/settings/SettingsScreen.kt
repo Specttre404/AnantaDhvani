@@ -7,6 +7,7 @@ import com.lastwave.app.data.local.MiscSettings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -3806,53 +3807,180 @@ private fun UsbDirectOutputCard(
 
 @Composable
 private fun MetroEInkTypographyStudioCard() {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    var eInkMode by remember { mutableStateOf(false) }
-    var liveTiles3D by remember { mutableStateOf(true) }
-    var fontName by remember { mutableStateOf("System Default (Material 3)") }
+    var tileMarginDp by remember { mutableFloatStateOf(6f) }
+    var tileBorderDp by remember { mutableFloatStateOf(1.5f) }
+    var tileCornerDp by remember { mutableFloatStateOf(0f) }
+    var liveTileFlipEnabled by remember { mutableStateOf(true) }
+    var zunePanoramaEnabled by remember { mutableStateOf(true) }
+    var eInkMonochromeMode by remember { mutableStateOf(false) }
+    var pixelAtAGlanceEnabled by remember { mutableStateOf(true) }
+    var loadedCustomFontName by remember { mutableStateOf("System Default (Inter / Roboto)") }
 
-    val fontPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            fontName = it.lastPathSegment?.substringAfterLast("/") ?: "Custom Variable Font (.ttf)"
-            android.widget.Toast.makeText(context, "Loaded font: $fontName", android.widget.Toast.LENGTH_SHORT).show()
+    val fontPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent(),
+    ) { uri: android.net.Uri? ->
+        if (uri != null) {
+            loadedCustomFontName = uri.lastPathSegment?.substringAfterLast('/') ?: "CustomTypeface.ttf"
         }
     }
 
+    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "metro_3d_flip")
+    val flipCycle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(durationMillis = 7000, easing = androidx.compose.animation.core.LinearEasing),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Restart,
+        ),
+        label = "flip_angle",
+    )
+
+    val isFlippedBack = liveTileFlipEnabled && (flipCycle in 90f..270f)
+    val cardBg = if (eInkMonochromeMode) Color.Black else MaterialTheme.colorScheme.surfaceContainerHigh
+    val cardFg = if (eInkMonochromeMode) Color.White else MaterialTheme.colorScheme.onSurface
+    val accentColor = if (eInkMonochromeMode) Color.White else Color(0xFF00E5FF)
+
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 20.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg),
+        border = if (eInkMonochromeMode) androidx.compose.foundation.BorderStroke(2.dp, Color.White) else null,
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Dashboard, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Metro 3D Live Tiles & E-Ink Studio", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Windows Phone typography, high-contrast E-Ink dithering & custom variable fonts", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Text(
+                text = "Metro 3D Hub, E-Ink & Typography Studio",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = cardFg,
+            )
+            Text(
+                text = "Metrolist 3D live tiles, Zune panorama, Obsidian 1-bit E-Ink & Pixel At-a-Glance",
+                style = MaterialTheme.typography.bodySmall,
+                color = cardFg.copy(alpha = 0.75f),
+            )
 
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier.padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+            if (pixelAtAGlanceEnabled) {
+                Surface(
+                    shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 50.dp),
+                    color = if (eInkMonochromeMode) Color.Black else Color(0xFF10141C),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, accentColor.copy(alpha = 0.6f)),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Custom Font: $fontName", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                        Text("Load variable TTF/OTF typography files", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    OutlinedButton(onClick = { fontPickerLauncher.launch(arrayOf("font/ttf", "font/otf", "font/*", "*/*")) }) {
-                        Text("Load TTF")
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Column {
+                            Text(
+                                text = "AT A GLANCE • NOW AUDITIONING",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = accentColor,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Text(
+                                text = "Ananta Dhvani • 32-Bit Float Oboe Pipeline",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White,
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = accentColor.copy(alpha = 0.2f),
+                        ) {
+                            Text(
+                                text = "USB DAC",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = accentColor,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            )
+                        }
                     }
                 }
+            }
+
+            if (zunePanoramaEnabled) {
+                Text(
+                    text = "collection  •  now playing  •  acoustics",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Light,
+                    color = accentColor,
+                    maxLines = 1,
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = (tileMarginDp / 2f).dp),
+                horizontalArrangement = Arrangement.spacedBy(tileMarginDp.dp),
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(tileCornerDp.dp),
+                    color = if (eInkMonochromeMode) Color.Black else Color(0xFF0078D7),
+                    border = if (tileBorderDp > 0f) androidx.compose.foundation.BorderStroke(tileBorderDp.dp, Color.White) else null,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(100.dp)
+                        .graphicsLayer {
+                            rotationX = if (liveTileFlipEnabled && !eInkMonochromeMode) {
+                                kotlin.math.sin(Math.toRadians(flipCycle.toDouble())).toFloat() * 25f
+                            } else 0f
+                            cameraDistance = 12f * density
+                        },
+                ) {
+                    Box(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+                        if (!isFlippedBack) {
+                            Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
+                                Text("METRO LIVE", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
+                                Text("Hi-Res Vault", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                            }
+                        } else {
+                            Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
+                                Text("PLAY STATS", style = MaterialTheme.typography.labelSmall, color = Color(0xFFFFD700))
+                                Text("148 Tracks • FLAC", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                            }
+                        }
+                    }
+                }
+
+                Surface(
+                    shape = RoundedCornerShape(tileCornerDp.dp),
+                    color = if (eInkMonochromeMode) Color.Black else Color(0xFF6A00FF),
+                    border = if (tileBorderDp > 0f) androidx.compose.foundation.BorderStroke(tileBorderDp.dp, Color.White) else null,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(100.dp),
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(12.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text("ZUNE HUB", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
+                        Text("31-Band PEQ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+            }
+
+            Text("Tile Grid Spacing Margin: ${tileMarginDp.toInt()} dp", style = MaterialTheme.typography.labelSmall, color = cardFg)
+            Slider(value = tileMarginDp, onValueChange = { tileMarginDp = it }, valueRange = 0f..16f)
+
+            Text("Tile Outline Border Width: ${"%.1f".format(tileBorderDp)} dp", style = MaterialTheme.typography.labelSmall, color = cardFg)
+            Slider(value = tileBorderDp, onValueChange = { tileBorderDp = it }, valueRange = 0f..4f)
+
+            Text("Tile Corner Radius: ${tileCornerDp.toInt()} dp (0 = Sharp Metro)", style = MaterialTheme.typography.labelSmall, color = cardFg)
+            Slider(value = tileCornerDp, onValueChange = { tileCornerDp = it }, valueRange = 0f..24f)
+
+            Text("Custom Font File: $loadedCustomFontName", style = MaterialTheme.typography.labelSmall, color = accentColor, fontWeight = FontWeight.Bold)
+            OutlinedButton(
+                onClick = { fontPickerLauncher.launch("*/*") },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Import Local .TTF / .OTF Font File", color = cardFg)
             }
 
             Row(
@@ -3860,11 +3988,8 @@ private fun MetroEInkTypographyStudioCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text("Windows Phone 3D Live Tiles", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Enable 3D flip animation for Metro Hub live audio tiles", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = liveTiles3D, onCheckedChange = { liveTiles3D = it })
+                Text("3D Flipping Live Tiles", style = MaterialTheme.typography.bodyMedium, color = cardFg)
+                Switch(checked = liveTileFlipEnabled, onCheckedChange = { liveTileFlipEnabled = it })
             }
 
             Row(
@@ -3872,11 +3997,26 @@ private fun MetroEInkTypographyStudioCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text("E-Ink High-Contrast Outdoor Mode", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("1-bit monochrome high-contrast theme for outdoor sunlight readability", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = eInkMode, onCheckedChange = { eInkMode = it })
+                Text("Full Panoramic Zune Header", style = MaterialTheme.typography.bodyMedium, color = cardFg)
+                Switch(checked = zunePanoramaEnabled, onCheckedChange = { zunePanoramaEnabled = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Pure Monochrome E-Ink Mode (Zero Blur)", style = MaterialTheme.typography.bodyMedium, color = cardFg)
+                Switch(checked = eInkMonochromeMode, onCheckedChange = { eInkMonochromeMode = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Pixel At-a-Glance Media Banner", style = MaterialTheme.typography.bodyMedium, color = cardFg)
+                Switch(checked = pixelAtAGlanceEnabled, onCheckedChange = { pixelAtAGlanceEnabled = it })
             }
         }
     }
