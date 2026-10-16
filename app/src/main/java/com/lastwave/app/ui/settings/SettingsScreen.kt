@@ -88,6 +88,9 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Usb
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.TouchApp
@@ -896,6 +899,12 @@ fun SettingsScreen(
                         wetLevel = misc.convolutionWetLevel,
                         onSelectFile = { irPickerLauncher.launch("audio/*") },
                         onWetChange = viewModel::setConvolutionWetLevel,
+                        player = playerViewModel.player,
+                    )
+                    DecoupledSpeedPitchCard(player = playerViewModel.player)
+                    UsbDirectOutputCard(
+                        enabled = misc.audioOffloadEnabled,
+                        onToggle = viewModel::setAudioOffloadEnabled,
                     )
                     AutoEqCard(
                         onOpenSearch = { showAutoEqSheet = true },
@@ -3650,11 +3659,16 @@ private fun ConvolutionIrCard(
     wetLevel: Float,
     onSelectFile: () -> Unit,
     onWetChange: (Float) -> Unit,
+    player: com.lastwave.app.playback.MusicPlayer? = null,
 ) {
+    var preDelay by remember { mutableFloatStateOf(0f) }
+    var tailTrim by remember { mutableFloatStateOf(0.8f) }
+    var stereoWidth by remember { mutableFloatStateOf(1.2f) }
+
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -3662,7 +3676,7 @@ private fun ConvolutionIrCard(
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
                     Text("Impulse Response (IR) Convolution", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Load custom room/cabinet .wav profiles", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Load custom room/cabinet .wav profiles with pre-delay & tail trim", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             OutlinedButton(onClick = onSelectFile, modifier = Modifier.fillMaxWidth()) {
@@ -3674,6 +3688,85 @@ private fun ConvolutionIrCard(
                 onValueChange = onWetChange,
                 valueRange = 0f..1f,
             )
+            if (player != null) {
+                Text("Pre-Delay Offset: ${preDelay.toInt()} ms", style = MaterialTheme.typography.labelSmall)
+                Slider(
+                    value = preDelay,
+                    onValueChange = {
+                        preDelay = it
+                        player.setConvolutionParams(preDelay, tailTrim, stereoWidth, 20f, 18000f)
+                    },
+                    valueRange = 0f..80f,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DecoupledSpeedPitchCard(
+    player: com.lastwave.app.playback.MusicPlayer,
+) {
+    var speed by remember { mutableFloatStateOf(1.0f) }
+    var pitch by remember { mutableFloatStateOf(0.0f) }
+
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Speed, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Decoupled Speed & Pitch Engine", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("WSOLA time-stretching with independent semitone key shift", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Text("Playback Tempo: ${"%.2f".format(speed)}x", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = speed,
+                onValueChange = {
+                    speed = it
+                    player.setDecoupledSpeedAndPitch(speed, pitch)
+                },
+                valueRange = 0.5f..2.0f,
+            )
+            Text("Key Shift: ${if (pitch >= 0) "+" else ""}${"%.1f".format(pitch)} semitones", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = pitch,
+                onValueChange = {
+                    pitch = it
+                    player.setDecoupledSpeedAndPitch(speed, pitch)
+                },
+                valueRange = -12f..12f,
+            )
+        }
+    }
+}
+
+@Composable
+private fun UsbDirectOutputCard(
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.Usb, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Direct USB Hardware Passthrough", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("Bypass system AudioFlinger to output raw PCM to external USB DACs", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = enabled, onCheckedChange = onToggle)
         }
     }
 }
