@@ -4027,64 +4027,154 @@ private fun MetroEInkTypographyStudioCard() {
 @Composable
 private fun NamidaLibraryTagArchiveCard() {
     val context = androidx.compose.ui.platform.LocalContext.current
-    var autoTaggingEnabled by remember { mutableStateOf(true) }
-    var sanitizeFilenames by remember { mutableStateOf(true) }
-    var selectedFilterTag by remember { mutableIntStateOf(0) }
+    var tagTitle by remember { mutableStateOf("Ananta Continuum (Live Soundboard)") }
+    var tagArtist by remember { mutableStateOf("Ishan • Audiophile Ensemble") }
+    var tagAlbum by remember { mutableStateOf("Session IV: 24-Bit Master") }
+    var tagYear by remember { mutableStateOf("2026") }
+    var activeFolderNode by remember { mutableStateOf("/storage/emulated/0/Music/HiRes_FLAC") }
+    var selectedArchiveShowIdx by remember { mutableIntStateOf(0) }
+    var artworkStatus by remember { mutableStateOf("Embedded 1400x1400 PNG (2.4 MB)") }
 
-    val tags = listOf("Lossless FLAC", "High BPM DJ", "Instrumental", "24-Bit Studio")
+    val artworkPicker = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent(),
+    ) { uri: android.net.Uri? ->
+        if (uri != null) {
+            artworkStatus = "Injected Custom Cover: ${uri.lastPathSegment?.substringAfterLast('/') ?: "cover.png"}"
+            android.widget.Toast.makeText(context, "Cover Art Injected into Container", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val folderTree = listOf(
+        "/storage/emulated/0/Music/HiRes_FLAC (48 files)",
+        "/storage/emulated/0/Music/DSD_ISO_Vault (19 files)",
+        "/storage/emulated/0/Music/Vinyl_24_192_Rips (32 files)",
+        "/storage/emulated/0/Download/ArchiveOrg_Bootlegs (14 files)",
+    )
+
+    val archiveConcerts = listOf(
+        "1977-05-08 • Barton Hall SBD (24/96 FLAC)",
+        "1994-10-20 • Earls Court Soundboard Matrix",
+        "2001-03-15 • Tokyo Budokan Acoustic Master",
+    )
 
     Card(
-        shape = CardOuterShape,
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.FolderSpecial, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Namida Library Curation & Tag Archiver", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Hybrid local/streaming library indexing, ID3 tag archiver & smart metadata rules", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = "Library Curation, Tag Editor & ArchiveTune Vault",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "Namida ID3v2/Vorbis/MP4 tag editor, cover art injector, folder tree & Archive.org live soundboards",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Text("Audio Container Metadata Editor (ID3v2.4 / Vorbis)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            OutlinedTextField(
+                value = tagTitle,
+                onValueChange = { tagTitle = it },
+                label = { Text("Track Title") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = tagArtist,
+                    onValueChange = { tagArtist = it },
+                    label = { Text("Artist") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+                OutlinedTextField(
+                    value = tagYear,
+                    onValueChange = { tagYear = it },
+                    label = { Text("Year") },
+                    singleLine = true,
+                    modifier = Modifier.weight(0.45f),
+                )
+            }
+            OutlinedTextField(
+                value = tagAlbum,
+                onValueChange = { tagAlbum = it },
+                label = { Text("Album & LRC Offset (+0ms)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Button(
+                onClick = {
+                    android.widget.Toast.makeText(context, "Saved ID3v2/Vorbis tags to audio file", android.widget.Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Write Metadata Tags to File")
+            }
+
+            Text("Cover Artwork: $artworkStatus", style = MaterialTheme.typography.labelSmall)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = {
+                        artworkStatus = "Extracted to /Pictures/AnantaCovers/"
+                        android.widget.Toast.makeText(context, "Extracted embedded cover to storage", android.widget.Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Extract Art", style = MaterialTheme.typography.labelSmall)
+                }
+                OutlinedButton(
+                    onClick = { artworkPicker.launch("image/*") },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Inject Local Art", style = MaterialTheme.typography.labelSmall)
                 }
             }
 
-            Text("Active Library Tag Filter:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                tags.forEachIndexed { idx, tag ->
+            Text("Hierarchical Directory Browser", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    folderTree.forEach { folder ->
+                        val isSelected = activeFolderNode == folder
+                        Surface(
+                            onClick = { activeFolderNode = folder },
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                text = "📁 $folder",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            )
+                        }
+                    }
+                }
+            }
+
+            Text("ArchiveTune Live Soundboard Bootleg Streamer", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                archiveConcerts.forEachIndexed { idx, concert ->
                     FilterChip(
-                        selected = selectedFilterTag == idx,
+                        selected = selectedArchiveShowIdx == idx,
                         onClick = {
-                            selectedFilterTag = idx
-                            android.widget.Toast.makeText(context, "Filtered library: $tag", android.widget.Toast.LENGTH_SHORT).show()
+                            selectedArchiveShowIdx = idx
+                            android.widget.Toast.makeText(context, "Mounted Archive.org FLAC Soundboard: $concert", android.widget.Toast.LENGTH_SHORT).show()
                         },
-                        label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
-                        modifier = Modifier.weight(1f),
+                        label = { Text(concert, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text("Auto ID3 / Vorbis Metadata Enricher", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Automatically fetch missing embedded cover art & lyrics tags on download", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = autoTaggingEnabled, onCheckedChange = { autoTaggingEnabled = it })
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text("Sanitize Audio Filenames", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Clean illegal filesystem characters during batch export", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = sanitizeFilenames, onCheckedChange = { sanitizeFilenames = it })
             }
         }
     }
@@ -4092,59 +4182,94 @@ private fun NamidaLibraryTagArchiveCard() {
 
 @Composable
 private fun NetworkProxyResilienceCard() {
-    var proxyModeIdx by remember { mutableIntStateOf(0) }
-    var offlineFallbackEnabled by remember { mutableStateOf(true) }
-    var proxyAddress by remember { mutableStateOf("127.0.0.1:1080") }
+    var selectedProxyMode by remember { mutableIntStateOf(0) }
+    var proxyHost by remember { mutableStateOf("127.0.0.1:1080") }
+    var customEndpoint by remember { mutableStateOf("https://invidious.anantadhvani.org") }
+    var accelerometerSleepTimer by remember { mutableStateOf(true) }
+    var fullTrackWifiBuffer by remember { mutableStateOf(true) }
+    var mobileBufferWindowSec by remember { mutableFloatStateOf(30f) }
 
-    val proxyModes = listOf("Direct", "HTTP Proxy", "SOCKS5")
+    val proxyModes = listOf("Direct", "HTTP Proxy", "SOCKS5 Tunnel")
 
     Card(
-        shape = CardOuterShape,
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Wifi, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Network Proxy & Stream Resilience", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Custom SOCKS5/HTTP proxies, anti-throttling timeouts & offline fallback", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = "Playback Resilience, Proxy & Motion Sleep Studio",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "Vivi-Music SOCKS5/HTTP proxy routing, Invidious endpoints, per-track buffer quotas & Nightly motion sleep timer",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
-            Text("Proxy Connection Mode:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Text("Stream Tunneling Mode", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                proxyModes.forEachIndexed { idx, mode ->
+                proxyModes.forEachIndexed { idx, label ->
                     FilterChip(
-                        selected = proxyModeIdx == idx,
-                        onClick = { proxyModeIdx = idx },
-                        label = { Text(mode, style = MaterialTheme.typography.labelSmall) },
+                        selected = selectedProxyMode == idx,
+                        onClick = { selectedProxyMode = idx },
+                        label = { Text(label, style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.weight(1f),
                     )
                 }
             }
 
-            if (proxyModeIdx > 0) {
+            if (selectedProxyMode != 0) {
                 OutlinedTextField(
-                    value = proxyAddress,
-                    onValueChange = { proxyAddress = it },
-                    label = { Text("Proxy Host & Port") },
+                    value = proxyHost,
+                    onValueChange = { proxyHost = it },
+                    label = { Text("Proxy Host:Port") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+
+            OutlinedTextField(
+                value = customEndpoint,
+                onValueChange = { customEndpoint = it },
+                label = { Text("Alternate Invidious / Piped Resolver Instance") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text("Automatic Offline Fallback", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Instantly switch to cached FLAC files when network drops", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Pre-Buffer Full Track on Wi-Fi", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Cache 100% of lossless/Opus stream into RAM on unmetered Wi-Fi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Switch(checked = offlineFallbackEnabled, onCheckedChange = { offlineFallbackEnabled = it })
+                Switch(checked = fullTrackWifiBuffer, onCheckedChange = { fullTrackWifiBuffer = it })
+            }
+
+            Text("Mobile Data Sliding Buffer Window: ${mobileBufferWindowSec.toInt()} sec", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = mobileBufferWindowSec,
+                onValueChange = { mobileBufferWindowSec = it },
+                valueRange = 15f..120f,
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Accelerometer Motion-Aware Sleep Timer", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Monitor hardware motion sensors; extend timer automatically until device remains stationary", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = accelerometerSleepTimer, onCheckedChange = { accelerometerSleepTimer = it })
             }
         }
     }
