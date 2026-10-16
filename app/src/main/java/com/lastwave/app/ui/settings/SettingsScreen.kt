@@ -3659,46 +3659,82 @@ private fun ConvolutionIrCard(
     wetLevel: Float,
     onSelectFile: () -> Unit,
     onWetChange: (Float) -> Unit,
-    player: com.lastwave.app.playback.MusicPlayer? = null,
+    player: com.lastwave.app.playback.MusicPlayer,
 ) {
-    var preDelay by remember { mutableFloatStateOf(0f) }
-    var tailTrim by remember { mutableFloatStateOf(0.8f) }
-    var stereoWidth by remember { mutableFloatStateOf(1.2f) }
+    var preDelayMs by remember { mutableFloatStateOf(15f) }
+    var tailTrim by remember { mutableFloatStateOf(0.85f) }
+    var stereoWidth by remember { mutableFloatStateOf(1.4f) }
+    var lowCutHz by remember { mutableFloatStateOf(80f) }
+    var highCutHz by remember { mutableFloatStateOf(14000f) }
 
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.GraphicEq, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Impulse Response (IR) Convolution", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Load custom room/cabinet .wav profiles with pre-delay & tail trim", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("FIR Convolution Studio", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text("Acoustic impulse response profiling and partitioned convolution", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Canvas(modifier = Modifier.fillMaxWidth().height(72.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceContainerLowest)) {
+                val step = size.width / 48f
+                for (i in 0 until 48) {
+                    val freqFactor = i / 48f
+                    val curveHeight = kotlin.math.sin(freqFactor * Math.PI.toFloat()) * size.height * 0.75f * tailTrim
+                    drawRect(
+                        color = Color(0xFF00E5FF).copy(alpha = 0.7f),
+                        topLeft = androidx.compose.ui.geometry.Offset(i * step, size.height - curveHeight.coerceAtLeast(4f)),
+                        size = androidx.compose.ui.geometry.Size(step * 0.75f, curveHeight.coerceAtLeast(4f)),
+                    )
                 }
             }
-            OutlinedButton(onClick = onSelectFile, modifier = Modifier.fillMaxWidth()) {
-                Text("Import .wav IR Profile")
+
+            Button(onClick = onSelectFile, modifier = Modifier.fillMaxWidth()) {
+                Text("Load Custom Impulse WAV")
             }
-            Text("Wet/Dry Mix: ${(wetLevel * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
+
+            Text("Reverb Wet Level: ${(wetLevel * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
+            Slider(value = wetLevel, onValueChange = onWetChange, valueRange = 0f..1f)
+
+            Text("Pre-Delay: ${preDelayMs.toInt()} ms", style = MaterialTheme.typography.labelSmall)
             Slider(
-                value = wetLevel,
-                onValueChange = onWetChange,
-                valueRange = 0f..1f,
+                value = preDelayMs,
+                onValueChange = {
+                    preDelayMs = it
+                    player.setConvolutionParams(preDelayMs, tailTrim, stereoWidth, lowCutHz, highCutHz)
+                },
+                valueRange = 0f..100f,
             )
-            if (player != null) {
-                Text("Pre-Delay Offset: ${preDelay.toInt()} ms", style = MaterialTheme.typography.labelSmall)
-                Slider(
-                    value = preDelay,
-                    onValueChange = {
-                        preDelay = it
-                        player.setConvolutionParams(preDelay, tailTrim, stereoWidth, 20f, 18000f)
-                    },
-                    valueRange = 0f..80f,
-                )
-            }
+
+            Text("Stereo Widening: ${"%.1f".format(stereoWidth)}x", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = stereoWidth,
+                onValueChange = {
+                    stereoWidth = it
+                    player.setConvolutionParams(preDelayMs, tailTrim, stereoWidth, lowCutHz, highCutHz)
+                },
+                valueRange = 0.5f..2.5f,
+            )
+
+            Text("Low-Cut Filter: ${lowCutHz.toInt()} Hz", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = lowCutHz,
+                onValueChange = {
+                    lowCutHz = it
+                    player.setConvolutionParams(preDelayMs, tailTrim, stereoWidth, lowCutHz, highCutHz)
+                },
+                valueRange = 20f..500f,
+            )
+
+            Text("High-Cut Filter: ${highCutHz.toInt()} Hz", style = MaterialTheme.typography.labelSmall)
+            Slider(
+                value = highCutHz,
+                onValueChange = {
+                    highCutHz = it
+                    player.setConvolutionParams(preDelayMs, tailTrim, stereoWidth, lowCutHz, highCutHz)
+                },
+                valueRange = 2000f..20000f,
+            )
         }
     }
 }
@@ -3708,39 +3744,35 @@ private fun DecoupledSpeedPitchCard(
     player: com.lastwave.app.playback.MusicPlayer,
 ) {
     var speed by remember { mutableFloatStateOf(1.0f) }
-    var pitch by remember { mutableFloatStateOf(0.0f) }
+    var pitchSemitones by remember { mutableFloatStateOf(0.0f) }
 
     Card(
         shape = CardOuterShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Speed, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Decoupled Speed & Pitch Engine", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("WSOLA time-stretching with independent semitone key shift", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Text("Playback Tempo: ${"%.2f".format(speed)}x", style = MaterialTheme.typography.labelSmall)
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Decoupled Speed & Pitch", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text("Scale playback tempo without altering musical key, or shift semitones independently", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Text("Playback Speed: ${"%.2f".format(speed)}x", style = MaterialTheme.typography.labelSmall)
             Slider(
                 value = speed,
                 onValueChange = {
                     speed = it
-                    player.setDecoupledSpeedAndPitch(speed, pitch)
+                    player.setDecoupledSpeedAndPitch(speed, pitchSemitones)
                 },
                 valueRange = 0.5f..2.0f,
             )
-            Text("Key Shift: ${if (pitch >= 0) "+" else ""}${"%.1f".format(pitch)} semitones", style = MaterialTheme.typography.labelSmall)
+
+            Text("Key Pitch Shift: ${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)} st", style = MaterialTheme.typography.labelSmall)
             Slider(
-                value = pitch,
+                value = pitchSemitones,
                 onValueChange = {
-                    pitch = it
-                    player.setDecoupledSpeedAndPitch(speed, pitch)
+                    pitchSemitones = it
+                    player.setDecoupledSpeedAndPitch(speed, pitchSemitones)
                 },
-                valueRange = -12f..12f,
+                valueRange = -12.0f..12.0f,
             )
         }
     }
@@ -3757,14 +3789,14 @@ private fun UsbDirectOutputCard(
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
         Row(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Icon(Icons.Filled.Usb, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Text("Direct USB Hardware Passthrough", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("Bypass system AudioFlinger to output raw PCM to external USB DACs", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Column(modifier = Modifier.weight(1f)) {
+                Text("USB Audio Class 2 Direct Output", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                Text("Bypass Android system AudioFlinger mixing pipeline for external USB DAC bit-perfect delivery", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Switch(checked = enabled, onCheckedChange = onToggle)
         }
