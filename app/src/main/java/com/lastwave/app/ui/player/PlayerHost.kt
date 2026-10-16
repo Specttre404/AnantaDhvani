@@ -2954,6 +2954,20 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             )
         }
 
+        var showLinguisticsSheet by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = showLinguisticsSheet,
+            onClick = { showLinguisticsSheet = true },
+            label = { Text("Linguistics & Romaji", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        if (showLinguisticsSheet) {
+            LinguisticLyricsStudioSheet(
+                trackTitle = state.current?.title ?: "夢の音響 (Yume no Onkyō)",
+                onDismiss = { showLinguisticsSheet = false },
+            )
+        }
+
         if (showCamelotSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showCamelotSheet = false },
@@ -3757,6 +3771,114 @@ private fun SkeuomorphicCassetteDialog(
 
             Text("Tape Head Azimuth Calibration: ${"%.2f".format(azimuthDial)}", style = MaterialTheme.typography.labelSmall, color = Color.White)
             Slider(value = azimuthDial, onValueChange = { azimuthDial = it }, valueRange = 0f..1f)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LinguisticLyricsStudioSheet(
+    trackTitle: String,
+    onDismiss: () -> Unit,
+) {
+    var showFurigana by remember { mutableStateOf(true) }
+    var showRomaji by remember { mutableStateOf(true) }
+    var showIpaPhonetics by remember { mutableStateOf(false) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Text("Yuma Linguistic Lyrics Studio", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("Japanese Furigana Ruby annotations, Hepburn Romaji & IPA phonetics for $trackTitle", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text("Live Annotation Preview:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        listOf(
+                            "夢" to "ゆめ",
+                            "の" to null,
+                            "音" to "おと",
+                            "が" to null,
+                            "響" to "ひび",
+                            "く" to null,
+                        ).forEach { (kanji, reading) ->
+                            if (reading != null && showFurigana) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(reading, style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                                    Text(kanji, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                                }
+                            } else {
+                                Text(kanji, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    if (showRomaji) {
+                        Text("Romaji: Yume no oto ga hibiku", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                    }
+
+                    if (showIpaPhonetics) {
+                        Text("IPA: [jɯme no oto ɡa hibikɯ]", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
+            Text("Annotation Toggles", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Furigana Ruby Text", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Render small Hiragana readings above Kanji symbols", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = showFurigana, onCheckedChange = { showFurigana = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Romaji Transliteration", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Display Hepburn-style Latin character transliteration", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = showRomaji, onCheckedChange = { showRomaji = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("IPA Phonetic Alphabet", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("International Phonetic Alphabet pronunciation guides", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = showIpaPhonetics, onCheckedChange = { showIpaPhonetics = it })
+            }
         }
     }
 }
