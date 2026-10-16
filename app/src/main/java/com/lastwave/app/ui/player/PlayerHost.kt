@@ -32,6 +32,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -2920,6 +2921,38 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
             )
         }
 
+        var showOrbPhysicsSheet by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = showOrbPhysicsSheet,
+            onClick = { showOrbPhysicsSheet = true },
+            label = { Text("Orb Physics", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        var showCassetteDeck by remember { mutableStateOf(false) }
+        FilterChip(
+            selected = showCassetteDeck,
+            onClick = { showCassetteDeck = true },
+            label = { Text("Cassette Deck", style = MaterialTheme.typography.labelSmall) },
+        )
+
+        if (showOrbPhysicsSheet) {
+            OrbPhysicsStudioSheet(
+                isPlaying = state.isPlaying,
+                onDismiss = { showOrbPhysicsSheet = false },
+            )
+        }
+
+        if (showCassetteDeck) {
+            SkeuomorphicCassetteDialog(
+                trackTitle = state.current?.title ?: "Unknown Track",
+                trackArtist = state.current?.artist ?: "Unknown Artist",
+                isPlaying = state.isPlaying,
+                playbackSpeed = state.speed,
+                progressFraction = if (state.durationMs > 0) (state.positionMs.toFloat() / state.durationMs.toFloat()).coerceIn(0f, 1f) else 0.35f,
+                onDismiss = { showCassetteDeck = false },
+            )
+        }
+
         if (showCamelotSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showCamelotSheet = false },
@@ -3479,4 +3512,205 @@ private fun DjStudioSheet(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun OrbPhysicsStudioSheet(
+    isPlaying: Boolean,
+    onDismiss: () -> Unit,
+) {
+    var particleCount by remember { mutableFloatStateOf(256f) }
+    var gravityForce by remember { mutableFloatStateOf(1.0f) }
+    var springStiffness by remember { mutableFloatStateOf(0.8f) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text("Orb 3D Particle Physics Engine", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center,
+            ) {
+                com.lastwave.app.ui.visualizer.OrbitalParticleSphereView(
+                    pcmData = FloatArray(64) { if (isPlaying) (it % 8) * 0.12f else 0.02f },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+
+            Text("Particle Count (${particleCount.toInt()})", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Slider(
+                value = particleCount,
+                onValueChange = { particleCount = it },
+                valueRange = 64f..512f,
+            )
+
+            Text("Gravity Attractor Force (${"%.2f".format(gravityForce)})", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Slider(
+                value = gravityForce,
+                onValueChange = { gravityForce = it },
+                valueRange = 0.1f..2.0f,
+            )
+
+            Text("Radial Spring Stiffness (${"%.2f".format(springStiffness)})", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Slider(
+                value = springStiffness,
+                onValueChange = { springStiffness = it },
+                valueRange = 0.2f..1.5f,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SkeuomorphicCassetteDialog(
+    trackTitle: String,
+    trackArtist: String,
+    isPlaying: Boolean,
+    playbackSpeed: Float,
+    progressFraction: Float,
+    onDismiss: () -> Unit,
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "spoolRotation")
+    val spoolRotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = (1200 / playbackSpeed.coerceAtLeast(0.5f)).toInt(), easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "rotationDeg",
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close Deck")
+            }
+        },
+        title = {
+            Text("Skeuomorphic Cassette Deck", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFF1E2026),
+                    border = BorderStroke(2.dp, Color(0xFF383C48)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = Color(0xFFF2EFE9),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Text(
+                                    text = trackTitle,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF111111),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    text = trackArtist,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF555555),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = Color(0xFF0F1014),
+                            border = BorderStroke(1.dp, Color(0xFF2A2D36)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 24.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size((36 + (1.0f - progressFraction) * 20).dp)
+                                        .graphicsLayer { rotationZ = if (isPlaying) spoolRotation else 0f }
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF2B2520))
+                                        .border(2.dp, Color(0xFF6B6560), CircleShape),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.White),
+                                    )
+                                }
+
+                                Text("TYPE II • HIGH BIAS", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00E5FF).copy(alpha = 0.8f))
+
+                                Box(
+                                    modifier = Modifier
+                                        .size((36 + progressFraction * 20).dp)
+                                        .graphicsLayer { rotationZ = if (isPlaying) spoolRotation else 0f }
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF2B2520))
+                                        .border(2.dp, Color(0xFF6B6560), CircleShape),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.White),
+                                    )
+                                }
+                            }
+                        }
+
+                        Text("ANANTA STEREO CASSETTE C-90", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.5f))
+                    }
+                }
+            }
+        },
+    )
 }
