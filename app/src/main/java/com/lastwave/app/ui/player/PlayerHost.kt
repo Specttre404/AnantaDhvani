@@ -63,6 +63,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -3520,9 +3521,33 @@ private fun OrbPhysicsStudioSheet(
     isPlaying: Boolean,
     onDismiss: () -> Unit,
 ) {
-    var particleCount by remember { mutableFloatStateOf(256f) }
-    var gravityForce by remember { mutableFloatStateOf(1.0f) }
-    var springStiffness by remember { mutableFloatStateOf(0.8f) }
+    var particleCount by remember { mutableFloatStateOf(1200f) }
+    var spinSpeed by remember { mutableFloatStateOf(1.0f) }
+    var gravityPull by remember { mutableFloatStateOf(0.8f) }
+    var particleJitter by remember { mutableFloatStateOf(0.35f) }
+    var decayRate by remember { mutableFloatStateOf(0.6f) }
+    var bloomIntensity by remember { mutableFloatStateOf(0.7f) }
+    var motionBlur by remember { mutableFloatStateOf(0.4f) }
+    var paletteIndex by remember { mutableIntStateOf(0) }
+
+    val palettes = listOf(
+        "Cyan / Gold" to listOf(Color(0xFF00E5FF), Color(0xFF7F52FF), Color(0xFFFFD700)),
+        "Crimson Bass" to listOf(Color(0xFFFF1744), Color(0xFFFF9100), Color(0xFFFFEA00)),
+        "Matrix Emerald" to listOf(Color(0xFF00E676), Color(0xFF00B0FF), Color(0xFF1DE9B6)),
+        "Solar Nebula" to listOf(Color(0xFFD500F9), Color(0xFF651FFF), Color(0xFF00E5FF)),
+    )
+    val activeColors = palettes[paletteIndex].second
+
+    val infiniteTransition = rememberInfiniteTransition(label = "orb_spin")
+    val phase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = (2f * Math.PI).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = (4000 / spinSpeed.coerceAtLeast(0.2f)).toInt(), easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "orb_phase",
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -3531,49 +3556,94 @@ private fun OrbPhysicsStudioSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text("Orb 3D Particle Physics Engine", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("Orb Visualizer & Shader Physics", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("Real-time 3D particle density, orbital attractors & frequency color zones", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            Box(
+            Canvas(
                 modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .background(Color.Black),
-                contentAlignment = Alignment.Center,
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF07090E)),
             ) {
-                com.lastwave.app.ui.visualizer.OrbitalParticleSphereView(
-                    pcmData = FloatArray(64) { if (isPlaying) (it % 8) * 0.12f else 0.02f },
-                    modifier = Modifier.fillMaxSize(),
-                )
+                val center = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f)
+                val maxRadius = size.minDimension * 0.42f * (1.2f - gravityPull * 0.3f)
+                val renderedPoints = (particleCount.toInt() / 8).coerceIn(40, 625)
+
+                for (i in 0 until renderedPoints) {
+                    val norm = i.toFloat() / renderedPoints.toFloat()
+                    val goldenAngle = i * 2.3999632f + (if (isPlaying) phase else 0f)
+                    val r = kotlin.math.sqrt(norm) * maxRadius
+                    val jitterOffset = kotlin.math.sin(phase * 3f + i) * particleJitter * 12f
+                    val x = center.x + kotlin.math.cos(goldenAngle) * (r + jitterOffset)
+                    val y = center.y + kotlin.math.sin(goldenAngle) * (r + jitterOffset)
+
+                    val zoneColor = when {
+                        norm < 0.33f -> activeColors[0]
+                        norm < 0.66f -> activeColors[1]
+                        else -> activeColors[2]
+                    }
+
+                    if (bloomIntensity > 0.1f) {
+                        drawCircle(
+                            color = zoneColor.copy(alpha = (0.18f * bloomIntensity).coerceIn(0f, 0.5f)),
+                            radius = 6f + bloomIntensity * 8f,
+                            center = androidx.compose.ui.geometry.Offset(x, y),
+                        )
+                    }
+                    drawCircle(
+                        color = zoneColor.copy(alpha = (0.85f - motionBlur * 0.3f).coerceIn(0.3f, 1f)),
+                        radius = 2.2f,
+                        center = androidx.compose.ui.geometry.Offset(x, y),
+                    )
+                }
             }
 
-            Text("Particle Count (${particleCount.toInt()})", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+            Text("Frequency Zone Palette (Bass • Mid • Treble)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                palettes.forEachIndexed { idx, pair ->
+                    FilterChip(
+                        selected = paletteIndex == idx,
+                        onClick = { paletteIndex = idx },
+                        label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            Text("Particle Density: ${particleCount.toInt()} pts", style = MaterialTheme.typography.labelSmall)
+            Slider(value = particleCount, onValueChange = { particleCount = it }, valueRange = 200f..5000f)
+
+            Text("Orbital Spin Speed: ${"%.2f".format(spinSpeed)}x", style = MaterialTheme.typography.labelSmall)
+            Slider(value = spinSpeed, onValueChange = { spinSpeed = it }, valueRange = 0.1f..3.0f)
+
+            Text("Gravity Pull & Attractor: ${"%.2f".format(gravityPull)} G", style = MaterialTheme.typography.labelSmall)
+            Slider(value = gravityPull, onValueChange = { gravityPull = it }, valueRange = 0.0f..2.0f)
+
+            Text("Particle Jitter & Decay: ${(particleJitter * 100).toInt()}% • ${(decayRate * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
             Slider(
-                value = particleCount,
-                onValueChange = { particleCount = it },
-                valueRange = 64f..512f,
+                value = particleJitter,
+                onValueChange = {
+                    particleJitter = it
+                    decayRate = (1f - it * 0.5f).coerceIn(0.1f, 1f)
+                },
+                valueRange = 0.0f..1.0f,
             )
 
-            Text("Gravity Attractor Force (${"%.2f".format(gravityForce)})", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-            Slider(
-                value = gravityForce,
-                onValueChange = { gravityForce = it },
-                valueRange = 0.1f..2.0f,
-            )
+            Text("Bloom Glow Radiance: ${(bloomIntensity * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
+            Slider(value = bloomIntensity, onValueChange = { bloomIntensity = it }, valueRange = 0.0f..1.0f)
 
-            Text("Radial Spring Stiffness (${"%.2f".format(springStiffness)})", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-            Slider(
-                value = springStiffness,
-                onValueChange = { springStiffness = it },
-                valueRange = 0.2f..1.5f,
-            )
+            Text("Camera Motion Blur: ${(motionBlur * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
+            Slider(value = motionBlur, onValueChange = { motionBlur = it }, valueRange = 0.0f..1.0f)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SkeuomorphicCassetteDialog(
     trackTitle: String,
@@ -3583,134 +3653,110 @@ private fun SkeuomorphicCassetteDialog(
     progressFraction: Float,
     onDismiss: () -> Unit,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "spoolRotation")
-    val spoolRotation by infiniteTransition.animateFloat(
+    var analogWarmthDial by remember { mutableFloatStateOf(0.65f) }
+    var azimuthDial by remember { mutableFloatStateOf(0.5f) }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "cassette_reels")
+    val reelAngle by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = (1200 / playbackSpeed.coerceAtLeast(0.5f)).toInt(), easing = LinearEasing),
+            animation = tween(durationMillis = (2400 / playbackSpeed.coerceAtLeast(0.5f)).toInt(), easing = LinearEasing),
             repeatMode = RepeatMode.Restart,
         ),
-        label = "rotationDeg",
+        label = "reel_rotation",
     )
+    val effectiveAngle = if (isPlaying) reelAngle else 0f
 
-    AlertDialog(
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close Deck")
-            }
-        },
-        title = {
-            Text("Skeuomorphic Cassette Deck", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        },
-        text = {
-            Column(
+        containerColor = Color(0xFF141619),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text("OreoTunes Vintage Cassette Deck", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
+            Text("Type IV Metal Bias • Synchronous Dual-Spool Transport", style = MaterialTheme.typography.labelSmall, color = Color(0xFF9E9E9E))
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                    .height(210.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Color(0xFF22252A))
+                    .border(2.dp, Color(0xFF3E434C), RoundedCornerShape(18.dp))
+                    .padding(16.dp),
             ) {
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFF1E2026),
-                    border = BorderStroke(2.dp, Color(0xFF383C48)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                    Surface(
+                        color = Color(0xFFF5F0E6),
+                        shape = RoundedCornerShape(6.dp),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = Color(0xFFF2EFE9),
-                            modifier = Modifier.fillMaxWidth(),
+                        Column(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                Text(
-                                    text = trackTitle,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF111111),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    text = trackArtist,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF555555),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
+                            Text(trackTitle, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = Color(0xFF1A1A1A), maxLines = 1)
+                            Text("$trackArtist • ${"%.2f".format(playbackSpeed)}x IPS", style = MaterialTheme.typography.labelSmall, color = Color(0xFF555555), maxLines = 1)
                         }
-
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFF0F1014),
-                            border = BorderStroke(1.dp, Color(0xFF2A2D36)),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(80.dp),
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 24.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size((36 + (1.0f - progressFraction) * 20).dp)
-                                        .graphicsLayer { rotationZ = if (isPlaying) spoolRotation else 0f }
-                                        .clip(CircleShape)
-                                        .background(Color(0xFF2B2520))
-                                        .border(2.dp, Color(0xFF6B6560), CircleShape),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(12.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.White),
-                                    )
-                                }
-
-                                Text("TYPE II • HIGH BIAS", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00E5FF).copy(alpha = 0.8f))
-
-                                Box(
-                                    modifier = Modifier
-                                        .size((36 + progressFraction * 20).dp)
-                                        .graphicsLayer { rotationZ = if (isPlaying) spoolRotation else 0f }
-                                        .clip(CircleShape)
-                                        .background(Color(0xFF2B2520))
-                                        .border(2.dp, Color(0xFF6B6560), CircleShape),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(12.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.White),
-                                    )
-                                }
-                            }
-                        }
-
-                        Text("ANANTA STEREO CASSETTE C-90", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.5f))
                     }
+
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(105.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF111315)),
+                    ) {
+                        val leftCenter = androidx.compose.ui.geometry.Offset(size.width * 0.28f, size.height * 0.5f)
+                        val rightCenter = androidx.compose.ui.geometry.Offset(size.width * 0.72f, size.height * 0.5f)
+                        val maxTapeRadius = size.height * 0.44f
+                        val minCoreRadius = size.height * 0.18f
+
+                        val leftTapeRadius = minCoreRadius + (maxTapeRadius - minCoreRadius) * kotlin.math.sqrt(1f - progressFraction)
+                        val rightTapeRadius = minCoreRadius + (maxTapeRadius - minCoreRadius) * kotlin.math.sqrt(progressFraction)
+
+                        drawCircle(color = Color(0xFF2B1D16), radius = leftTapeRadius, center = leftCenter)
+                        drawCircle(color = Color(0xFF2B1D16), radius = rightTapeRadius, center = rightCenter)
+
+                        drawCircle(color = Color(0xFFDADCE0), radius = minCoreRadius, center = leftCenter)
+                        drawCircle(color = Color(0xFFDADCE0), radius = minCoreRadius, center = rightCenter)
+
+                        listOf(leftCenter, rightCenter).forEach { hub ->
+                            for (tooth in 0 until 6) {
+                                val rad = Math.toRadians((effectiveAngle + tooth * 60f).toDouble())
+                                val startX = hub.x + kotlin.math.cos(rad).toFloat() * (minCoreRadius * 0.35f)
+                                val startY = hub.y + kotlin.math.sin(rad).toFloat() * (minCoreRadius * 0.35f)
+                                val endX = hub.x + kotlin.math.cos(rad).toFloat() * (minCoreRadius * 0.9f)
+                                val endY = hub.y + kotlin.math.sin(rad).toFloat() * (minCoreRadius * 0.9f)
+                                drawLine(
+                                    color = Color(0xFF111315),
+                                    start = androidx.compose.ui.geometry.Offset(startX, startY),
+                                    end = androidx.compose.ui.geometry.Offset(endX, endY),
+                                    strokeWidth = 3.5f,
+                                )
+                            }
+                        }
+                    }
+
+                    Text("ANANTA DHVANI • HI-BIAS CrO2 90", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00E5FF))
                 }
             }
-        },
-    )
+
+            Text("Analog Bias Warmth: ${(analogWarmthDial * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = Color.White)
+            Slider(value = analogWarmthDial, onValueChange = { analogWarmthDial = it }, valueRange = 0f..1f)
+
+            Text("Tape Head Azimuth Calibration: ${"%.2f".format(azimuthDial)}", style = MaterialTheme.typography.labelSmall, color = Color.White)
+            Slider(value = azimuthDial, onValueChange = { azimuthDial = it }, valueRange = 0f..1f)
+        }
+    }
 }
