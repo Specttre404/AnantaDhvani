@@ -1,5 +1,13 @@
 package com.lastwave.app.ui.feed
 
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.draw.clip
+import com.lastwave.app.ui.theme.NeonCyanPrimary
+import com.lastwave.app.ui.theme.AudiophileGold
+import com.lastwave.app.ui.theme.ExpressivePurple
+import com.lastwave.app.ui.theme.SurfaceGlassHigh
+import com.lastwave.app.ui.theme.GlassBorderStroke
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -1841,3 +1849,62 @@ private fun FeedEmptyState(
 
 @dagger.hilt.android.lifecycle.HiltViewModel
 class ArtistAlbumNavBridgeFeed @javax.inject.Inject constructor(val navigator: ArtistAlbumNavigator) : androidx.lifecycle.ViewModel()
+
+@Composable
+fun RevampedFeedHeader(
+    onOpenSearch: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(NeonCyanPrimary.copy(alpha = 0.15f), Color.Transparent)
+                )
+            )
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Zune-style panoramic ticker title
+            Text(
+                text = "collection  •  vault  •  acoustics",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Light,
+                    brush = Brush.linearGradient(
+                        colors = listOf(NeonCyanPrimary, AudiophileGold, ExpressivePurple)
+                    )
+                ),
+                maxLines = 1,
+            )
+
+            // Subtitle status pill
+            Surface(
+                shape = CircleShape,
+                color = SurfaceGlassHigh,
+                border = BorderStroke(1.dp, GlassBorderStroke),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(NeonCyanPrimary)
+                    )
+                    Text(
+                        text = "BIT-PERFECT OBOE C++20 ACTIVE",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold,
+                            color = NeonCyanPrimary
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
