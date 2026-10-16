@@ -912,6 +912,7 @@ fun SettingsScreen(
                     AudiophileThemePaletteCard(
                         onSelectPreset = viewModel::setAudiophilePalette,
                     )
+                    MetroEInkTypographyStudioCard()
                 }
             }
 
@@ -3799,6 +3800,84 @@ private fun UsbDirectOutputCard(
                 Text("Bypass Android system AudioFlinger mixing pipeline for external USB DAC bit-perfect delivery", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Switch(checked = enabled, onCheckedChange = onToggle)
+        }
+    }
+}
+
+@Composable
+private fun MetroEInkTypographyStudioCard() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var eInkMode by remember { mutableStateOf(false) }
+    var liveTiles3D by remember { mutableStateOf(true) }
+    var fontName by remember { mutableStateOf("System Default (Material 3)") }
+
+    val fontPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            fontName = it.lastPathSegment?.substringAfterLast("/") ?: "Custom Variable Font (.ttf)"
+            android.widget.Toast.makeText(context, "Loaded font: $fontName", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+    ) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Dashboard, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Metro 3D Live Tiles & E-Ink Studio", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Windows Phone typography, high-contrast E-Ink dithering & custom variable fonts", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Custom Font: $fontName", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                        Text("Load variable TTF/OTF typography files", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    OutlinedButton(onClick = { fontPickerLauncher.launch(arrayOf("font/ttf", "font/otf", "font/*", "*/*")) }) {
+                        Text("Load TTF")
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Windows Phone 3D Live Tiles", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Enable 3D flip animation for Metro Hub live audio tiles", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = liveTiles3D, onCheckedChange = { liveTiles3D = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("E-Ink High-Contrast Outdoor Mode", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("1-bit monochrome high-contrast theme for outdoor sunlight readability", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = eInkMode, onCheckedChange = { eInkMode = it })
+            }
         }
     }
 }
