@@ -11,6 +11,14 @@ val ExpressivePurple = Color(0xFF7F52FF)
 val SubduedGrayText = Color(0xFF94A3B8)
 val GlassBorderStroke = Color(0x2600E5FF) // 15% Cyan stroke for glowing borders
 
+val CinematicVoid = Color(0xFF020408)
+val AmbientGlowCyan = Color(0xFF00F0FF)
+val RawNeonPurple = Color(0xFF9D00FF)
+val HdrGoldAccent = Color(0xFFFFC700)
+val GlassSurfacePanel = Color(0xFF0D121F)
+val GlassBorderActive = Color(0x4D00F0FF)
+val BokehBlurOverlay = Color(0x66020408)
+
 data class AudiophileAccentTheme(
     val id: String,
     val name: String,
