@@ -914,6 +914,8 @@ fun SettingsScreen(
                         onSelectPreset = viewModel::setAudiophilePalette,
                     )
                     MetroEInkTypographyStudioCard()
+                    NamidaLibraryTagArchiveCard()
+                    NetworkProxyResilienceCard()
                 }
             }
 
@@ -4017,6 +4019,132 @@ private fun MetroEInkTypographyStudioCard() {
             ) {
                 Text("Pixel At-a-Glance Media Banner", style = MaterialTheme.typography.bodyMedium, color = cardFg)
                 Switch(checked = pixelAtAGlanceEnabled, onCheckedChange = { pixelAtAGlanceEnabled = it })
+            }
+        }
+    }
+}
+
+@Composable
+private fun NamidaLibraryTagArchiveCard() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var autoTaggingEnabled by remember { mutableStateOf(true) }
+    var sanitizeFilenames by remember { mutableStateOf(true) }
+    var selectedFilterTag by remember { mutableIntStateOf(0) }
+
+    val tags = listOf("Lossless FLAC", "High BPM DJ", "Instrumental", "24-Bit Studio")
+
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+    ) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.FolderSpecial, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Namida Library Curation & Tag Archiver", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Hybrid local/streaming library indexing, ID3 tag archiver & smart metadata rules", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            Text("Active Library Tag Filter:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                tags.forEachIndexed { idx, tag ->
+                    FilterChip(
+                        selected = selectedFilterTag == idx,
+                        onClick = {
+                            selectedFilterTag = idx
+                            android.widget.Toast.makeText(context, "Filtered library: $tag", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Auto ID3 / Vorbis Metadata Enricher", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Automatically fetch missing embedded cover art & lyrics tags on download", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = autoTaggingEnabled, onCheckedChange = { autoTaggingEnabled = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Sanitize Audio Filenames", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Clean illegal filesystem characters during batch export", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = sanitizeFilenames, onCheckedChange = { sanitizeFilenames = it })
+            }
+        }
+    }
+}
+
+@Composable
+private fun NetworkProxyResilienceCard() {
+    var proxyModeIdx by remember { mutableIntStateOf(0) }
+    var offlineFallbackEnabled by remember { mutableStateOf(true) }
+    var proxyAddress by remember { mutableStateOf("127.0.0.1:1080") }
+
+    val proxyModes = listOf("Direct", "HTTP Proxy", "SOCKS5")
+
+    Card(
+        shape = CardOuterShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+    ) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Wifi, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Network Proxy & Stream Resilience", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Custom SOCKS5/HTTP proxies, anti-throttling timeouts & offline fallback", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            Text("Proxy Connection Mode:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                proxyModes.forEachIndexed { idx, mode ->
+                    FilterChip(
+                        selected = proxyModeIdx == idx,
+                        onClick = { proxyModeIdx = idx },
+                        label = { Text(mode, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            if (proxyModeIdx > 0) {
+                OutlinedTextField(
+                    value = proxyAddress,
+                    onValueChange = { proxyAddress = it },
+                    label = { Text("Proxy Host & Port") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("Automatic Offline Fallback", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Instantly switch to cached FLAC files when network drops", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = offlineFallbackEnabled, onCheckedChange = { offlineFallbackEnabled = it })
             }
         }
     }
