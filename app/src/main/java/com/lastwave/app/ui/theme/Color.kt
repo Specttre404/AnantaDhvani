@@ -2,6 +2,15 @@ package com.lastwave.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val VoidBackground = Color(0xFF05070B)
+val SurfaceGlassHigh = Color(0xFF10141C)
+val SurfaceGlassLow = Color(0xFF0A0D14)
+val NeonCyanPrimary = Color(0xFF00E5FF)
+val AudiophileGold = Color(0xFFFFD700)
+val ExpressivePurple = Color(0xFF7F52FF)
+val SubduedGrayText = Color(0xFF94A3B8)
+val GlassBorderStroke = Color(0x2600E5FF) // 15% Cyan stroke for glowing borders
+
 data class AudiophileAccentTheme(
     val id: String,
     val name: String,
