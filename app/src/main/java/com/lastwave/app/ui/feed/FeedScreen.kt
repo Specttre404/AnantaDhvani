@@ -229,6 +229,11 @@ fun FeedScreen(
                 },
             )
 
+            RevampedFeedHeader(
+                onOpenSearch = onOpenSearch,
+                onOpenSettings = onOpenSettings,
+            )
+
             var activeFilter by remember { mutableStateOf(FeedCategoryFilter.ALL) }
 
             LazyRow(

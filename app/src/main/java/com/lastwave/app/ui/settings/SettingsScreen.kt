@@ -214,7 +214,7 @@ private val ACCENT_PRESETS = listOf(
 )
 
 // -- Expressive shape scale used only within this screen --
-private val CardOuterShape = RoundedCornerShape(28.dp)
+private val CardOuterShape = RoundedCornerShape(24.dp)
 private val IconBadgeShape = RoundedCornerShape(14.dp)
 
 /** Where a row sits within a visually-connected group of settings rows —
@@ -2457,14 +2457,27 @@ private fun SectionLabel(text: String) {
             modifier = Modifier
                 .size(width = 4.dp, height = 16.dp)
                 .clip(RoundedCornerShape(2.dp))
-                .background(MaterialTheme.colorScheme.primary)
+                .background(
+                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                        colors = listOf(
+                            com.lastwave.app.ui.theme.NeonCyanPrimary,
+                            com.lastwave.app.ui.theme.AudiophileGold,
+                        )
+                    )
+                )
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = text.uppercase(),
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelLarge.copy(
+                brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                    colors = listOf(
+                        com.lastwave.app.ui.theme.NeonCyanPrimary,
+                        com.lastwave.app.ui.theme.AudiophileGold,
+                    )
+                )
+            ),
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
             letterSpacing = androidx.compose.ui.unit.TextUnit(1.1f, androidx.compose.ui.unit.TextUnitType.Sp),
         )
     }
