@@ -3775,15 +3775,91 @@ private fun SkeuomorphicCassetteDialog(
     }
 }
 
+private data class KanjiLexiconEntry(
+    val surface: String,
+    val readingKana: String,
+    val romaji: String,
+    val jlptLevel: String,
+    val pitchPattern: String,
+    val moraHeights: List<Boolean>,
+    val definition: String,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LinguisticLyricsStudioSheet(
     trackTitle: String,
     onDismiss: () -> Unit,
 ) {
-    var showFurigana by remember { mutableStateOf(true) }
-    var showRomaji by remember { mutableStateOf(true) }
-    var showIpaPhonetics by remember { mutableStateOf(false) }
+    var romajiEnabled by remember { mutableStateOf(true) }
+    var pitchAccentEnabled by remember { mutableStateOf(true) }
+    var dualTranslationEnabled by remember { mutableStateOf(true) }
+    var selectedLatinFontIdx by remember { mutableIntStateOf(0) }
+    var selectedCjkFontIdx by remember { mutableIntStateOf(0) }
+    var selectedWordIndex by remember { mutableIntStateOf(0) }
+
+    val latinFonts = listOf(
+        "Geometric Sans" to androidx.compose.ui.text.font.FontFamily.SansSerif,
+        "Editorial Serif" to androidx.compose.ui.text.font.FontFamily.Serif,
+        "Studio Mono" to androidx.compose.ui.text.font.FontFamily.Monospace,
+    )
+    val cjkFonts = listOf(
+        "Gothic CJK" to androidx.compose.ui.text.font.FontFamily.SansSerif,
+        "Mincho Serif" to androidx.compose.ui.text.font.FontFamily.Serif,
+        "Fixed Kana" to androidx.compose.ui.text.font.FontFamily.Monospace,
+    )
+
+    val lexicon = remember {
+        listOf(
+            KanjiLexiconEntry(
+                surface = "永遠",
+                readingKana = "えいえん",
+                romaji = "eien",
+                jlptLevel = "JLPT N3",
+                pitchPattern = "[0] Heiban (平板)",
+                moraHeights = listOf(false, true, true, true),
+                definition = "Eternity, perpetuity, immortality, permanence.",
+            ),
+            KanjiLexiconEntry(
+                surface = "響き",
+                readingKana = "ひびき",
+                romaji = "hibiki",
+                jlptLevel = "JLPT N2",
+                pitchPattern = "[3] Odaka (尾高)",
+                moraHeights = listOf(false, true, true),
+                definition = "Echo, reverberation, acoustic resonance, sound.",
+            ),
+            KanjiLexiconEntry(
+                surface = "夜空",
+                readingKana = "よぞら",
+                romaji = "yozora",
+                jlptLevel = "JLPT N3",
+                pitchPattern = "[1] Atamadaka (頭高)",
+                moraHeights = listOf(true, false, false),
+                definition = "Night sky, starlit firmament.",
+            ),
+            KanjiLexiconEntry(
+                surface = "旋律",
+                readingKana = "せんりつ",
+                romaji = "senritsu",
+                jlptLevel = "JLPT N1",
+                pitchPattern = "[0] Heiban (平板)",
+                moraHeights = listOf(false, true, true, true),
+                definition = "Melody, tune, harmonic progression.",
+            ),
+            KanjiLexiconEntry(
+                surface = "心",
+                readingKana = "こころ",
+                romaji = "kokoro",
+                jlptLevel = "JLPT N4",
+                pitchPattern = "[2] Nakadaka (中高)",
+                moraHeights = listOf(false, true, false),
+                definition = "Heart, mind, spirit, inner acoustic emotion.",
+            ),
+        )
+    }
+
+    val activeWord = lexicon[selectedWordIndex]
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -3796,64 +3872,179 @@ private fun LinguisticLyricsStudioSheet(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text("Yuma Linguistic Lyrics Studio", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("Japanese Furigana Ruby annotations, Hepburn Romaji & IPA phonetics for $trackTitle", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = "YumaPlayer Linguistics & Lyric Engine",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "Romaji transliteration, Tokyo pitch accent contours, Kanji lexicon & dual-script typography",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                color = Color(0xFF0B0E14),
+                border = BorderStroke(1.dp, Color(0xFF262B36)),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text("Live Annotation Preview:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        text = "ACTIVE LYRIC STREAM • ${trackTitle.uppercase()}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF00E5FF),
+                    )
 
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        listOf(
-                            "夢" to "ゆめ",
-                            "の" to null,
-                            "音" to "おと",
-                            "が" to null,
-                            "響" to "ひび",
-                            "く" to null,
-                        ).forEach { (kanji, reading) ->
-                            if (reading != null && showFurigana) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(reading, style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
-                                    Text(kanji, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    if (pitchAccentEnabled) {
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(34.dp)
+                                .padding(horizontal = 16.dp),
+                        ) {
+                            val heights = activeWord.moraHeights
+                            val stepX = size.width / (heights.size.coerceAtLeast(1))
+                            val highY = size.height * 0.22f
+                            val lowY = size.height * 0.78f
+
+                            for (i in heights.indices) {
+                                val x = stepX * i + stepX * 0.5f
+                                val y = if (heights[i]) highY else lowY
+                                if (i < heights.size - 1) {
+                                    val nextX = stepX * (i + 1) + stepX * 0.5f
+                                    val nextY = if (heights[i + 1]) highY else lowY
+                                    drawLine(
+                                        color = Color(0xFFFFD700),
+                                        start = androidx.compose.ui.geometry.Offset(x, y),
+                                        end = androidx.compose.ui.geometry.Offset(nextX, nextY),
+                                        strokeWidth = 3f,
+                                    )
                                 }
-                            } else {
-                                Text(kanji, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                                drawCircle(
+                                    color = if (heights[i]) Color(0xFF00E5FF) else Color(0xFFFFD700),
+                                    radius = 5f,
+                                    center = androidx.compose.ui.geometry.Offset(x, y),
+                                )
                             }
                         }
                     }
 
-                    if (showRomaji) {
-                        Text("Romaji: Yume no oto ga hibiku", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                    Text(
+                        text = "永遠の響きが夜空に広がる",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
+
+                    if (romajiEnabled) {
+                        Text(
+                            text = "eien no hibiki ga yozora ni hirogaru",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontFamily = latinFonts[selectedLatinFontIdx].second,
+                            color = Color(0xFF00E5FF),
+                        )
                     }
 
-                    if (showIpaPhonetics) {
-                        Text("IPA: [jɯme no oto ɡa hibikɯ]", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (dualTranslationEnabled) {
+                        Text(
+                            text = "An eternal resonance spreads across the night sky",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = latinFonts[selectedLatinFontIdx].second,
+                            color = Color(0xFFB0BEC5),
+                        )
                     }
                 }
             }
 
-            Text("Annotation Toggles", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text("Furigana Ruby Text", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Render small Hiragana readings above Kanji symbols", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Interactive Kanji Dictionary Lookup (Tap token)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                lexicon.forEachIndexed { idx, entry ->
+                    FilterChip(
+                        selected = selectedWordIndex == idx,
+                        onClick = { selectedWordIndex = idx },
+                        label = {
+                            Text(
+                                text = entry.surface,
+                                fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
                 }
-                Switch(checked = showFurigana, onCheckedChange = { showFurigana = it })
+            }
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "${activeWord.surface} 【${activeWord.readingKana} • ${activeWord.romaji}】",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                        )
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                        ) {
+                            Text(
+                                text = activeWord.jlptLevel,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            )
+                        }
+                    }
+                    Text(
+                        text = "Tokyo Pitch Accent: ${activeWord.pitchPattern}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = activeWord.definition,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontFamily = latinFonts[selectedLatinFontIdx].second,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            Text("Latin Script Typeface", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                latinFonts.forEachIndexed { idx, pair ->
+                    FilterChip(
+                        selected = selectedLatinFontIdx == idx,
+                        onClick = { selectedLatinFontIdx = idx },
+                        label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            Text("East Asian (CJK) Script Typeface", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                cjkFonts.forEachIndexed { idx, pair ->
+                    FilterChip(
+                        selected = selectedCjkFontIdx == idx,
+                        onClick = { selectedCjkFontIdx = idx },
+                        label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
 
             Row(
@@ -3861,11 +4052,8 @@ private fun LinguisticLyricsStudioSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text("Romaji Transliteration", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Display Hepburn-style Latin character transliteration", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = showRomaji, onCheckedChange = { showRomaji = it })
+                Text("Hepburn Romaji Subtitle Line", style = MaterialTheme.typography.bodyMedium)
+                Switch(checked = romajiEnabled, onCheckedChange = { romajiEnabled = it })
             }
 
             Row(
@@ -3873,11 +4061,17 @@ private fun LinguisticLyricsStudioSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text("IPA Phonetic Alphabet", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("International Phonetic Alphabet pronunciation guides", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = showIpaPhonetics, onCheckedChange = { showIpaPhonetics = it })
+                Text("Tokyo Pitch Accent Contours", style = MaterialTheme.typography.bodyMedium)
+                Switch(checked = pitchAccentEnabled, onCheckedChange = { pitchAccentEnabled = it })
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Simultaneous Dual-Language Translation", style = MaterialTheme.typography.bodyMedium)
+                Switch(checked = dualTranslationEnabled, onCheckedChange = { dualTranslationEnabled = it })
             }
         }
     }
