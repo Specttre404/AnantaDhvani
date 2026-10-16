@@ -3,6 +3,11 @@ package com.lastwave.app.ui.feed
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.draw.clip
+import com.lastwave.app.ui.theme.SubduedGrayText
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.ColumnScope
 import com.lastwave.app.ui.theme.NeonCyanPrimary
 import com.lastwave.app.ui.theme.AudiophileGold
 import com.lastwave.app.ui.theme.ExpressivePurple
@@ -1905,6 +1910,69 @@ fun RevampedFeedHeader(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun RevampedStudioHeaderCard(
+    title: String,
+    subtitle: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceGlassHigh),
+        border = BorderStroke(1.dp, GlassBorderStroke),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = NeonCyanPrimary.copy(alpha = 0.1f),
+                    modifier = Modifier.size(44.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = NeonCyanPrimary,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        ),
+                    )
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = SubduedGrayText,
+                        ),
+                    )
+                }
+            }
+
+            HorizontalDivider(color = Color.White.copy(alpha = 0.06f))
+
+            content()
         }
     }
 }
