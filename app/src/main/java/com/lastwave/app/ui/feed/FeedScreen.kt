@@ -1,18 +1,14 @@
 package com.lastwave.app.ui.feed
 
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.draw.clip
-import com.lastwave.app.ui.theme.SubduedGrayText
+import com.lastwave.app.ui.theme.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.layout.ColumnScope
-import com.lastwave.app.ui.theme.NeonCyanPrimary
-import com.lastwave.app.ui.theme.AudiophileGold
-import com.lastwave.app.ui.theme.ExpressivePurple
-import com.lastwave.app.ui.theme.SurfaceGlassHigh
-import com.lastwave.app.ui.theme.GlassBorderStroke
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -1870,51 +1866,62 @@ fun RevampedFeedHeader(
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(NeonCyanPrimary.copy(alpha = 0.15f), Color.Transparent)
+                    colors = listOf(RawNeonPurple.copy(alpha = 0.25f), CinematicVoid)
                 )
             )
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            // Zune-style panoramic ticker title
-            Text(
-                text = "collection  •  vault  •  acoustics",
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Light,
-                    brush = Brush.linearGradient(
-                        colors = listOf(NeonCyanPrimary, AudiophileGold, ExpressivePurple)
-                    )
-                ),
-                maxLines = 1,
-            )
-
-            // Subtitle status pill
-            Surface(
-                shape = CircleShape,
-                color = SurfaceGlassHigh,
-                border = BorderStroke(1.dp, GlassBorderStroke),
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(NeonCyanPrimary)
-                    )
-                    Text(
-                        text = "BIT-PERFECT OBOE C++20 ACTIVE",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold,
-                            color = NeonCyanPrimary
+                Text(
+                    text = "ANANTA DHVANI",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 2.sp,
+                        brush = Brush.linearGradient(
+                            colors = listOf(AmbientGlowCyan, HdrGoldAccent, RawNeonPurple)
                         )
                     )
+                )
+                Surface(
+                    shape = CircleShape,
+                    color = GlassSurfacePanel,
+                    border = BorderStroke(1.dp, GlassBorderActive)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(AmbientGlowCyan)
+                        )
+                        Text(
+                            text = "HDR OBOE C++20",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold,
+                                color = AmbientGlowCyan
+                            )
+                        )
+                    }
                 }
             }
+            Text(
+              text = "vault  •  audiophile  •  cinematic  •  live",
+              style = MaterialTheme.typography.bodySmall.copy(
+                  fontWeight = FontWeight.Light,
+                  color = SubduedGrayText,
+                  letterSpacing = 1.5.sp
+              )
+            )
         }
     }
 }
