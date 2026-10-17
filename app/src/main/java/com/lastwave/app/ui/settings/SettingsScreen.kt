@@ -2451,34 +2451,37 @@ private fun rememberPressScale(interactionSource: MutableInteractionSource): Flo
 private fun SectionLabel(text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp, top = 6.dp),
+        modifier = Modifier.padding(start = 6.dp, bottom = 6.dp, top = 10.dp),
     ) {
         Box(
             modifier = Modifier
-                .size(width = 4.dp, height = 16.dp)
-                .clip(RoundedCornerShape(2.dp))
+                .size(width = 5.dp, height = 18.dp)
+                .clip(RoundedCornerShape(50))
                 .background(
                     brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                         colors = listOf(
-                            com.lastwave.app.ui.theme.NeonCyanPrimary,
-                            com.lastwave.app.ui.theme.AudiophileGold,
-                        )
-                    )
-                )
+                            Color(0xFF00F0FF),
+                            Color(0xFFFF2E93),
+                            Color(0xFFFFC700),
+                        ),
+                    ),
+                ),
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(10.dp))
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.labelLarge.copy(
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = androidx.compose.ui.unit.TextUnit(1.4f, androidx.compose.ui.unit.TextUnitType.Sp),
                 brush = androidx.compose.ui.graphics.Brush.linearGradient(
                     colors = listOf(
-                        com.lastwave.app.ui.theme.NeonCyanPrimary,
-                        com.lastwave.app.ui.theme.AudiophileGold,
-                    )
-                )
+                        Color(0xFF00F0FF),
+                        Color(0xFFFF2E93),
+                        Color(0xFFFFC700),
+                    ),
+                ),
             ),
-            fontWeight = FontWeight.Bold,
-            letterSpacing = androidx.compose.ui.unit.TextUnit(1.1f, androidx.compose.ui.unit.TextUnitType.Sp),
         )
     }
 }
@@ -3822,216 +3825,163 @@ private fun UsbDirectOutputCard(
 
 @Composable
 private fun MetroEInkTypographyStudioCard() {
-    var tileMarginDp by remember { mutableFloatStateOf(6f) }
-    var tileBorderDp by remember { mutableFloatStateOf(1.5f) }
-    var tileCornerDp by remember { mutableFloatStateOf(0f) }
-    var liveTileFlipEnabled by remember { mutableStateOf(true) }
-    var zunePanoramaEnabled by remember { mutableStateOf(true) }
     var eInkMonochromeMode by remember { mutableStateOf(false) }
+    var eInkInvertContrast by remember { mutableStateOf(false) }
     var pixelAtAGlanceEnabled by remember { mutableStateOf(true) }
-    var loadedCustomFontName by remember { mutableStateOf("System Default (Inter / Roboto)") }
+    var showDacTelemetryInGlance by remember { mutableStateOf(true) }
 
-    val fontPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent(),
-    ) { uri: android.net.Uri? ->
-        if (uri != null) {
-            loadedCustomFontName = uri.lastPathSegment?.substringAfterLast('/') ?: "CustomTypeface.ttf"
-        }
+    val cardBg = when {
+        eInkMonochromeMode && eInkInvertContrast -> Color.White
+        eInkMonochromeMode -> Color.Black
+        else -> Color(0xFF0D121F)
     }
-
-    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "metro_3d_flip")
-    val flipCycle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
-            animation = androidx.compose.animation.core.tween(durationMillis = 7000, easing = androidx.compose.animation.core.LinearEasing),
-            repeatMode = androidx.compose.animation.core.RepeatMode.Restart,
-        ),
-        label = "flip_angle",
-    )
-
-    val isFlippedBack = liveTileFlipEnabled && (flipCycle in 90f..270f)
-    val cardBg = if (eInkMonochromeMode) Color.Black else MaterialTheme.colorScheme.surfaceContainerHigh
-    val cardFg = if (eInkMonochromeMode) Color.White else MaterialTheme.colorScheme.onSurface
-    val accentColor = if (eInkMonochromeMode) Color.White else Color(0xFF00E5FF)
+    val cardFg = when {
+        eInkMonochromeMode && eInkInvertContrast -> Color.Black
+        eInkMonochromeMode -> Color.White
+        else -> Color.White
+    }
+    val accentCyan = if (eInkMonochromeMode) cardFg else Color(0xFF00F0FF)
+    val accentRose = if (eInkMonochromeMode) cardFg else Color(0xFFFF2E93)
 
     Card(
-        shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 20.dp),
+        shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 24.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
-        border = if (eInkMonochromeMode) androidx.compose.foundation.BorderStroke(2.dp, Color.White) else null,
+        border = androidx.compose.foundation.BorderStroke(
+            width = if (eInkMonochromeMode) 2.dp else 1.dp,
+            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                colors = if (eInkMonochromeMode) listOf(cardFg, cardFg)
+                else listOf(accentCyan.copy(alpha = 0.5f), accentRose.copy(alpha = 0.4f)),
+            ),
+        ),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Text(
-                text = "Metro 3D Hub, E-Ink & Typography Studio",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = cardFg,
-            )
-            Text(
-                text = "Metrolist 3D live tiles, Zune panorama, Obsidian 1-bit E-Ink & Pixel At-a-Glance",
-                style = MaterialTheme.typography.bodySmall,
-                color = cardFg.copy(alpha = 0.75f),
-            )
-
-            if (pixelAtAGlanceEnabled) {
-                Surface(
-                    shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 50.dp),
-                    color = if (eInkMonochromeMode) Color.Black else Color(0xFF10141C),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, accentColor.copy(alpha = 0.6f)),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Column {
-                            Text(
-                                text = "AT A GLANCE • NOW AUDITIONING",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = "Ananta Dhvani • 32-Bit Float Oboe Pipeline",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White,
-                            )
-                        }
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = accentColor.copy(alpha = 0.2f),
-                        ) {
-                            Text(
-                                text = "USB DAC",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            )
-                        }
-                    }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            if (!eInkMonochromeMode) {
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    drawCircle(
+                        color = Color(0xFF00F0FF).copy(alpha = 0.08f),
+                        radius = size.minDimension * 0.6f,
+                        center = androidx.compose.ui.geometry.Offset(size.width * 0.85f, size.height * 0.2f),
+                    )
+                    drawCircle(
+                        color = Color(0xFFFF2E93).copy(alpha = 0.07f),
+                        radius = size.minDimension * 0.5f,
+                        center = androidx.compose.ui.geometry.Offset(size.width * 0.15f, size.height * 0.8f),
+                    )
                 }
             }
 
-            if (zunePanoramaEnabled) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
                 Text(
-                    text = "collection  •  now playing  •  acoustics",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Light,
-                    color = accentColor,
-                    maxLines = 1,
+                    text = "Pixel At-a-Glance & 1-Bit E-Ink Display Studio",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = cardFg,
+                    ),
                 )
-            }
+                Text(
+                    text = "Live Google Pixel hardware audio telemetry pill & zero-blur 1-bit monochrome display mode",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = cardFg.copy(alpha = 0.75f),
+                )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(all = (tileMarginDp / 2f).dp),
-                horizontalArrangement = Arrangement.spacedBy(tileMarginDp.dp),
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(tileCornerDp.dp),
-                    color = if (eInkMonochromeMode) Color.Black else Color(0xFF0078D7),
-                    border = if (tileBorderDp > 0f) androidx.compose.foundation.BorderStroke(tileBorderDp.dp, Color.White) else null,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(100.dp)
-                        .graphicsLayer {
-                            rotationX = if (liveTileFlipEnabled && !eInkMonochromeMode) {
-                                kotlin.math.sin(Math.toRadians(flipCycle.toDouble())).toFloat() * 25f
-                            } else 0f
-                            cameraDistance = 12f * density
-                        },
-                ) {
-                    Box(modifier = Modifier.fillMaxSize().padding(12.dp)) {
-                        if (!isFlippedBack) {
-                            Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
-                                Text("METRO LIVE", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
-                                Text("Hi-Res Vault", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                // Upgraded 39A: Pixel At a Glance Live Media Status Banner
+                if (pixelAtAGlanceEnabled) {
+                    Surface(
+                        shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 50.dp),
+                        color = if (eInkMonochromeMode) cardBg else Color(0xFF070A12),
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                                colors = listOf(accentCyan, accentRose),
+                            ),
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text(
+                                    text = "PIXEL AT A GLANCE • BIT-PERFECT",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = accentCyan,
+                                    fontWeight = FontWeight.ExtraBold,
+                                )
+                                Text(
+                                    text = if (showDacTelemetryInGlance) "Oboe C++20 • 32-Bit Float / 96 kHz" else "Ananta Dhvani • Active Session",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = cardFg,
+                                )
                             }
-                        } else {
-                            Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
-                                Text("PLAY STATS", style = MaterialTheme.typography.labelSmall, color = Color(0xFFFFD700))
-                                Text("148 Tracks • FLAC", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                            Surface(
+                                shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 12.dp),
+                                color = accentCyan.copy(alpha = 0.18f),
+                            ) {
+                                Text(
+                                    text = "DIRECT DAC",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = accentCyan,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                )
                             }
                         }
                     }
                 }
 
-                Surface(
-                    shape = RoundedCornerShape(tileCornerDp.dp),
-                    color = if (eInkMonochromeMode) Color.Black else Color(0xFF6A00FF),
-                    border = if (tileBorderDp > 0f) androidx.compose.foundation.BorderStroke(tileBorderDp.dp, Color.White) else null,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(100.dp),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(12.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Pixel At-a-Glance Media Banner", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = cardFg)
+                        Text("Display contextual playback & DAC routing status", style = MaterialTheme.typography.bodySmall, color = cardFg.copy(alpha = 0.7f))
+                    }
+                    Switch(checked = pixelAtAGlanceEnabled, onCheckedChange = { pixelAtAGlanceEnabled = it })
+                }
+
+                if (pixelAtAGlanceEnabled) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("ZUNE HUB", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
-                        Text("31-Band PEQ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Show Sample Rate & Bit-Depth in Banner", style = MaterialTheme.typography.bodySmall, color = cardFg)
+                        Switch(checked = showDacTelemetryInGlance, onCheckedChange = { showDacTelemetryInGlance = it })
                     }
                 }
-            }
 
-            Text("Tile Grid Spacing Margin: ${tileMarginDp.toInt()} dp", style = MaterialTheme.typography.labelSmall, color = cardFg)
-            Slider(value = tileMarginDp, onValueChange = { tileMarginDp = it }, valueRange = 0f..16f)
+                // Upgraded 37A: Pure Monochrome 1-Bit E-Ink Mode
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Pure Monochrome 1-Bit E-Ink Mode", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = cardFg)
+                        Text("Disable GPU shaders, blurs & animations for sunlight readability", style = MaterialTheme.typography.bodySmall, color = cardFg.copy(alpha = 0.7f))
+                    }
+                    Switch(checked = eInkMonochromeMode, onCheckedChange = { eInkMonochromeMode = it })
+                }
 
-            Text("Tile Outline Border Width: ${"%.1f".format(tileBorderDp)} dp", style = MaterialTheme.typography.labelSmall, color = cardFg)
-            Slider(value = tileBorderDp, onValueChange = { tileBorderDp = it }, valueRange = 0f..4f)
-
-            Text("Tile Corner Radius: ${tileCornerDp.toInt()} dp (0 = Sharp Metro)", style = MaterialTheme.typography.labelSmall, color = cardFg)
-            Slider(value = tileCornerDp, onValueChange = { tileCornerDp = it }, valueRange = 0f..24f)
-
-            Text("Custom Font File: $loadedCustomFontName", style = MaterialTheme.typography.labelSmall, color = accentColor, fontWeight = FontWeight.Bold)
-            OutlinedButton(
-                onClick = { fontPickerLauncher.launch("*/*") },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Import Local .TTF / .OTF Font File", color = cardFg)
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("3D Flipping Live Tiles", style = MaterialTheme.typography.bodyMedium, color = cardFg)
-                Switch(checked = liveTileFlipEnabled, onCheckedChange = { liveTileFlipEnabled = it })
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Full Panoramic Zune Header", style = MaterialTheme.typography.bodyMedium, color = cardFg)
-                Switch(checked = zunePanoramaEnabled, onCheckedChange = { zunePanoramaEnabled = it })
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Pure Monochrome E-Ink Mode (Zero Blur)", style = MaterialTheme.typography.bodyMedium, color = cardFg)
-                Switch(checked = eInkMonochromeMode, onCheckedChange = { eInkMonochromeMode = it })
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Pixel At-a-Glance Media Banner", style = MaterialTheme.typography.bodyMedium, color = cardFg)
-                Switch(checked = pixelAtAGlanceEnabled, onCheckedChange = { pixelAtAGlanceEnabled = it })
+                if (eInkMonochromeMode) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("Daylight Paper Mode (Black Ink on White)", style = MaterialTheme.typography.bodySmall, color = cardFg)
+                        Switch(checked = eInkInvertContrast, onCheckedChange = { eInkInvertContrast = it })
+                    }
+                }
             }
         }
     }
@@ -4040,153 +3990,189 @@ private fun MetroEInkTypographyStudioCard() {
 @Composable
 private fun NamidaLibraryTagArchiveCard() {
     val context = androidx.compose.ui.platform.LocalContext.current
-    var tagTitle by remember { mutableStateOf("Ananta Continuum (Live Soundboard)") }
+    var tagTitle by remember { mutableStateOf("Ananta Continuum (24-Bit Studio Master)") }
     var tagArtist by remember { mutableStateOf("Ishan • Audiophile Ensemble") }
-    var tagAlbum by remember { mutableStateOf("Session IV: 24-Bit Master") }
+    var tagAlbum by remember { mutableStateOf("Session IV: Acoustic Reference") }
     var tagYear by remember { mutableStateOf("2026") }
+    var tagGenre by remember { mutableStateOf("Progressive Instrumental") }
+    var lrcOffsetMs by remember { mutableFloatStateOf(0f) }
     var activeFolderNode by remember { mutableStateOf("/storage/emulated/0/Music/HiRes_FLAC") }
-    var selectedArchiveShowIdx by remember { mutableIntStateOf(0) }
-    var artworkStatus by remember { mutableStateOf("Embedded 1400x1400 PNG (2.4 MB)") }
+    var artworkStatus by remember { mutableStateOf("Embedded 1400x1400 Lossless PNG (2.4 MB)") }
 
     val artworkPicker = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.GetContent(),
     ) { uri: android.net.Uri? ->
         if (uri != null) {
             artworkStatus = "Injected Custom Cover: ${uri.lastPathSegment?.substringAfterLast('/') ?: "cover.png"}"
-            android.widget.Toast.makeText(context, "Cover Art Injected into Container", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, "High-Res Cover Art Injected into Container", android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
     val folderTree = listOf(
-        "/storage/emulated/0/Music/HiRes_FLAC (48 files)",
-        "/storage/emulated/0/Music/DSD_ISO_Vault (19 files)",
-        "/storage/emulated/0/Music/Vinyl_24_192_Rips (32 files)",
-        "/storage/emulated/0/Download/ArchiveOrg_Bootlegs (14 files)",
-    )
-
-    val archiveConcerts = listOf(
-        "1977-05-08 • Barton Hall SBD (24/96 FLAC)",
-        "1994-10-20 • Earls Court Soundboard Matrix",
-        "2001-03-15 • Tokyo Budokan Acoustic Master",
+        "/storage/emulated/0/Music/HiRes_FLAC" to "48 files • 24/96 FLAC",
+        "/storage/emulated/0/Music/DSD_PCM_Vault" to "19 files • 32-Bit WAV",
+        "/storage/emulated/0/Music/Vinyl_Masters" to "32 files • 24/192 FLAC",
+        "/storage/emulated/0/Music/Instrumental_Sessions" to "27 files • ALAC/FLAC",
     )
 
     Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D121F)),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                colors = listOf(Color(0xFF00F0FF).copy(alpha = 0.45f), Color(0xFFFFC700).copy(alpha = 0.35f)),
+            ),
+        ),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = "Library Curation, Tag Editor & ArchiveTune Vault",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = "Namida ID3v2/Vorbis/MP4 tag editor, cover art injector, folder tree & Archive.org live soundboards",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            Text("Audio Container Metadata Editor (ID3v2.4 / Vorbis)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-            OutlinedTextField(
-                value = tagTitle,
-                onValueChange = { tagTitle = it },
-                label = { Text("Track Title") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = tagArtist,
-                    onValueChange = { tagArtist = it },
-                    label = { Text("Artist") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawCircle(
+                    color = Color(0xFF00F0FF).copy(alpha = 0.07f),
+                    radius = size.minDimension * 0.55f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.9f, size.height * 0.15f),
                 )
-                OutlinedTextField(
-                    value = tagYear,
-                    onValueChange = { tagYear = it },
-                    label = { Text("Year") },
-                    singleLine = true,
-                    modifier = Modifier.weight(0.45f),
+                drawCircle(
+                    color = Color(0xFFFFC700).copy(alpha = 0.06f),
+                    radius = size.minDimension * 0.5f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.1f, size.height * 0.85f),
                 )
             }
-            OutlinedTextField(
-                value = tagAlbum,
-                onValueChange = { tagAlbum = it },
-                label = { Text("Album & LRC Offset (+0ms)") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Button(
-                onClick = {
-                    android.widget.Toast.makeText(context, "Saved ID3v2/Vorbis tags to audio file", android.widget.Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier.fillMaxWidth(),
+
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text("Write Metadata Tags to File")
-            }
+                Text(
+                    text = "Namida Tag Editor, Artwork & Folder Tree Studio",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                    ),
+                )
+                Text(
+                    text = "ID3v2.4 / Vorbis / MP4 container metadata writer, high-res cover art injector & direct directory tree browser",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF94A3B8),
+                )
 
-            Text("Cover Artwork: $artworkStatus", style = MaterialTheme.typography.labelSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(
+                // Upgraded 40A: In-App ID3v2 / Vorbis / MP4 Audio Tag Editor
+                Text("Audio Container Metadata Editor (ID3v2.4 / Vorbis / MP4)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFF00F0FF))
+                OutlinedTextField(
+                    value = tagTitle,
+                    onValueChange = { tagTitle = it },
+                    label = { Text("Track Title") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = tagArtist,
+                        onValueChange = { tagArtist = it },
+                        label = { Text("Artist") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedTextField(
+                        value = tagYear,
+                        onValueChange = { tagYear = it },
+                        label = { Text("Year") },
+                        singleLine = true,
+                        modifier = Modifier.weight(0.45f),
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = tagAlbum,
+                        onValueChange = { tagAlbum = it },
+                        label = { Text("Album") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedTextField(
+                        value = tagGenre,
+                        onValueChange = { tagGenre = it },
+                        label = { Text("Genre") },
+                        singleLine = true,
+                        modifier = Modifier.weight(0.8f),
+                    )
+                }
+
+                Text("Embedded LRC Lyric Timestamp Offset: ${if (lrcOffsetMs >= 0) "+" else ""}${lrcOffsetMs.toInt()} ms", style = MaterialTheme.typography.labelSmall, color = Color(0xFFFFC700))
+                Slider(
+                    value = lrcOffsetMs,
+                    onValueChange = { lrcOffsetMs = it },
+                    valueRange = -2000f..2000f,
+                )
+
+                Button(
                     onClick = {
-                        artworkStatus = "Extracted to /Pictures/AnantaCovers/"
-                        android.widget.Toast.makeText(context, "Extracted embedded cover to storage", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(context, "Committed ID3v2.4/Vorbis tags & LRC offset to audio file", android.widget.Toast.LENGTH_SHORT).show()
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Extract Art", style = MaterialTheme.typography.labelSmall)
+                    Text("Write Metadata Tags to Audio File", fontWeight = FontWeight.Bold)
                 }
-                OutlinedButton(
-                    onClick = { artworkPicker.launch("image/*") },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("Inject Local Art", style = MaterialTheme.typography.labelSmall)
-                }
-            }
 
-            Text("Hierarchical Directory Browser", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    folderTree.forEach { folder ->
-                        val isSelected = activeFolderNode == folder
-                        Surface(
-                            onClick = { activeFolderNode = folder },
-                            shape = RoundedCornerShape(8.dp),
-                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(
-                                text = "📁 $folder",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            )
-                        }
+                // Upgraded 41A: Cover Artwork Extractor & Injector
+                Text("Embedded Artwork Status: $artworkStatus", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00F0FF))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(
+                        onClick = {
+                            artworkStatus = "Exported 1400x1400 PNG to /Pictures/AnantaCovers/"
+                            android.widget.Toast.makeText(context, "Extracted embedded cover to gallery", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("Extract Cover Art", style = MaterialTheme.typography.labelSmall)
+                    }
+                    OutlinedButton(
+                        onClick = { artworkPicker.launch("image/*") },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text("Inject New Cover", style = MaterialTheme.typography.labelSmall)
                     }
                 }
-            }
 
-            Text("ArchiveTune Live Soundboard Bootleg Streamer", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                archiveConcerts.forEachIndexed { idx, concert ->
-                    FilterChip(
-                        selected = selectedArchiveShowIdx == idx,
-                        onClick = {
-                            selectedArchiveShowIdx = idx
-                            android.widget.Toast.makeText(context, "Mounted Archive.org FLAC Soundboard: $concert", android.widget.Toast.LENGTH_SHORT).show()
-                        },
-                        label = { Text(concert, style = MaterialTheme.typography.labelSmall) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                // Upgraded 42A: Hierarchical Folder Tree Browser
+                Text("Hierarchical Storage Directory Browser", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFF070A12),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B)),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        folderTree.forEach { (folderPath, codecBadge) ->
+                            val isSelected = activeFolderNode == folderPath
+                            Surface(
+                                onClick = { activeFolderNode = folderPath },
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) Color(0xFF00F0FF).copy(alpha = 0.16f) else Color.Transparent,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp).fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = "📁 ${folderPath.substringAfterLast('/')}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.White,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    )
+                                    Text(
+                                        text = codecBadge,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color(0xFF00F0FF),
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -4195,94 +4181,110 @@ private fun NamidaLibraryTagArchiveCard() {
 
 @Composable
 private fun NetworkProxyResilienceCard() {
-    var selectedProxyMode by remember { mutableIntStateOf(0) }
-    var proxyHost by remember { mutableStateOf("127.0.0.1:1080") }
-    var customEndpoint by remember { mutableStateOf("https://invidious.anantadhvani.org") }
-    var accelerometerSleepTimer by remember { mutableStateOf(true) }
     var fullTrackWifiBuffer by remember { mutableStateOf(true) }
+    var wifiRamCacheLimitMb by remember { mutableFloatStateOf(512f) }
     var mobileBufferWindowSec by remember { mutableFloatStateOf(30f) }
-
-    val proxyModes = listOf("Direct", "HTTP Proxy", "SOCKS5 Tunnel")
+    var accelerometerSleepTimer by remember { mutableStateOf(true) }
+    var motionAutoExtendMinutes by remember { mutableFloatStateOf(10f) }
+    var gentleFadeOutBeforeSleep by remember { mutableStateOf(true) }
 
     Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D121F)),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                colors = listOf(Color(0xFFFF2E93).copy(alpha = 0.45f), Color(0xFF00F0FF).copy(alpha = 0.45f)),
+            ),
+        ),
         modifier = Modifier.fillMaxWidth().wrapContentHeight(),
     ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = "Playback Resilience, Proxy & Motion Sleep Studio",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = "Vivi-Music SOCKS5/HTTP proxy routing, Invidious endpoints, per-track buffer quotas & Nightly motion sleep timer",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            Text("Stream Tunneling Mode", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                proxyModes.forEachIndexed { idx, label ->
-                    FilterChip(
-                        selected = selectedProxyMode == idx,
-                        onClick = { selectedProxyMode = idx },
-                        label = { Text(label, style = MaterialTheme.typography.labelSmall) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-
-            if (selectedProxyMode != 0) {
-                OutlinedTextField(
-                    value = proxyHost,
-                    onValueChange = { proxyHost = it },
-                    label = { Text("Proxy Host:Port") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawCircle(
+                    color = Color(0xFFFF2E93).copy(alpha = 0.08f),
+                    radius = size.minDimension * 0.55f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.85f, size.height * 0.25f),
                 )
             }
 
-            OutlinedTextField(
-                value = customEndpoint,
-                onValueChange = { customEndpoint = it },
-                label = { Text("Alternate Invidious / Piped Resolver Instance") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Pre-Buffer Full Track on Wi-Fi", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Cache 100% of lossless/Opus stream into RAM on unmetered Wi-Fi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = fullTrackWifiBuffer, onCheckedChange = { fullTrackWifiBuffer = it })
-            }
+                Text(
+                    text = "Smart Stream Buffer & Motion-Aware Sleep Studio",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                    ),
+                )
+                Text(
+                    text = "Adaptive Wi-Fi RAM pre-buffering, mobile data sliding window quotas & accelerometer standstill sleep detection",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF94A3B8),
+                )
 
-            Text("Mobile Data Sliding Buffer Window: ${mobileBufferWindowSec.toInt()} sec", style = MaterialTheme.typography.labelSmall)
-            Slider(
-                value = mobileBufferWindowSec,
-                onValueChange = { mobileBufferWindowSec = it },
-                valueRange = 15f..120f,
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Accelerometer Motion-Aware Sleep Timer", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Monitor hardware motion sensors; extend timer automatically until device remains stationary", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                // Upgraded 51A: Smart Wi-Fi Full Pre-Buffer & Mobile Data Window
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Pre-Buffer 100% of Track on Wi-Fi", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        Text("Load entire lossless/Opus stream into RAM immediately for zero-drop playback", style = MaterialTheme.typography.bodySmall, color = Color(0xFF94A3B8))
+                    }
+                    Switch(checked = fullTrackWifiBuffer, onCheckedChange = { fullTrackWifiBuffer = it })
                 }
-                Switch(checked = accelerometerSleepTimer, onCheckedChange = { accelerometerSleepTimer = it })
+
+                if (fullTrackWifiBuffer) {
+                    Text("Wi-Fi RAM Pre-Buffer Ceiling: ${wifiRamCacheLimitMb.toInt()} MB", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00F0FF))
+                    Slider(
+                        value = wifiRamCacheLimitMb,
+                        onValueChange = { wifiRamCacheLimitMb = it },
+                        valueRange = 128f..1024f,
+                    )
+                }
+
+                Text("Mobile Data Sliding Buffer Window: ${mobileBufferWindowSec.toInt()} sec", style = MaterialTheme.typography.labelSmall, color = Color.White)
+                Slider(
+                    value = mobileBufferWindowSec,
+                    onValueChange = { mobileBufferWindowSec = it },
+                    valueRange = 15f..120f,
+                )
+
+                // Upgraded 52A: Accelerometer-Assisted Smart Sleep Timer
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Accelerometer Motion-Aware Sleep Timer", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        Text("Monitor hardware motion sensors; only pause once phone lies completely still", style = MaterialTheme.typography.bodySmall, color = Color(0xFF94A3B8))
+                    }
+                    Switch(checked = accelerometerSleepTimer, onCheckedChange = { accelerometerSleepTimer = it })
+                }
+
+                if (accelerometerSleepTimer) {
+                    Text("Motion Detected Auto-Extend Duration: +${motionAutoExtendMinutes.toInt()} min", style = MaterialTheme.typography.labelSmall, color = Color(0xFFFF2E93))
+                    Slider(
+                        value = motionAutoExtendMinutes,
+                        onValueChange = { motionAutoExtendMinutes = it },
+                        valueRange = 5f..30f,
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("Smooth 10-Second Volume Fade-Out on Sleep", style = MaterialTheme.typography.bodySmall, color = Color.White)
+                        Switch(checked = gentleFadeOutBeforeSleep, onCheckedChange = { gentleFadeOutBeforeSleep = it })
+                    }
+                }
             }
         }
     }

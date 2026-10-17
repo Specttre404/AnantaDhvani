@@ -3454,77 +3454,147 @@ private fun DjStudioSheet(
     onDismiss: () -> Unit,
 ) {
     var balancePan by remember { mutableFloatStateOf(0f) }
+    var activeLoopBars by remember { mutableIntStateOf(0) }
     val hotCues = player.activeHotCues
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        containerColor = Color(0xFF0B0F1A),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text("DJ Studio Controls", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawCircle(
+                    color = Color(0xFF00F0FF).copy(alpha = 0.10f),
+                    radius = size.minDimension * 0.65f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.2f, size.height * 0.2f),
+                )
+                drawCircle(
+                    color = Color(0xFFFF2E93).copy(alpha = 0.09f),
+                    radius = size.minDimension * 0.55f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.85f, size.height * 0.75f),
+                )
+            }
 
-            Text("Hot Cues (Tap to jump • Long-press to set)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                (1..4).forEach { cueIdx ->
-                    val hasCue = hotCues.containsKey(cueIdx)
-                    Surface(
-                        onClick = {
-                            if (hasCue) player.jumpToHotCue(cueIdx) else player.setHotCue(cueIdx)
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (hasCue) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 12.dp)) {
-                            Text("C$cueIdx${if (hasCue) " ✓" else ""}", fontWeight = FontWeight.Bold)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "DJ Studio & Beat Workstation",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                            fontWeight = FontWeight.ExtraBold,
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93), Color(0xFFFFC700)),
+                            ),
+                        ),
+                    )
+                    if (hotCues.isNotEmpty()) {
+                        TextButton(onClick = { (1..4).forEach { player.clearHotCue(it) } }) {
+                            Text("Clear Cues", style = MaterialTheme.typography.labelSmall, color = Color(0xFFFF2E93))
                         }
                     }
                 }
-            }
 
-            Text("Phrase Loopers", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                listOf(1, 2, 4, 8).forEach { bars ->
-                    OutlinedButton(
-                        onClick = { player.startPhraseLoop(bars, bpm) },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("${bars}B", style = MaterialTheme.typography.labelSmall)
+                Text("4 Hot Cue Pads (Tap to Set / Jump)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    (1..4).forEach { cueIdx ->
+                        val cueMs = hotCues[cueIdx]
+                        val hasCue = cueMs != null
+                        Surface(
+                            onClick = {
+                                if (hasCue) player.jumpToHotCue(cueIdx) else player.setHotCue(cueIdx)
+                            },
+                            shape = RoundedCornerShape(14.dp),
+                            color = if (hasCue) Color(0xFF00F0FF).copy(alpha = 0.18f) else Color(0xFF13192B),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = if (hasCue) Color(0xFF00F0FF) else Color(0xFF26304A),
+                            ),
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(vertical = 10.dp),
+                            ) {
+                                Text("CUE $cueIdx", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                                Text(
+                                    text = if (cueMs != null) formatTime(cueMs) else "EMPTY",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (hasCue) Color(0xFF00F0FF) else Color(0xFF94A3B8),
+                                )
+                            }
+                        }
                     }
                 }
-                Button(
-                    onClick = { player.exitLoop() },
-                    modifier = Modifier.weight(1.2f),
+
+                Text("Beat-Snapped Phrase Loopers (${bpm.toInt()} BPM)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    listOf(1, 2, 4, 8).forEach { bars ->
+                        val isSelected = activeLoopBars == bars
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                activeLoopBars = bars
+                                player.startPhraseLoop(bars, bpm)
+                            },
+                            label = { Text("${bars}B", style = MaterialTheme.typography.labelSmall) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            activeLoopBars = 0
+                            player.exitLoop()
+                        },
+                        modifier = Modifier.weight(1.2f),
+                    ) {
+                        Text("Exit", style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+
+                Text("Momentary Pitch Bend Nudge (±3%)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(onClick = { player.nudgePlayback(false) }, modifier = Modifier.weight(1f)) {
+                        Text("[-] Nudge Slow", color = Color(0xFF00F0FF))
+                    }
+                    OutlinedButton(onClick = { player.nudgePlayback(true) }, modifier = Modifier.weight(1f)) {
+                        Text("[+] Nudge Fast", color = Color(0xFFFFC700))
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Exit", style = MaterialTheme.typography.labelSmall)
+                    Text("Stereo Channel Balance (${"%.2f".format(balancePan)})", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    if (balancePan != 0f) {
+                        TextButton(onClick = {
+                            balancePan = 0f
+                            player.setChannelBalance(0f)
+                        }) {
+                            Text("Center (0.00)", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00F0FF))
+                        }
+                    }
                 }
+                Slider(
+                    value = balancePan,
+                    onValueChange = {
+                        balancePan = it
+                        player.setChannelBalance(it)
+                    },
+                    valueRange = -1.0f..1.0f,
+                )
             }
-
-            Text("Pitch Nudge", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = { player.nudgePlayback(false) }, modifier = Modifier.weight(1f)) {
-                    Text("[-] Nudge")
-                }
-                OutlinedButton(onClick = { player.nudgePlayback(true) }, modifier = Modifier.weight(1f)) {
-                    Text("[+] Nudge")
-                }
-            }
-
-            Text("Stereo Channel Balance (${"%.2f".format(balancePan)})", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Slider(
-                value = balancePan,
-                onValueChange = {
-                    balancePan = it
-                    player.setChannelBalance(it)
-                },
-                valueRange = -1.0f..1.0f,
-            )
         }
     }
 }
@@ -3791,6 +3861,7 @@ private fun LinguisticLyricsStudioSheet(
     trackTitle: String,
     onDismiss: () -> Unit,
 ) {
+    var furiganaEnabled by remember { mutableStateOf(true) }
     var romajiEnabled by remember { mutableStateOf(true) }
     var pitchAccentEnabled by remember { mutableStateOf(true) }
     var dualTranslationEnabled by remember { mutableStateOf(true) }
@@ -3863,215 +3934,269 @@ private fun LinguisticLyricsStudioSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        containerColor = Color(0xFF0B0F1A),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Text(
-                text = "YumaPlayer Linguistics & Lyric Engine",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = "Romaji transliteration, Tokyo pitch accent contours, Kanji lexicon & dual-script typography",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawCircle(
+                    color = Color(0xFF00F0FF).copy(alpha = 0.10f),
+                    radius = size.minDimension * 0.6f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.85f, size.height * 0.18f),
+                )
+                drawCircle(
+                    color = Color(0xFFFF2E93).copy(alpha = 0.08f),
+                    radius = size.minDimension * 0.55f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.15f, size.height * 0.78f),
+                )
+            }
 
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = Color(0xFF0B0E14),
-                border = BorderStroke(1.dp, Color(0xFF262B36)),
-                modifier = Modifier.fillMaxWidth(),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                Text(
+                    text = "Linguistics, Furigana & Romaji Studio",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                        fontWeight = FontWeight.ExtraBold,
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93), Color(0xFFFFC700)),
+                        ),
+                    ),
+                )
+                Text(
+                    text = "Furigana Ruby readings, Hepburn Romaji, Tokyo pitch accent contours & Kanji dictionary",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF94A3B8),
+                )
+
+                Surface(
+                    shape = RoundedCornerShape(18.dp),
+                    color = Color(0xFF070A12),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF00F0FF).copy(alpha = 0.5f), Color(0xFFFF2E93).copy(alpha = 0.4f)),
+                        ),
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(
-                        text = "ACTIVE LYRIC STREAM • ${trackTitle.uppercase()}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF00E5FF),
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = "ACTIVE LYRIC STREAM • ${trackTitle.uppercase()}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF00F0FF),
+                            fontWeight = FontWeight.Bold,
+                        )
 
-                    if (pitchAccentEnabled) {
-                        Canvas(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(34.dp)
-                                .padding(horizontal = 16.dp),
-                        ) {
-                            val heights = activeWord.moraHeights
-                            val stepX = size.width / (heights.size.coerceAtLeast(1))
-                            val highY = size.height * 0.22f
-                            val lowY = size.height * 0.78f
+                        if (pitchAccentEnabled) {
+                            Canvas(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(34.dp)
+                                    .padding(horizontal = 16.dp),
+                            ) {
+                                val heights = activeWord.moraHeights
+                                val stepX = size.width / (heights.size.coerceAtLeast(1))
+                                val highY = size.height * 0.22f
+                                val lowY = size.height * 0.78f
 
-                            for (i in heights.indices) {
-                                val x = stepX * i + stepX * 0.5f
-                                val y = if (heights[i]) highY else lowY
-                                if (i < heights.size - 1) {
-                                    val nextX = stepX * (i + 1) + stepX * 0.5f
-                                    val nextY = if (heights[i + 1]) highY else lowY
-                                    drawLine(
-                                        color = Color(0xFFFFD700),
-                                        start = androidx.compose.ui.geometry.Offset(x, y),
-                                        end = androidx.compose.ui.geometry.Offset(nextX, nextY),
-                                        strokeWidth = 3f,
+                                for (i in heights.indices) {
+                                    val x = stepX * i + stepX * 0.5f
+                                    val y = if (heights[i]) highY else lowY
+                                    if (i < heights.size - 1) {
+                                        val nextX = stepX * (i + 1) + stepX * 0.5f
+                                        val nextY = if (heights[i + 1]) highY else lowY
+                                        drawLine(
+                                            color = Color(0xFFFFC700),
+                                            start = androidx.compose.ui.geometry.Offset(x, y),
+                                            end = androidx.compose.ui.geometry.Offset(nextX, nextY),
+                                            strokeWidth = 3f,
+                                        )
+                                    }
+                                    drawCircle(
+                                        color = if (heights[i]) Color(0xFF00F0FF) else Color(0xFFFF2E93),
+                                        radius = 5f,
+                                        center = androidx.compose.ui.geometry.Offset(x, y),
                                     )
                                 }
-                                drawCircle(
-                                    color = if (heights[i]) Color(0xFF00E5FF) else Color(0xFFFFD700),
-                                    radius = 5f,
-                                    center = androidx.compose.ui.geometry.Offset(x, y),
+                            }
+                        }
+
+                        // 27A: Furigana Ruby Line Above Kanji
+                        if (furiganaEnabled) {
+                            Text(
+                                text = "えいえん の ひびき が よぞら に ひろがる",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                                color = Color(0xFFFFC700),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+
+                        // Primary CJK Line
+                        Text(
+                            text = "永遠の響きが夜空に広がる",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                        )
+
+                        // 26A: Romaji Subtitle Line
+                        if (romajiEnabled) {
+                            Text(
+                                text = "eien no hibiki ga yozora ni hirogaru",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = latinFonts[selectedLatinFontIdx].second,
+                                color = Color(0xFF00F0FF),
+                            )
+                        }
+
+                        // 30A: Simultaneous Dual-Language Translation
+                        if (dualTranslationEnabled) {
+                            Text(
+                                text = "An eternal resonance spreads across the night sky",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = latinFonts[selectedLatinFontIdx].second,
+                                color = Color(0xFFE2E8F0),
+                            )
+                        }
+                    }
+                }
+
+                // 28A: Interactive Kanji Dictionary Lookup
+                Text("Interactive Kanji Dictionary Lookup (Tap token)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    lexicon.forEachIndexed { idx, entry ->
+                        FilterChip(
+                            selected = selectedWordIndex == idx,
+                            onClick = { selectedWordIndex = idx },
+                            label = {
+                                Text(
+                                    text = entry.surface,
+                                    fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFF13192B),
+                    border = BorderStroke(1.dp, Color(0xFF26304A)),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = "${activeWord.surface} 【${activeWord.readingKana} •${activeWord.romaji}】",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                            )
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = Color(0xFF00F0FF).copy(alpha = 0.2f),
+                            ) {
+                                Text(
+                                    text = activeWord.jlptLevel,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF00F0FF),
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 )
                             }
                         }
-                    }
-
-                    Text(
-                        text = "永遠の響きが夜空に広がる",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontFamily = cjkFonts[selectedCjkFontIdx].second,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    )
-
-                    if (romajiEnabled) {
                         Text(
-                            text = "eien no hibiki ga yozora ni hirogaru",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontFamily = latinFonts[selectedLatinFontIdx].second,
-                            color = Color(0xFF00E5FF),
+                            text = "Tokyo Pitch Accent: ${activeWord.pitchPattern}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFFFFC700),
                         )
-                    }
-
-                    if (dualTranslationEnabled) {
                         Text(
-                            text = "An eternal resonance spreads across the night sky",
+                            text = activeWord.definition,
                             style = MaterialTheme.typography.bodySmall,
                             fontFamily = latinFonts[selectedLatinFontIdx].second,
-                            color = Color(0xFFB0BEC5),
+                            color = Color(0xFFCBD5E1),
                         )
                     }
                 }
-            }
 
-            Text("Interactive Kanji Dictionary Lookup (Tap token)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                lexicon.forEachIndexed { idx, entry ->
-                    FilterChip(
-                        selected = selectedWordIndex == idx,
-                        onClick = { selectedWordIndex = idx },
-                        label = {
-                            Text(
-                                text = entry.surface,
-                                fontFamily = cjkFonts[selectedCjkFontIdx].second,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "${activeWord.surface} 【${activeWord.readingKana} • ${activeWord.romaji}】",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = cjkFonts[selectedCjkFontIdx].second,
+                // 31A: Dual-Script Font Picker
+                Text("Latin Script Typeface", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    latinFonts.forEachIndexed { idx, pair ->
+                        FilterChip(
+                            selected = selectedLatinFontIdx == idx,
+                            onClick = { selectedLatinFontIdx = idx },
+                            label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
+                            modifier = Modifier.weight(1f),
                         )
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                        ) {
-                            Text(
-                                text = activeWord.jlptLevel,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                            )
-                        }
                     }
-                    Text(
-                        text = "Tokyo Pitch Accent: ${activeWord.pitchPattern}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = activeWord.definition,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = latinFonts[selectedLatinFontIdx].second,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
-            }
 
-            Text("Latin Script Typeface", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                latinFonts.forEachIndexed { idx, pair ->
-                    FilterChip(
-                        selected = selectedLatinFontIdx == idx,
-                        onClick = { selectedLatinFontIdx = idx },
-                        label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
-                        modifier = Modifier.weight(1f),
-                    )
+                Text("East Asian (CJK) Script Typeface", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    cjkFonts.forEachIndexed { idx, pair ->
+                        FilterChip(
+                            selected = selectedCjkFontIdx == idx,
+                            onClick = { selectedCjkFontIdx = idx },
+                            label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
-            }
 
-            Text("East Asian (CJK) Script Typeface", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                cjkFonts.forEachIndexed { idx, pair ->
-                    FilterChip(
-                        selected = selectedCjkFontIdx == idx,
-                        onClick = { selectedCjkFontIdx = idx },
-                        label = { Text(pair.first, style = MaterialTheme.typography.labelSmall) },
-                        modifier = Modifier.weight(1f),
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Furigana Ruby Readings Above Kanji", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                    Switch(checked = furiganaEnabled, onCheckedChange = { furiganaEnabled = it })
                 }
-            }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Hepburn Romaji Subtitle Line", style = MaterialTheme.typography.bodyMedium)
-                Switch(checked = romajiEnabled, onCheckedChange = { romajiEnabled = it })
-            }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Hepburn Romaji Subtitle Line", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                    Switch(checked = romajiEnabled, onCheckedChange = { romajiEnabled = it })
+                }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Tokyo Pitch Accent Contours", style = MaterialTheme.typography.bodyMedium)
-                Switch(checked = pitchAccentEnabled, onCheckedChange = { pitchAccentEnabled = it })
-            }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Tokyo Pitch Accent Contours", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                    Switch(checked = pitchAccentEnabled, onCheckedChange = { pitchAccentEnabled = it })
+                }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Simultaneous Dual-Language Translation", style = MaterialTheme.typography.bodyMedium)
-                Switch(checked = dualTranslationEnabled, onCheckedChange = { dualTranslationEnabled = it })
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Simultaneous Dual-Language Translation", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                    Switch(checked = dualTranslationEnabled, onCheckedChange = { dualTranslationEnabled = it })
+                }
             }
         }
     }

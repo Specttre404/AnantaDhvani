@@ -76,6 +76,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.People
 import androidx.compose.animation.AnimatedVisibility
@@ -172,14 +173,12 @@ fun HomeScreen(
         topBar = {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 ExpressiveHeader(
-                    title = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
+                    title = "Ananta Dhvani",
                     modifier = Modifier.adaptiveContentWidth(maxWidth = 860.dp),
                     actions = {
-                        HeaderActionIcon(Icons.Filled.Explore, "Discover", onOpenDiscover)
+                        HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
                         HeaderActionIcon(Icons.Filled.Search, "Search", onOpenSearch)
-                        IconButton(onClick = onOpenSettings) {
-                            ProfileAvatar(avatarUrl = uiState.stats?.avatarUrl, modifier = Modifier.size(30.dp))
-                        }
+                        HeaderActionIcon(Icons.Filled.Settings, "Settings", onOpenSettings)
                     },
                 )
             }
