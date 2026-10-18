@@ -651,16 +651,7 @@ fun TrackContextMenuSheet(
                     }
                     add { pos -> MenuActionRow(Icons.Filled.QueuePlayNext, "Play next", position = pos) { musicPlayer.playNext(playable); onDismiss() } }
                     add { pos -> MenuActionRow(Icons.Filled.QueueMusic, "Add to queue", position = pos) { musicPlayer.addToQueue(playable); onDismiss() } }
-                    add { pos ->
-                        Card(
-                            shape = groupShape(pos),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            PlayerCastMenuRow(musicPlayer)
-                        }
-                    }
+
                     add { pos -> MenuActionRow(Icons.Filled.Language, "Open in Last.fm", position = pos) { openUrl(context, buildLastFmUrl(target)); onDismiss() } }
                     if (onRefreshArtwork != null) {
                         add { pos -> MenuActionRow(Icons.Filled.Refresh, "Refresh Cover Art", position = pos) { onRefreshArtwork(); onDismiss() } }
@@ -696,12 +687,7 @@ fun TrackContextMenuSheet(
                             showTranscodeDialog = true
                         }
                     }
-                    add { pos ->
-                        MenuActionRow(Icons.Filled.Block, "Block Artist / Mute Track", position = pos) {
-                            android.widget.Toast.makeText(context, "Muted ${t.name} by ${t.artist}", android.widget.Toast.LENGTH_SHORT).show()
-                            onDismiss()
-                        }
-                    }
+
                     add { pos ->
                         MenuActionRow(Icons.Filled.GraphicEq, "Equalizer & Sound FX", position = pos) {
                             showEqualizerSheet = true

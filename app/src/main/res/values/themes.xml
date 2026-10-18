@@ -21,14 +21,13 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <!-- Splash theme: matches the app's dark hue-0 background (the md
-         background token at hue 0, chroma 5%, lightness 6%) so there's no
-         flash before Compose draws. -->
+    <!-- Splash theme: matches the app's dark void #020408 background so there's no
+         square box or color clash before Compose renders. -->
     <style name="Theme.LastWave.Splash" parent="Theme.LastWave">
         <item name="android:windowSplashScreenBackground" tools:targetApi="s">@color/splash_background</item>
-        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@mipmap/ic_launcher</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/ic_launcher_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.LastWave</item>
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_logo</item>
     </style>
 </resources>

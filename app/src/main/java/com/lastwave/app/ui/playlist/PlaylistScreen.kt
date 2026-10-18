@@ -47,6 +47,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.BookmarkAdd
@@ -270,16 +272,17 @@ fun PlaylistScreen(
                                         val sub = item[2] as String
                                         val icon = item[3] as androidx.compose.ui.graphics.vector.ImageVector
                                         Surface(
-                                            shape = RoundedCornerShape(16.dp),
+                                            shape = RoundedCornerShape(24.dp),
                                             color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                            border = BorderStroke(1.dp, Color(0xFF00F0FF).copy(alpha = 0.3f)),
                                             onClick = { onOpenPlaylist(id) },
                                             modifier = Modifier.width(170.dp),
                                         ) {
                                             Column(Modifier.padding(14.dp)) {
-                                                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                Icon(icon, contentDescription = null, tint = Color(0xFF00F0FF))
                                                 Spacer(Modifier.height(8.dp))
                                                 Text(title, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1)
-                                                Text(sub, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                                                Text(sub, style = MaterialTheme.typography.labelSmall, color = Color(0xFF00F0FF), fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, fontWeight = FontWeight.SemiBold, maxLines = 1)
                                             }
                                         }
                                     }
@@ -503,16 +506,19 @@ fun PlaylistScreen(
 @Composable
 private fun CountPill(text: String) {
     Surface(
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        border = BorderStroke(1.dp, Color(0xFF00F0FF).copy(alpha = 0.35f)),
         modifier = Modifier.heightIn(min = 34.dp),
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
             Text(
                 text,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF00F0FF),
+                ),
                 modifier = Modifier.padding(horizontal = 13.dp, vertical = 6.dp),
             )
         }
