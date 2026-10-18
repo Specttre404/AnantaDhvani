@@ -3015,36 +3015,58 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         if (showCamelotSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showCamelotSheet = false },
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                containerColor = Color(0xFF0B0F1A),
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
-                    Text("Camelot Wheel DJ Mix Key", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text("Current Track: ${keyResult.camelotKey} (${keyResult.musicalKey}) @ ${keyResult.bpm} BPM", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-                    Text("Harmonically Compatible Transition Keys:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Camelot Wheel DJ Mix Key",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.ExtraBold,
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93), Color(0xFFFFC700)),
+                            ),
+                        ),
+                    )
+                    Text("Current Track: ${keyResult.camelotKey} (${keyResult.musicalKey}) @ ${keyResult.bpm} BPM", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF00F0FF))
+                    Text("Harmonically Compatible Transition Keys:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.White)
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                         keyResult.compatibleCamelotKeys.forEach { key ->
                             Surface(
                                 shape = CircleShape,
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                color = Color(0xFF00F0FF).copy(alpha = 0.2f),
+                                contentColor = Color(0xFF00F0FF),
+                                border = BorderStroke(1.dp, Color(0xFF00F0FF)),
                             ) {
                                 Text(key, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp))
                             }
                         }
                     }
 
-                    Text("• Same Code (${keyResult.camelotKey}): Perfect energy match\n• +1 / -1: Smooth energy shift (+1 boost, -1 drop)\n• Swap A/B: Relative Major/Minor harmonic shift", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("• Same Code (${keyResult.camelotKey}): Perfect energy match\n• +1 / -1: Smooth energy shift (+1 boost, -1 drop)\n• Swap A/B: Relative Major/Minor harmonic shift", style = MaterialTheme.typography.bodySmall, color = Color(0xFF94A3B8))
                 }
             }
         }
         if (showPitchDialog) {
             AlertDialog(
                 onDismissRequest = { showPitchDialog = false },
-                title = { Text("Key Lock & Pitch Tuning") },
+                containerColor = Color(0xFF0B0F1A),
+                title = {
+                    Text(
+                        text = "Key Lock & Pitch Tuning",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.ExtraBold,
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93), Color(0xFFFFC700)),
+                            ),
+                        ),
+                    )
+                },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(
@@ -3053,21 +3075,21 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column(Modifier.weight(1f)) {
-                                Text("WSOLA Key Lock", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                Text("Preserve musical key when changing speed", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("WSOLA Key Lock", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                                Text("Preserve musical key when changing speed", style = MaterialTheme.typography.bodySmall, color = Color(0xFF94A3B8))
                             }
                             Switch(
                                 checked = keyLockOn,
                                 onCheckedChange = { player.toggleKeyLock() },
                             )
                         }
-                        Box(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
+                        Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF26304A)))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
-                            Text("Semitone Shift", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                            Text("${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)} st", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            Text("Semitone Shift", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
+                            Text("${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)} st", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF00F0FF), fontWeight = FontWeight.Bold)
                         }
                         Slider(
                             value = pitchSemitones,
@@ -3507,7 +3529,7 @@ private fun DjStudioSheet(
     onDismiss: () -> Unit,
 ) {
     var balancePan by remember { mutableFloatStateOf(0f) }
-    var activeLoopBars by remember { mutableIntStateOf(0) }
+    val activeLoopBars by player.activeLoopBars.collectAsStateWithLifecycle()
     val hotCues = player.activeHotCues
 
     ModalBottomSheet(
@@ -3596,7 +3618,6 @@ private fun DjStudioSheet(
                         FilterChip(
                             selected = isSelected,
                             onClick = {
-                                activeLoopBars = bars
                                 player.startPhraseLoop(bars, bpm)
                             },
                             label = { Text("${bars}B", style = MaterialTheme.typography.labelSmall) },
@@ -3605,7 +3626,6 @@ private fun DjStudioSheet(
                     }
                     Button(
                         onClick = {
-                            activeLoopBars = 0
                             player.exitLoop()
                         },
                         modifier = Modifier.weight(1.2f),

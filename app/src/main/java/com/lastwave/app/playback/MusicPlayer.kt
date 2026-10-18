@@ -203,9 +203,12 @@ class MusicPlayer @Inject constructor(
     private val hotCues = androidx.compose.runtime.mutableStateMapOf<Int, Long>()
     val activeHotCues: Map<Int, Long> get() = hotCues
 
+    private val _activeLoopBars = MutableStateFlow(0)
+    val activeLoopBars: StateFlow<Int> = _activeLoopBars.asStateFlow()
     private var loopStartMs: Long = -1L
     private var loopEndMs: Long = -1L
     private var isLooping: Boolean = false
+    private var lastLoopSeekTimeMs: Long = 0L
 
     fun toggleKeyLock() = onMain {
         _keyLockEnabled.value = !_keyLockEnabled.value
@@ -975,6 +978,7 @@ class MusicPlayer @Inject constructor(
                         if (playerDelegate.isInitialized() && player.volume < 1f) player.volume = 1f
                     }
                     if (player.currentMediaItem?.mediaId != _state.value.current?.mediaIdKey()) {
+                        if (isLooping) exitLoop()
                         _state.update { it.copy(sleepTimerRemainingMs = remaining?.coerceAtLeast(0), sleepTimerRemainingTracks = sleepTimerRemainingTracks) }
                         delay(60L)
                         continue
@@ -983,7 +987,11 @@ class MusicPlayer @Inject constructor(
                     val rawPos = player.currentPosition.coerceAtLeast(0)
                     val pos = if (dur > 0) rawPos.coerceIn(0L, dur) else rawPos
                     if (isLooping && loopEndMs > loopStartMs && pos >= loopEndMs) {
-                        player.seekTo(loopStartMs)
+                        val now = android.os.SystemClock.elapsedRealtime()
+                        if (now - lastLoopSeekTimeMs > 600L) {
+                            lastLoopSeekTimeMs = now
+                            player.seekTo(loopStartMs)
+                        }
                     }
                     val buf = player.bufferedPosition.coerceAtLeast(0)
                     val sleepRemaining = remaining?.coerceAtLeast(0)
@@ -2134,17 +2142,29 @@ class MusicPlayer @Inject constructor(
     }
 
     fun startPhraseLoop(bars: Int, bpm: Float) {
-        val currentPos = player.currentPosition
-        val barDurationMs = ((60000f / bpm.coerceIn(60f, 180f)) * 4f).toLong().coerceAtLeast(1500L)
+        if (_activeLoopBars.value == bars && isLooping) {
+            exitLoop()
+            return
+        }
+        val currentPos = player.currentPosition.coerceAtLeast(0L)
+        val barDurationMs = ((60000f / bpm.coerceIn(70f, 160f)) * 4f).toLong().coerceAtLeast(3500L)
         loopStartMs = currentPos
         loopEndMs = currentPos + (bars * barDurationMs)
         isLooping = true
+        _activeLoopBars.value = bars
     }
 
     fun exitLoop() {
         isLooping = false
         loopStartMs = -1L
         loopEndMs = -1L
+        _activeLoopBars.value = 0
+    }
+
+    fun updateCurrentTrackMetadata(newTitle: String, newArtist: String, newAlbum: String) {
+        _state.update { st ->
+            st.copy(current = st.current?.copy(title = newTitle, artist = newArtist, album = newAlbum))
+        }
     }
 
     fun nudgePlayback(forward: Boolean) {

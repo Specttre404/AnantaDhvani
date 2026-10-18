@@ -390,6 +390,7 @@ fun TrackContextMenuSheet(
         com.lastwave.app.ui.local.TagEditorSheet(
             track = playable,
             onSave = { newTitle, newArtist, newAlbum ->
+                musicPlayer.updateCurrentTrackMetadata(newTitle, newArtist, newAlbum)
                 android.widget.Toast.makeText(context, "Metadata tags updated: $newTitle", android.widget.Toast.LENGTH_SHORT).show()
                 showTagEditorSheet = false
                 onDismiss()
@@ -1562,24 +1563,25 @@ private fun EqualizerSheet(
         initialValue = com.lastwave.app.data.local.EqualizerSettings()
     )
 
+    var selectedPresetName by remember(eqSettings.presetName) {
+        mutableStateOf(eqSettings.presetName.ifBlank { "Flat" })
+    }
+
     val avgBassGain = eqSettings.gainsDb.take(5).average().toFloat().coerceIn(0f, 6f)
     var bassBoostPercent by remember(eqSettings.gainsDb) {
         mutableFloatStateOf(((avgBassGain / 6.0f) * 100f).coerceIn(0f, 100f))
     }
 
-    val presets = listOf(
-        com.lastwave.app.data.local.EqualizerPresets.FLAT,
-        com.lastwave.app.data.local.EqualizerPresets.byName("Deep Bass Clean")
-            ?: com.lastwave.app.data.local.EqPreset("Bass Boost", listOf(6f, 5.5f, 4.5f, 3f, 1.5f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
-        com.lastwave.app.data.local.EqualizerPresets.byName("Vocal Clarity")
-            ?: com.lastwave.app.data.local.EqPreset("Vocal Enhancer", listOf(-1.5f, -1f, -0.5f, 0f, 0.5f, 1f, 2f, 3f, 3.5f, 3f, 2.5f, 2f, 1.5f, 1.5f, 1f)),
-        com.lastwave.app.data.local.EqualizerPresets.byName("Rock")
-            ?: com.lastwave.app.data.local.EqPreset("Rock", listOf(4f, 3.5f, 3f, 1.5f, 0f, -1f, -1f, -0.5f, 0.5f, 1.5f, 2.5f, 3f, 3.5f, 4f, 4f)),
-        com.lastwave.app.data.local.EqualizerPresets.byName("Pop")
-            ?: com.lastwave.app.data.local.EqPreset("Pop", listOf(-1f, -0.5f, 0f, 1f, 1.5f, 2f, 2f, 1.5f, 1f, 0.5f, 0.5f, 1f, 1.5f, 2f, 2.5f)),
-        com.lastwave.app.data.local.EqualizerPresets.byName("Electronic")
-            ?: com.lastwave.app.data.local.EqPreset("Electronic", listOf(4.5f, 4f, 3f, 2f, 0.5f, -0.5f, 0f, 1f, 2f, 2.5f, 2.5f, 2.5f, 3f, 3.5f, 4f)),
-    )
+    val presets = remember {
+        listOf(
+            Triple("Flat", 0f, com.lastwave.app.data.local.EqPreset("Flat", List(31) { 0f })),
+            Triple("Bass Boost", 80f, com.lastwave.app.data.local.EqPreset("Bass Boost", List(31) { idx -> if (idx < 6) 5.0f - idx * 0.7f else 0f })),
+            Triple("Vocal Enhancer", 20f, com.lastwave.app.data.local.EqPreset("Vocal Enhancer", List(31) { idx -> if (idx in 10..20) 3.5f else 0f })),
+            Triple("Rock", 55f, com.lastwave.app.data.local.EqPreset("Rock", List(31) { idx -> if (idx < 5) 3.5f else if (idx > 22) 3.0f else -0.5f })),
+            Triple("Pop", 35f, com.lastwave.app.data.local.EqPreset("Pop", List(31) { idx -> if (idx in 8..22) 2.5f else 1.0f })),
+            Triple("Electronic", 70f, com.lastwave.app.data.local.EqPreset("Electronic", List(31) { idx -> if (idx < 6) 4.5f else if (idx > 20) 3.5f else 0f })),
+        )
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1682,14 +1684,15 @@ private fun EqualizerSheet(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            rowPresets.forEach { preset ->
-                                val isSelected = eqSettings.presetName.equals(preset.name, ignoreCase = true) ||
-                                    (preset.name == "Bass Boost" && eqSettings.presetName.equals("Deep Bass Clean", ignoreCase = true)) ||
-                                    (preset.name == "Vocal Enhancer" && eqSettings.presetName.equals("Vocal Clarity", ignoreCase = true))
+                            rowPresets.forEach { (presetName, targetBass, eqPreset) ->
+                                val isSelected = selectedPresetName.equals(presetName, ignoreCase = true)
 
                                 Surface(
                                     onClick = {
-                                        equalizerViewModel.applyPreset(preset)
+                                        equalizerViewModel.setEnabled(true)
+                                        selectedPresetName = presetName
+                                        bassBoostPercent = targetBass
+                                        equalizerViewModel.applyPreset(eqPreset)
                                     },
                                     shape = RoundedCornerShape(12.dp),
                                     border = BorderStroke(
@@ -1713,7 +1716,7 @@ private fun EqualizerSheet(
                                         modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp),
                                     ) {
                                         Text(
-                                            text = preset.name,
+                                            text = presetName,
                                             style = MaterialTheme.typography.labelMedium,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                             maxLines = 1,
