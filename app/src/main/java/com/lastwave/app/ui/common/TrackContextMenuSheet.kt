@@ -6,7 +6,7 @@ import android.net.Uri
 import androidx.compose.runtime.rememberCoroutineScope
 import com.lastwave.app.data.converter.AudioFormatConverter
 import com.lastwave.app.data.converter.TargetAudioFormat
-import com.lastwave.app.data.metadata.MusicBrainzAutoTagger
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -669,24 +669,7 @@ fun TrackContextMenuSheet(
                             showTagEditorSheet = true
                         }
                     }
-                    add { pos ->
-                        MenuActionRow(Icons.Filled.AutoAwesome, "Auto-Fix Metadata & Cover (MusicBrainz)", position = pos) {
-                            android.widget.Toast.makeText(context, "Querying MusicBrainz tags for ${t.name}...", android.widget.Toast.LENGTH_SHORT).show()
-                            onDismiss()
-                            scope.launch {
-                                val tagger = MusicBrainzAutoTagger.getInstance()
-                                val result = tagger.fetchMetadata(t.name, t.artist)
-                                withContext(Dispatchers.Main) {
-                                    if (result != null) {
-                                        val info = "${result.title} — ${result.artist}\nAlbum: ${result.album} (${result.year ?: "N/A"})"
-                                        android.widget.Toast.makeText(context, "MusicBrainz Tags Applied:\n$info", android.widget.Toast.LENGTH_LONG).show()
-                                    } else {
-                                        android.widget.Toast.makeText(context, "No MusicBrainz match found for ${t.name}", android.widget.Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            }
-                        }
-                    }
+
                     add { pos ->
                         MenuActionRow(Icons.Filled.Edit, "Convert / Transcode Audio", position = pos) {
                             showTranscodeDialog = true
