@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -453,12 +454,24 @@ fun SearchScreen(
                                                 focusManager.clearFocus()
                                                 viewModel.executeSearch(genre)
                                             },
-                                            label = { Text(genre, style = MaterialTheme.typography.labelLarge) },
+                                            label = {
+                                                Text(
+                                                    genre,
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                    fontWeight = FontWeight.Bold,
+                                                )
+                                            },
+                                            border = BorderStroke(
+                                                width = 1.dp,
+                                                brush = Brush.linearGradient(
+                                                    colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93)),
+                                                ),
+                                            ),
                                             colors = AssistChipDefaults.assistChipColors(
                                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                                 labelColor = MaterialTheme.colorScheme.onSurface,
                                             ),
-                                            shape = RoundedCornerShape(12.dp),
+                                            shape = RoundedCornerShape(16.dp),
                                         )
                                     }
                                 }

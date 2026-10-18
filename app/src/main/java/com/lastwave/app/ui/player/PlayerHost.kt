@@ -143,6 +143,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -2825,6 +2826,19 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val chipColors = FilterChipDefaults.filterChipColors(
+            containerColor = Color(0xD90B0F1A),
+            labelColor = Color.White,
+            selectedContainerColor = Color(0xFF00F0FF).copy(alpha = 0.25f),
+            selectedLabelColor = Color(0xFF00F0FF),
+        )
+        val chipBorder = FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = false,
+            borderColor = Color(0xFF26304A),
+            selectedBorderColor = Color(0xFF00F0FF),
+        )
+
         val context = LocalContext.current
         var bassHapticsEnabled by remember { mutableStateOf(false) }
         FilterChip(
@@ -2834,6 +2848,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 val driver = BassHapticDriver.getInstance(context)
                 driver.enabled = bassHapticsEnabled
             },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Bass Haptics", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2847,6 +2863,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         FilterChip(
             selected = showCamelotSheet,
             onClick = { showCamelotSheet = true },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("${keyResult.camelotKey} • ${keyResult.bpm} BPM", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2857,6 +2875,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         FilterChip(
             selected = pitchSemitones != 0f || keyLockOn,
             onClick = { showPitchDialog = true },
+            colors = chipColors,
+            border = chipBorder,
             label = {
                 Text(
                     if (pitchSemitones == 0f) "Pitch: 0st" else "Pitch: ${if (pitchSemitones > 0) "+" else ""}${"%.1f".format(pitchSemitones)}st",
@@ -2874,6 +2894,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 player.setSpatialAudio(spatialActive, 0.6f, 0.5f, 18.0f, 1.3f)
                 if (spatialActive) showSpatialPuckDialog = true
             },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("3D Spatial", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2884,6 +2906,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 dolbyActive = !dolbyActive
                 player.setSurroundVirtualizer(dolbyActive, 800)
             },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Surround Virtualizer", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2894,6 +2918,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 lofiActive = !lofiActive
                 player.setBitcrusher(lofiActive, 10, 4)
             },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Lo-Fi", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2904,6 +2930,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
                 slowedActive = !slowedActive
                 player.setSlowedReverb(slowedActive)
             },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Slowed + Reverb", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2911,6 +2939,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         FilterChip(
             selected = showDjSheet,
             onClick = { showDjSheet = true },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("DJ Studio", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2926,6 +2956,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         FilterChip(
             selected = showOrbPhysicsSheet,
             onClick = { showOrbPhysicsSheet = true },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Orb Physics", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2933,6 +2965,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         FilterChip(
             selected = showCassetteDeck,
             onClick = { showCassetteDeck = true },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Cassette Deck", style = MaterialTheme.typography.labelSmall) },
         )
 
@@ -2958,6 +2992,8 @@ private fun PlayerUtilityControls(state: MusicPlayerState, player: MusicPlayer, 
         FilterChip(
             selected = showLinguisticsSheet,
             onClick = { showLinguisticsSheet = true },
+            colors = chipColors,
+            border = chipBorder,
             label = { Text("Linguistics & Romaji", style = MaterialTheme.typography.labelSmall) },
         )
 

@@ -217,17 +217,12 @@ fun FeedScreen(
                 .adaptiveContentWidth(maxWidth = 920.dp),
         ) {
             ExpressiveHeader(
-                title = "Ananta Dhvani (अनन्त-ध्वनि / অনন্ত ধ্বনি)",
+                title = "Ananta Dhvani",
                 actions = {
                     HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
                     HeaderActionIcon(Icons.Filled.Search, "Search", onOpenSearch)
                     HeaderActionIcon(Icons.Filled.Settings, "Settings", onOpenSettings)
                 },
-            )
-
-            RevampedFeedHeader(
-                onOpenSearch = onOpenSearch,
-                onOpenSettings = onOpenSettings,
             )
 
             var activeFilter by remember { mutableStateOf(FeedCategoryFilter.ALL) }
@@ -1855,76 +1850,6 @@ private fun FeedEmptyState(
 
 @dagger.hilt.android.lifecycle.HiltViewModel
 class ArtistAlbumNavBridgeFeed @javax.inject.Inject constructor(val navigator: ArtistAlbumNavigator) : androidx.lifecycle.ViewModel()
-
-@Composable
-fun RevampedFeedHeader(
-    onOpenSearch: () -> Unit = {},
-    onOpenSettings: () -> Unit = {},
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(RawNeonPurple.copy(alpha = 0.25f), CinematicVoid)
-                )
-            )
-            .padding(horizontal = 20.dp, vertical = 20.dp)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "ANANTA DHVANI",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 2.sp,
-                        brush = Brush.linearGradient(
-                            colors = listOf(AmbientGlowCyan, HdrGoldAccent, RawNeonPurple)
-                        )
-                    )
-                )
-                Surface(
-                    shape = CircleShape,
-                    color = GlassSurfacePanel,
-                    border = BorderStroke(1.dp, GlassBorderActive)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(AmbientGlowCyan)
-                        )
-                        Text(
-                            text = "HDR OBOE C++20",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.Bold,
-                                color = AmbientGlowCyan
-                            )
-                        )
-                    }
-                }
-            }
-            Text(
-              text = "vault  •  audiophile  •  cinematic  •  live",
-              style = MaterialTheme.typography.bodySmall.copy(
-                  fontWeight = FontWeight.Light,
-                  color = SubduedGrayText,
-                  letterSpacing = 1.5.sp
-              )
-            )
-        }
-    }
-}
 
 @Composable
 fun RevampedStudioHeaderCard(

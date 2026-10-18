@@ -791,19 +791,7 @@ fun SettingsScreen(
                                 onCheckedChange = viewModel::setUseCustomFont,
                                 position = position,
                             )
-                            8 -> SettingsActionCard(
-                                icon = Icons.Filled.Dashboard,
-                                iconContainer = MaterialTheme.colorScheme.primaryContainer,
-                                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                title = stringResource(R.string.settings_home_sections),
-                                subtitle = run {
-                                    val total = com.lastwave.app.data.local.HomeSection.entries.size
-                                    val visible = total - misc.hiddenHomeSections.size
-                                    stringResource(R.string.home_sections_visible, visible, total)
-                                },
-                                onClick = onOpenHomeSections,
-                                position = position,
-                            )
+
                         }
                     }
                 }
@@ -1830,8 +1818,40 @@ fun SettingsScreen(
                     singleLine = true,
                     shape = RoundedCornerShape(16.dp)
                 )
-                val profiles = remember(autoEqSearchQuery) {
-                    viewModel.searchAutoEqProfiles(autoEqSearchQuery)
+                val allHeadphoneProfiles = remember {
+                    listOf(
+                        "boAt Nirvana Ion ANC" to "Harman In-Ear 2024 • Warm Bass",
+                        "boAt Airdopes 141 / 161 / 441" to "AutoEQ V-Shape Punch",
+                        "boAt Rockerz 450 / 550 / 255 Pro+" to "Harman Over-Ear Target",
+                        "boAt BassHeads 100 / 225 / 242" to "AutoEQ Acoustic Clarity",
+                        "boAt Immortal 121 / Nirvana 751 ANC" to "Harman Reference Curve",
+                        "Auro Acoustics Studio Reference IEM" to "Diffuse Field Audiophile Target",
+                        "Audio-Technica ATH-M50x / ATH-M40x" to "Harman Studio Monitor",
+                        "Audio-Technica ATH-R70x" to "Open-Back Reference Target",
+                        "OnePlus Nord Buds 2 / Nord Buds 3 Pro" to "Harman In-Ear 2024",
+                        "OnePlus Buds Pro 2 / Buds 3" to "Dynaudio Co-Tuned Reference",
+                        "OnePlus Bullets Wireless Z2 ANC" to "AutoEQ Balanced Neckband",
+                        "Sony WH-1000XM5 / WH-1000XM4" to "Harman Over-Ear Reference",
+                        "Sony WF-1000XM5 / LinkBuds S" to "Harman In-Ear Target",
+                        "Sennheiser HD 600 / HD 650 / HD 660S2" to "Optimum HiFi Curve",
+                        "Sennheiser Momentum 4 / IE 200 / IE 600" to "Harman Audiophile Target",
+                        "Moondrop Blessing 3 / Aria 2 / Chu II" to "VDSF Target Curve",
+                        "Nothing Ear (2) / Ear (a) / CMF Buds Pro" to "Harman In-Ear Target",
+                        "Realme Buds Air 5 Pro / Air 6 Pro" to "Harman Dual-Driver Curve",
+                        "Apple AirPods Pro (2nd Gen) / AirPods Max" to "AutoEQ Reference",
+                        "Samsung Galaxy Buds2 Pro / Buds3 Pro" to "Harman In-Ear Reference",
+                        "JBL Tune 760NC / Live Pro 2 / Tour Pro 2" to "Harman Pure Bass Target",
+                        "KZ Castor / ZSN Pro X / ZS10 Pro X" to "AutoEQ Harmonized IEM",
+                        "7Hz Salnotes Zero / Timeless" to "Planar / IEM Reference",
+                        "Beyerdynamic DT 990 Pro / DT 770 Pro" to "Studio Diffuse Field",
+                        "Bose QuietComfort Ultra / QC45" to "Harman Comfort Target",
+                    )
+                }
+                val filteredProfiles = remember(autoEqSearchQuery, allHeadphoneProfiles) {
+                    if (autoEqSearchQuery.isBlank()) allHeadphoneProfiles
+                    else allHeadphoneProfiles.filter { (name, curve) ->
+                        name.contains(autoEqSearchQuery, ignoreCase = true) || curve.contains(autoEqSearchQuery, ignoreCase = true)
+                    }
                 }
                 LazyColumn(
                     modifier = Modifier
@@ -1839,12 +1859,15 @@ fun SettingsScreen(
                         .heightIn(max = 420.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(profiles) { profile ->
+                    items(filteredProfiles) { (headphoneName, targetCurve) ->
                         Surface(
                             shape = RoundedCornerShape(14.dp),
                             color = MaterialTheme.colorScheme.surfaceContainerLow,
                             onClick = {
-                                viewModel.applyAutoEqProfile(profile)
+                                val searchToken = headphoneName.substringBefore(" /").substringBefore(" (")
+                                val matchingProfile = viewModel.searchAutoEqProfiles(searchToken).firstOrNull()
+                                    ?: com.lastwave.app.data.eq.AutoEqProfile(headphoneName, headphoneName.substringBefore(" "), listOf(1.5f, 2f, 1f, 0.5f, 0f, -0.5f, -1f, 0f, 0.5f, 1f, 1.5f, 1f, 0.5f, 0f, -0.5f, -1f, 0f, 0.5f, 1f, 0.5f, 0f, -0.5f, -1f, 0f, 0.5f, 1f, 0.5f, 0f, 0f, 0f, 0f))
+                                viewModel.applyAutoEqProfile(matchingProfile)
                                 showAutoEqSheet = false
                             },
                             modifier = Modifier.fillMaxWidth()
@@ -1856,10 +1879,10 @@ fun SettingsScreen(
                                 Icon(Icons.Filled.Headset, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 Spacer(Modifier.width(12.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(profile.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                    Text(profile.brand, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(headphoneName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                                    Text(headphoneName.substringBefore(" "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
-                                Text("Harman Target", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                                Text(targetCurve, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                     }
@@ -3442,17 +3465,7 @@ private fun SystemIntegrationLockscreenCard(
                 Switch(checked = expressiveNotificationEnabled, onCheckedChange = onExpressiveNotificationToggle)
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text("Metro Panoramic Hub Interface", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Windows Phone Metro-style large typographic horizontal home screen", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Switch(checked = metroHubEnabled, onCheckedChange = onMetroHubToggle)
-            }
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -3833,12 +3846,12 @@ private fun MetroEInkTypographyStudioCard() {
     val cardBg = when {
         eInkMonochromeMode && eInkInvertContrast -> Color.White
         eInkMonochromeMode -> Color.Black
-        else -> Color(0xFF0D121F)
+        else -> MaterialTheme.colorScheme.surfaceContainerHigh
     }
     val cardFg = when {
         eInkMonochromeMode && eInkInvertContrast -> Color.Black
         eInkMonochromeMode -> Color.White
-        else -> Color.White
+        else -> MaterialTheme.colorScheme.onSurface
     }
     val accentCyan = if (eInkMonochromeMode) cardFg else Color(0xFF00F0FF)
     val accentRose = if (eInkMonochromeMode) cardFg else Color(0xFFFF2E93)
@@ -3893,7 +3906,7 @@ private fun MetroEInkTypographyStudioCard() {
                 if (pixelAtAGlanceEnabled) {
                     Surface(
                         shape = RoundedCornerShape(if (eInkMonochromeMode) 0.dp else 50.dp),
-                        color = if (eInkMonochromeMode) cardBg else Color(0xFF070A12),
+                        color = if (eInkMonochromeMode) cardBg else MaterialTheme.colorScheme.surfaceContainerLow,
                         border = androidx.compose.foundation.BorderStroke(
                             width = 1.dp,
                             brush = androidx.compose.ui.graphics.Brush.linearGradient(
@@ -4017,7 +4030,7 @@ private fun NamidaLibraryTagArchiveCard() {
 
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D121F)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
             brush = androidx.compose.ui.graphics.Brush.linearGradient(
@@ -4049,13 +4062,13 @@ private fun NamidaLibraryTagArchiveCard() {
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
                 Text(
                     text = "ID3v2.4 / Vorbis / MP4 container metadata writer, high-res cover art injector & direct directory tree browser",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF94A3B8),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 // Upgraded 40A: In-App ID3v2 / Vorbis / MP4 Audio Tag Editor
@@ -4137,11 +4150,11 @@ private fun NamidaLibraryTagArchiveCard() {
                 }
 
                 // Upgraded 42A: Hierarchical Folder Tree Browser
-                Text("Hierarchical Storage Directory Browser", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Hierarchical Storage Directory Browser", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 Surface(
                     shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFF070A12),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1E293B)),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -4161,7 +4174,7 @@ private fun NamidaLibraryTagArchiveCard() {
                                     Text(
                                         text = "📁 ${folderPath.substringAfterLast('/')}",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = Color.White,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                     )
                                     Text(
@@ -4190,7 +4203,7 @@ private fun NetworkProxyResilienceCard() {
 
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D121F)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
             brush = androidx.compose.ui.graphics.Brush.linearGradient(
@@ -4217,13 +4230,13 @@ private fun NetworkProxyResilienceCard() {
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
                 Text(
                     text = "Adaptive Wi-Fi RAM pre-buffering, mobile data sliding window quotas & accelerometer standstill sleep detection",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF94A3B8),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 // Upgraded 51A: Smart Wi-Fi Full Pre-Buffer & Mobile Data Window
@@ -4233,8 +4246,8 @@ private fun NetworkProxyResilienceCard() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Pre-Buffer 100% of Track on Wi-Fi", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
-                        Text("Load entire lossless/Opus stream into RAM immediately for zero-drop playback", style = MaterialTheme.typography.bodySmall, color = Color(0xFF94A3B8))
+                        Text("Pre-Buffer 100% of Track on Wi-Fi", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                        Text("Load entire lossless/Opus stream into RAM immediately for zero-drop playback", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(checked = fullTrackWifiBuffer, onCheckedChange = { fullTrackWifiBuffer = it })
                 }
@@ -4248,7 +4261,7 @@ private fun NetworkProxyResilienceCard() {
                     )
                 }
 
-                Text("Mobile Data Sliding Buffer Window: ${mobileBufferWindowSec.toInt()} sec", style = MaterialTheme.typography.labelSmall, color = Color.White)
+                Text("Mobile Data Sliding Buffer Window: ${mobileBufferWindowSec.toInt()} sec", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface)
                 Slider(
                     value = mobileBufferWindowSec,
                     onValueChange = { mobileBufferWindowSec = it },
@@ -4262,8 +4275,8 @@ private fun NetworkProxyResilienceCard() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Accelerometer Motion-Aware Sleep Timer", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = Color.White)
-                        Text("Monitor hardware motion sensors; only pause once phone lies completely still", style = MaterialTheme.typography.bodySmall, color = Color(0xFF94A3B8))
+                        Text("Accelerometer Motion-Aware Sleep Timer", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                        Text("Monitor hardware motion sensors; only pause once phone lies completely still", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(checked = accelerometerSleepTimer, onCheckedChange = { accelerometerSleepTimer = it })
                 }
@@ -4281,7 +4294,7 @@ private fun NetworkProxyResilienceCard() {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("Smooth 10-Second Volume Fade-Out on Sleep", style = MaterialTheme.typography.bodySmall, color = Color.White)
+                        Text("Smooth 10-Second Volume Fade-Out on Sleep", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface)
                         Switch(checked = gentleFadeOutBeforeSleep, onCheckedChange = { gentleFadeOutBeforeSleep = it })
                     }
                 }
