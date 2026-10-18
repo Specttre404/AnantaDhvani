@@ -2135,7 +2135,7 @@ class MusicPlayer @Inject constructor(
 
     fun startPhraseLoop(bars: Int, bpm: Float) {
         val currentPos = player.currentPosition
-        val barDurationMs = if (bpm > 0f) ((60_000f / bpm) * 4f).toLong() else 2000L
+        val barDurationMs = ((60000f / bpm.coerceIn(60f, 180f)) * 4f).toLong().coerceAtLeast(1500L)
         loopStartMs = currentPos
         loopEndMs = currentPos + (bars * barDurationMs)
         isLooping = true

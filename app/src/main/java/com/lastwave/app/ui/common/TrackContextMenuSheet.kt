@@ -30,7 +30,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -1363,18 +1367,20 @@ private fun StatItemRow(
                     highlight -> MaterialTheme.colorScheme.onPrimaryContainer
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(0.42f),
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
                 fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.End,
                 color = when {
                     isError -> MaterialTheme.colorScheme.onErrorContainer
                     highlight -> MaterialTheme.colorScheme.onPrimaryContainer
                     else -> MaterialTheme.colorScheme.onSurface
                 },
+                modifier = Modifier.weight(0.58f),
             )
         }
     }
@@ -1579,12 +1585,8 @@ private fun EqualizerSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        modifier = Modifier.liquidGlassChrome(
-            RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            LocalLiquidGlass.current,
-            LiquidGlassPreset.ContextMenu,
-            LocalLiquidGlassOverlayBackdrop.current,
-        ),
+        containerColor = Color(0xFF0B0F1A),
+        scrimColor = Color.Black.copy(alpha = 0.65f),
     ) {
         Column(
             modifier = Modifier
@@ -1605,19 +1607,24 @@ private fun EqualizerSheet(
                     Icon(
                         Icons.Filled.GraphicEq,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Color(0xFF00F0FF),
                         modifier = Modifier.size(28.dp),
                     )
                     Column {
                         Text(
                             text = "Equalizer & Sound FX",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.ExtraBold,
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93), Color(0xFFFFC700)),
+                                ),
+                            ),
                         )
                         Text(
                             text = if (eqSettings.enabled) "Active • Live Gain Processing" else "Disabled",
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (eqSettings.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (eqSettings.enabled) Color(0xFF00F0FF) else Color(0xFF94A3B8),
                         )
                     }
                 }
@@ -1639,12 +1646,13 @@ private fun EqualizerSheet(
                         text = "Bass Boost",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
                     )
                     Text(
                         text = "${bassBoostPercent.roundToInt()}%",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = Color(0xFF00F0FF),
                     )
                 }
                 Slider(
@@ -1666,6 +1674,7 @@ private fun EqualizerSheet(
                     text = "Quick Presets",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     presets.chunked(3).forEach { rowPresets ->
@@ -1683,15 +1692,19 @@ private fun EqualizerSheet(
                                         equalizerViewModel.applyPreset(preset)
                                     },
                                     shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(
+                                        width = 1.dp,
+                                        color = if (isSelected && eqSettings.enabled) Color(0xFF00F0FF) else Color(0xFF26304A),
+                                    ),
                                     color = if (isSelected && eqSettings.enabled) {
-                                        MaterialTheme.colorScheme.primaryContainer
+                                        Color(0xFF00F0FF).copy(alpha = 0.2f)
                                     } else {
-                                        MaterialTheme.colorScheme.surfaceContainerHigh
+                                        Color(0xFF13192B)
                                     },
                                     contentColor = if (isSelected && eqSettings.enabled) {
-                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                        Color(0xFF00F0FF)
                                     } else {
-                                        MaterialTheme.colorScheme.onSurface
+                                        Color.White
                                     },
                                     modifier = Modifier.weight(1f),
                                 ) {
