@@ -1637,6 +1637,18 @@ private fun FullPlayer(
             isPlaying = state.isPlaying,
             modifier = Modifier.fillMaxSize(),
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            0.0f to Color.Transparent,
+                            0.40f to Color.Transparent,
+                            0.70f to Color(0x99050811),
+                            1.0f to Color(0xEE050811),
+                        )
+                    )
+            )
             Column(
                 Modifier
                     .fillMaxSize()

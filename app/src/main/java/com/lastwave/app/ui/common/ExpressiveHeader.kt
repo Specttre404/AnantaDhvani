@@ -49,6 +49,13 @@ fun ExpressiveHeader(
     actions: @Composable RowScope.() -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val titleGradient = if (isDark) {
+        Brush.verticalGradient(listOf(Color.White, Color(0xFFE2E8F0)))
+    } else {
+        Brush.verticalGradient(listOf(Color(0xFF0F172A), Color(0xFF334155)))
+    }
+
     val infiniteTransition = rememberInfiniteTransition(label = "header_aura")
     val phase by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -104,7 +111,11 @@ fun ExpressiveHeader(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.45f)),
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 }
                 Column {
@@ -113,9 +124,7 @@ fun ExpressiveHeader(
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.ExtraBold,
-                            brush = Brush.verticalGradient(
-                                colors = listOf(Color.White, Color(0xFFE2E8F0)),
-                            ),
+                            brush = titleGradient,
                             letterSpacing = (-0.5).sp,
                         ),
                     )
@@ -123,7 +132,7 @@ fun ExpressiveHeader(
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF94A3B8),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                         )
                     }
