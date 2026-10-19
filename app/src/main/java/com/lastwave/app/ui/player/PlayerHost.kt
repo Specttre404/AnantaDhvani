@@ -725,7 +725,7 @@ private fun AddToPlaylistDialogHost(
 }
 
 @Composable
-internal fun AnimatedPlayPauseIcon(isPlaying: Boolean, modifier: Modifier = Modifier) {
+internal fun AnimatedPlayPauseIcon(isPlaying: Boolean, modifier: Modifier = Modifier, tint: Color = androidx.compose.material3.LocalContentColor.current) {
     AnimatedContent(
         targetState = isPlaying,
         transitionSpec = {
@@ -740,6 +740,7 @@ internal fun AnimatedPlayPauseIcon(isPlaying: Boolean, modifier: Modifier = Modi
         Icon(
             if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
             contentDescription = "Play or pause",
+            tint = tint,
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -1615,6 +1616,7 @@ private fun FullPlayer(
     CompositionLocalProvider(
         LocalLiquidGlassBackdrop provides playerBackdrop,
         LocalLiquidGlassOverlayBackdrop provides playerBackdrop,
+        androidx.compose.material3.LocalContentColor provides Color.White,
     ) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -1671,7 +1673,7 @@ private fun FullPlayer(
                             if (currentTab != FullPlayerTab.NOW_PLAYING) Icons.Filled.ArrowBack else Icons.Filled.ExpandMore,
                             if (currentTab != FullPlayerTab.NOW_PLAYING) "Back to player" else "Minimize player",
                             modifier = Modifier.size(26.dp),
-                            tint = MaterialTheme.colorScheme.onSurface,
+                            tint = Color.White,
                         )
                     }
                     Column(
@@ -1685,7 +1687,7 @@ private fun FullPlayer(
                                 FullPlayerTab.QUEUE -> "PLAYING QUEUE"
                             },
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = Color(0xFF00F0FF),
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 0.9.sp,
                         )
@@ -1696,7 +1698,7 @@ private fun FullPlayer(
                                 state.sourceLabel.takeIf { it.isNotBlank() } ?: "LASTWAVEX"
                             },
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.92f),
+                            color = Color(0xFFCBD5E1),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -1720,7 +1722,7 @@ private fun FullPlayer(
                                 Icons.Filled.MoreVert,
                                 "Song options",
                                 modifier = Modifier.size(22.dp),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.90f),
+                                tint = Color.White,
                             )
                         }
                     }
@@ -1758,6 +1760,7 @@ private fun FullPlayer(
                                 Text(
                                     text = track.title,
                                     style = MaterialTheme.typography.headlineSmall,
+                                    color = Color.White,
                                     fontWeight = FontWeight.Bold,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
@@ -1765,7 +1768,7 @@ private fun FullPlayer(
                                 Text(
                                     text = track.artist,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = Color(0xFFCBD5E1),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -2204,6 +2207,7 @@ private fun FullPlayer(
                                             Text(
                                                 text = track.title,
                                                 style = MaterialTheme.typography.headlineSmall,
+                                                color = Color.White,
                                                 fontWeight = FontWeight.Bold,
                                                 maxLines = 1,
                                                 modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
@@ -2212,7 +2216,7 @@ private fun FullPlayer(
                                             Text(
                                                 text = track.artist,
                                                 style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                color = Color(0xFFCBD5E1),
                                                 maxLines = 1
                                             )
                                             val qualityBadgeText = remember(track.videoId, track.playbackMimeType, track.playbackUrl) {
@@ -2229,23 +2233,24 @@ private fun FullPlayer(
                                             Spacer(Modifier.height(4.dp))
                                             Surface(
                                                 shape = CircleShape,
-                                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.60f),
+                                                color = Color(0xFF00F0FF).copy(alpha = 0.20f),
+                                                border = BorderStroke(1.dp, Color(0xFF00F0FF).copy(alpha = 0.45f)),
                                             ) {
                                                 Text(
                                                     text = qualityBadgeText,
                                                     style = MaterialTheme.typography.labelSmall,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
+                                                    color = Color(0xFF00F0FF),
                                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                                 )
                                             }
                                         }
                                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                                             IconButton(onClick = onToggleLiked) {
-                                                Icon(if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = "Favorite", tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Icon(if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = "Favorite", tint = if (isLiked) Color(0xFFFF2E93) else Color.White.copy(alpha = 0.85f))
                                             }
                                             IconButton(onClick = { onTabChange(FullPlayerTab.LYRICS) }) {
-                                                Icon(Icons.Filled.FormatQuote, contentDescription = "Lyrics", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Icon(Icons.Filled.FormatQuote, contentDescription = "Lyrics", tint = Color.White.copy(alpha = 0.85f))
                                             }
                                         }
                                     }
@@ -2347,9 +2352,9 @@ internal fun PlayerProgressSlider(
     enabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val primary = MaterialTheme.colorScheme.primary
-    val tertiary = MaterialTheme.colorScheme.tertiary
-    val inactive = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 0.20f else 0.12f)
+    val primary = Color(0xFF00F0FF)
+    val secondary = Color(0xFFFF2E93)
+    val inactive = Color.White.copy(alpha = 0.22f)
     val range = (valueRange.endInclusive - valueRange.start).coerceAtLeast(0.0001f)
     val fraction = ((value - valueRange.start) / range).coerceIn(0f, 1f)
 
@@ -2381,7 +2386,7 @@ internal fun PlayerProgressSlider(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
                             primary.copy(alpha = if (enabled) 1f else 0.42f),
-                            tertiary.copy(alpha = if (enabled) 0.92f else 0.36f),
+                            secondary.copy(alpha = if (enabled) 0.92f else 0.36f),
                         ),
                         startX = startX,
                         endX = activeEndX,
@@ -2399,7 +2404,7 @@ internal fun PlayerProgressSlider(
             inactiveTrackColor = Color.Transparent,
             activeTickColor = Color.Transparent,
             inactiveTickColor = Color.Transparent,
-            disabledThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.34f),
+            disabledThumbColor = primary.copy(alpha = 0.34f),
             disabledActiveTrackColor = Color.Transparent,
             disabledInactiveTrackColor = Color.Transparent,
             disabledActiveTickColor = Color.Transparent,
@@ -2450,13 +2455,10 @@ private fun SeekBar(
         progress.positionMs.coerceIn(0L, boundedDurationMs)
     }
 
-    val primaryColor = if (isTranslucent) Color.White else MaterialTheme.colorScheme.primary
-    val inactiveColor = if (isTranslucent) {
-        Color.White.copy(alpha = 0.20f)
-    } else {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.28f)
-    }
-    val textColor = if (isTranslucent) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.92f)
+    val primaryColor = Color(0xFF00F0FF)
+    val activeBrush = Brush.horizontalGradient(listOf(Color(0xFF00F0FF), Color(0xFFFF2E93)))
+    val inactiveColor = Color.White.copy(alpha = 0.22f)
+    val textColor = Color(0xFFCBD5E1)
 
     // Same RTL pin as above: custom Canvas draws LTR, invisible Slider must match it.
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -2488,7 +2490,7 @@ private fun SeekBar(
                 // Thick active capsule ending before the vertical thumb.
                 if (activeEndX > 0f) {
                     drawRoundRect(
-                        color = primaryColor,
+                        brush = activeBrush,
                         topLeft = Offset(0f, centerY - trackHeightPx / 2f),
                         size = Size(activeEndX, trackHeightPx),
                         cornerRadius = cornerRadius,
@@ -2614,7 +2616,7 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
             interactionSource = prevInteraction,
             shape = CircleShape,
             color = liquidGlassContainerColor(if (isTranslucent) Color.White.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
-            contentColor = if (isTranslucent) Color.White.copy(alpha = 0.94f) else MaterialTheme.colorScheme.onSurface,
+            contentColor = Color.White,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier
@@ -2625,7 +2627,7 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
                 },
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(Icons.Filled.SkipPrevious, "Previous", Modifier.size(if (isTranslucent) 28.dp else 31.dp))
+                Icon(Icons.Filled.SkipPrevious, "Previous", Modifier.size(if (isTranslucent) 28.dp else 31.dp), tint = Color.White)
             }
         }
         LiquidGlassSurface(
@@ -2633,10 +2635,8 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
             onClick = player::togglePlayPause,
             interactionSource = playInteraction,
             shape = CircleShape,
-            color = liquidGlassContainerColor(if (isTranslucent) Color.White else MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)),
-            contentColor = if (LocalLiquidGlass.current) {
-                if (isTranslucent) Color.White else MaterialTheme.colorScheme.primary
-            } else if (isTranslucent) Color.Black else MaterialTheme.colorScheme.onPrimary,
+            color = Color(0xFF00F0FF),
+            contentColor = Color(0xFF050811),
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier
@@ -2650,11 +2650,11 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
                 if (state.isBuffering) {
                     ExpressiveInlineLoadingIndicator(
                         size = if (isTranslucent) 28.dp else 30.dp,
-                        color = androidx.compose.material3.LocalContentColor.current,
+                        color = Color(0xFF050811),
                         strokeWidth = 3.dp,
                     )
                 } else {
-                    AnimatedPlayPauseIcon(state.isPlaying, Modifier.size(if (isTranslucent) 36.dp else 39.dp))
+                    AnimatedPlayPauseIcon(state.isPlaying, Modifier.size(if (isTranslucent) 36.dp else 39.dp), tint = Color(0xFF050811))
                 }
             }
         }
@@ -2664,7 +2664,7 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
             interactionSource = nextInteraction,
             shape = CircleShape,
             color = liquidGlassContainerColor(if (isTranslucent) Color.White.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.40f)),
-            contentColor = if (isTranslucent) Color.White.copy(alpha = 0.94f) else MaterialTheme.colorScheme.onSurface,
+            contentColor = Color.White,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier

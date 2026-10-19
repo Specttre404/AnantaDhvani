@@ -301,16 +301,6 @@ fun PlayerBackgroundBackdrop(
             }
         }
 
-        // Light mode contrast scrim to prevent text blowout over bright backgrounds
-        val isDark = androidx.compose.foundation.isSystemInDarkTheme()
-        if (!isDark) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.45f)),
-            )
-        }
-
         content()
     }
 }
