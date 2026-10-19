@@ -1820,6 +1820,8 @@ fun SettingsScreen(
                 )
                 val allHeadphoneProfiles = remember {
                     listOf(
+                        "boAt Airdopes 131 Pro" to "Harman In-Ear 2024 • Sub-Bass Shelf",
+                        "Roseselsa - Aurora" to "Diffuse Field Audiophile Reference",
                         "boAt Nirvana Ion ANC" to "Harman In-Ear 2024 • Warm Bass",
                         "boAt Airdopes 141 / 161 / 441" to "AutoEQ V-Shape Punch",
                         "boAt Rockerz 450 / 550 / 255 Pro+" to "Harman Over-Ear Target",

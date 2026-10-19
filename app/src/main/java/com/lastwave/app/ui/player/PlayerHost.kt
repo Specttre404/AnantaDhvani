@@ -1730,8 +1730,7 @@ private fun FullPlayer(
 
                 val configuration = LocalConfiguration.current
                 val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-                val isTablet = configuration.screenWidthDp >= 600
-                val isSplitScreen = isLandscape || isTablet || playerStyle == com.lastwave.app.data.local.PlayerStyle.SPLIT_SCREEN
+                val isSplitScreen = isLandscape || (playerStyle == com.lastwave.app.data.local.PlayerStyle.SPLIT_SCREEN && isLandscape)
 
                 if (isSplitScreen && !lyricsFullscreen) {
                     Row(
