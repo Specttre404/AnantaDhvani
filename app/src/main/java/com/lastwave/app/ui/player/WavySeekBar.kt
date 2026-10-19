@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -32,14 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
@@ -48,20 +47,6 @@ import androidx.compose.ui.unit.dp
 import com.lastwave.app.data.local.SeekbarStyle
 import kotlin.math.PI
 import kotlin.math.sin
-
-private fun Color.shiftTonal(lightnessDelta: Float, saturationScale: Float = 1.0f): Color {
-    val hsv = FloatArray(3)
-    android.graphics.Color.RGBToHSV(
-        (red * 255).toInt().coerceIn(0, 255),
-        (green * 255).toInt().coerceIn(0, 255),
-        (blue * 255).toInt().coerceIn(0, 255),
-        hsv,
-    )
-    hsv[1] = (hsv[1] * saturationScale).coerceIn(0.15f, 1.0f)
-    hsv[2] = (hsv[2] + lightnessDelta).coerceIn(0.15f, 1.0f)
-    val rgb = android.graphics.Color.HSVToColor(hsv)
-    return Color(rgb)
-}
 
 @Composable
 fun WavySeekBar(
@@ -96,214 +81,90 @@ fun WavySeekBar(
         0f
     }
 
-    val primaryColor = if (isTranslucent) Color.White else MaterialTheme.colorScheme.primary
-    val secondaryColor = if (isTranslucent) Color.White else MaterialTheme.colorScheme.secondary
-    val tertiaryColor = if (isTranslucent) Color.White else MaterialTheme.colorScheme.tertiary
-
-    val inactiveColor = if (isTranslucent) {
-        Color.White.copy(alpha = 0.22f)
-    } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f)
-    }
-    val textColor = if (isTranslucent) {
-        Color.White.copy(alpha = 0.85f)
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
-
-    val layer1Light = remember(tertiaryColor, isTranslucent) { tertiaryColor.shiftTonal(lightnessDelta = +0.18f, saturationScale = 0.85f) }
-    val layer1Dark = remember(tertiaryColor, isTranslucent) { tertiaryColor.shiftTonal(lightnessDelta = -0.15f, saturationScale = 1.30f) }
-    val layer2Dark = remember(secondaryColor, isTranslucent) { secondaryColor.shiftTonal(lightnessDelta = -0.16f, saturationScale = 1.30f) }
-    val layer2Light = remember(secondaryColor, isTranslucent) { secondaryColor.shiftTonal(lightnessDelta = +0.18f, saturationScale = 0.85f) }
-    val layer3Light = remember(primaryColor, isTranslucent) { primaryColor.shiftTonal(lightnessDelta = +0.20f, saturationScale = 0.90f) }
-    val layer3Dark = remember(primaryColor, isTranslucent) { primaryColor.shiftTonal(lightnessDelta = -0.14f, saturationScale = 1.35f) }
-    val thumbColor = remember(primaryColor) { primaryColor.shiftTonal(lightnessDelta = -0.10f, saturationScale = 1.25f) }
+    val primaryColor = if (isTranslucent) Color(0xFF00F0FF) else Color(0xFF00F0FF)
+    val secondaryColor = Color(0xFFFF2E93)
+    val inactiveColor = Color.White.copy(alpha = 0.22f)
+    val textColor = Color(0xFFCBD5E1)
 
     val infiniteTransition = rememberInfiniteTransition(label = "WaveAnimation")
-
-    val phase1 by infiniteTransition.animateFloat(
+    val phase by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = (2 * PI).toFloat(),
-        animationSpec = infiniteRepeatable(tween(2400, easing = LinearEasing), repeatMode = RepeatMode.Restart),
-        label = "Phase1",
+        animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing), repeatMode = RepeatMode.Restart),
+        label = "Phase",
     )
-    val phase2 by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = (2 * PI).toFloat(),
-        animationSpec = infiniteRepeatable(tween(1800, easing = LinearEasing), repeatMode = RepeatMode.Restart),
-        label = "Phase2",
-    )
-    val phase3 by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = (2 * PI).toFloat(),
-        animationSpec = infiniteRepeatable(tween(1300, easing = LinearEasing), repeatMode = RepeatMode.Restart),
-        label = "Phase3",
-    )
-
-    val wavesActive = isPlaying && !dragging
-    val currPhase1 = if (wavesActive) phase1 + 2.2f else 2.2f
-    val currPhase2 = if (wavesActive) phase2 + 1.2f else 1.2f
-    val currPhase3 = if (wavesActive) phase3 else 0f
 
     val density = LocalDensity.current
-    val baseAmp1Px = with(density) { 13.0.dp.toPx() }
-    val baseAmp2Px = with(density) { 10.0.dp.toPx() }
-    val baseAmp3Px = with(density) { 7.5.dp.toPx() }
-    val draggingAmpPx = with(density) { 1.2.dp.toPx() }
-
-    val targetAmp1 = if (dragging) draggingAmpPx else if (isPlaying) baseAmp1Px else baseAmp1Px * 0.25f
-    val targetAmp2 = if (dragging) draggingAmpPx else if (isPlaying) baseAmp2Px else baseAmp2Px * 0.25f
-    val targetAmp3 = if (dragging) draggingAmpPx else if (isPlaying) baseAmp3Px else baseAmp3Px * 0.25f
-
-    val amp1 by animateFloatAsState(targetAmp1, tween(240), label = "Amp1")
-    val amp2 by animateFloatAsState(targetAmp2, tween(240), label = "Amp2")
-    val amp3 by animateFloatAsState(targetAmp3, tween(240), label = "Amp3")
-
-    val waveLength1Px = with(density) { 160.dp.toPx() }
-    val waveLength2Px = with(density) { 125.dp.toPx() }
-    val waveLength3Px = with(density) { 95.dp.toPx() }
-
-    val baseTrackThicknessPx = with(density) { 4.5.dp.toPx() }
-    val transitionLengthPx = with(density) { 44.dp.toPx() }
-    val waveSampleStepPx = with(density) { 1.5.dp.toPx() }
-
-    val pathFilled1 = remember { Path() }
-    val pathContour1 = remember { Path() }
-    val pathFilled2 = remember { Path() }
-    val pathContour2 = remember { Path() }
-    val pathFilled3 = remember { Path() }
-    val pathContour3 = remember { Path() }
-    val clipPathBounds = remember { Path() }
+    val activeWaveAmpPx = if (isPlaying && !dragging) with(density) { 7.dp.toPx() } else 0f
+    val waveAmpPx by animateFloatAsState(
+        targetValue = activeWaveAmpPx,
+        animationSpec = spring(stiffness = 300f, dampingRatio = 0.7f),
+        label = "waveAmplitude",
+    )
+    val wavePeriodPx = with(density) { 28.dp.toPx() }
 
     Column(modifier = modifier.fillMaxWidth()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(44.dp),
             ) {
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val width = size.width
                     val height = size.height
-                    val centerY = height / 2f + 4.dp.toPx()
+                    val centerY = height / 2f
                     val thumbX = (shownFraction * width).coerceIn(0f, width)
 
                     when (seekbarStyle) {
                         SeekbarStyle.WAVY_FLUID -> {
-                            val halfThickness = baseTrackThicknessPx / 2f
+                            val trackWidthPx = 4.dp.toPx()
+
+                            // Inactive line
                             drawLine(
                                 color = inactiveColor,
-                                start = Offset(0f, centerY),
+                                start = Offset(thumbX, centerY),
                                 end = Offset(width, centerY),
-                                strokeWidth = baseTrackThicknessPx,
+                                strokeWidth = trackWidthPx,
                                 cap = StrokeCap.Round,
                             )
 
+                            // Active squiggly path
                             if (thumbX > 0f) {
-                                clipPathBounds.reset()
-                                clipPathBounds.addRoundRect(
-                                    RoundRect(
-                                        rect = androidx.compose.ui.geometry.Rect(
-                                            left = -halfThickness,
-                                            top = 0f,
-                                            right = thumbX,
-                                            bottom = height,
-                                        ),
-                                        cornerRadius = CornerRadius(baseTrackThicknessPx, baseTrackThicknessPx),
-                                    )
-                                )
-
-                                clipPath(clipPathBounds) {
-                                    val bottomY = centerY + halfThickness
-                                    val topBaselineY = centerY - halfThickness
-
-                                    // Layer 1
-                                    pathFilled1.reset()
-                                    pathContour1.reset()
-                                    pathFilled1.moveTo(0f, bottomY)
-                                    pathContour1.moveTo(0f, topBaselineY)
-
-                                    var x = 0f
-                                    while (x <= thumbX) {
-                                        val damping = ((thumbX - x) / transitionLengthPx).coerceIn(0f, 1f)
-                                        val waveY = topBaselineY - sin((x / waveLength1Px) * 2 * PI + currPhase1).toFloat() * amp1 * damping
-                                        pathFilled1.lineTo(x, waveY)
-                                        pathContour1.lineTo(x, waveY)
-                                        x += waveSampleStepPx
-                                    }
-                                    pathFilled1.lineTo(thumbX, bottomY)
-                                    pathFilled1.close()
-
-                                    val grad1 = Brush.horizontalGradient(
-                                        colors = listOf(layer1Light, layer1Dark),
-                                        startX = 0f,
-                                        endX = thumbX.coerceAtLeast(1f),
-                                    )
-                                    drawPath(pathFilled1, brush = grad1)
-                                    drawPath(pathContour1, color = layer1Light, style = Stroke(1.2.dp.toPx(), cap = StrokeCap.Round))
-
-                                    // Layer 2
-                                    pathFilled2.reset()
-                                    pathContour2.reset()
-                                    pathFilled2.moveTo(0f, bottomY)
-                                    pathContour2.moveTo(0f, topBaselineY)
-
-                                    x = 0f
-                                    while (x <= thumbX) {
-                                        val damping = ((thumbX - x) / transitionLengthPx).coerceIn(0f, 1f)
-                                        val waveY = topBaselineY - sin((x / waveLength2Px) * 2 * PI + currPhase2).toFloat() * amp2 * damping
-                                        pathFilled2.lineTo(x, waveY)
-                                        pathContour2.lineTo(x, waveY)
-                                        x += waveSampleStepPx
-                                    }
-                                    pathFilled2.lineTo(thumbX, bottomY)
-                                    pathFilled2.close()
-
-                                    val grad2 = Brush.horizontalGradient(
-                                        colors = listOf(layer2Dark, layer2Light),
-                                        startX = 0f,
-                                        endX = thumbX.coerceAtLeast(1f),
-                                    )
-                                    drawPath(pathFilled2, brush = grad2)
-                                    drawPath(pathContour2, color = layer2Light, style = Stroke(1.4.dp.toPx(), cap = StrokeCap.Round))
-
-                                    // Layer 3
-                                    pathFilled3.reset()
-                                    pathContour3.reset()
-                                    pathFilled3.moveTo(0f, bottomY)
-                                    pathContour3.moveTo(0f, topBaselineY)
-
-                                    x = 0f
-                                    while (x <= thumbX) {
-                                        val damping = ((thumbX - x) / transitionLengthPx).coerceIn(0f, 1f)
-                                        val waveY = topBaselineY - sin((x / waveLength3Px) * 2 * PI + currPhase3).toFloat() * amp3 * damping
-                                        pathFilled3.lineTo(x, waveY)
-                                        pathContour3.lineTo(x, waveY)
-                                        x += waveSampleStepPx
-                                    }
-                                    pathFilled3.lineTo(thumbX, bottomY)
-                                    pathFilled3.close()
-
-                                    val grad3 = Brush.horizontalGradient(
-                                        colors = listOf(layer3Light, layer3Dark),
-                                        startX = 0f,
-                                        endX = thumbX.coerceAtLeast(1f),
-                                    )
-                                    drawPath(pathFilled3, brush = grad3)
-                                    drawPath(pathContour3, color = layer3Light, style = Stroke(1.6.dp.toPx(), cap = StrokeCap.Round))
+                                val wavePath = Path()
+                                wavePath.moveTo(0f, centerY)
+                                var x = 0f
+                                val step = 2.dp.toPx()
+                                while (x <= thumbX) {
+                                    val waveY = centerY + sin((x / wavePeriodPx) * 2 * PI + phase).toFloat() * waveAmpPx
+                                    wavePath.lineTo(x, waveY)
+                                    x += step
                                 }
+                                wavePath.lineTo(thumbX, centerY)
+
+                                val activeBrush = Brush.horizontalGradient(
+                                    colors = listOf(primaryColor, secondaryColor),
+                                    startX = 0f,
+                                    endX = thumbX,
+                                )
+                                drawPath(
+                                    path = wavePath,
+                                    brush = activeBrush,
+                                    style = Stroke(width = trackWidthPx, cap = StrokeCap.Round),
+                                )
                             }
 
+                            // Glowing thumb
                             drawCircle(
-                                color = thumbColor,
-                                radius = 7.5.dp.toPx(),
+                                color = primaryColor,
+                                radius = 8.dp.toPx(),
                                 center = Offset(thumbX, centerY),
                             )
                         }
 
                         SeekbarStyle.SEGMENTED_DASH -> {
                             val segmentCount = 32
-                            val gap = 4.dp.toPx()
+                            val gap = 2.dp.toPx()
                             val totalGap = gap * (segmentCount - 1)
                             val segmentWidth = (width - totalGap) / segmentCount
                             val segHeight = 8.dp.toPx()
@@ -317,18 +178,18 @@ fun WavySeekBar(
                                     color = color,
                                     topLeft = Offset(segLeft, centerY - segHeight / 2f),
                                     size = Size(segmentWidth, segHeight),
-                                    cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx()),
+                                    cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx()),
                                 )
                             }
                             drawCircle(
                                 color = primaryColor,
-                                radius = 9.dp.toPx(),
+                                radius = 8.dp.toPx(),
                                 center = Offset(thumbX, centerY),
                             )
                         }
 
                         SeekbarStyle.MINIMAL_PILL -> {
-                            val pillHeight = if (dragging) 10.dp.toPx() else 3.5.dp.toPx()
+                            val pillHeight = if (dragging) 8.dp.toPx() else 3.dp.toPx()
                             drawLine(
                                 color = inactiveColor,
                                 start = Offset(0f, centerY),
@@ -347,28 +208,28 @@ fun WavySeekBar(
                             }
                             drawCircle(
                                 color = primaryColor,
-                                radius = if (dragging) 10.dp.toPx() else 6.dp.toPx(),
+                                radius = if (dragging) 9.dp.toPx() else 5.dp.toPx(),
                                 center = Offset(thumbX, centerY),
                             )
                         }
 
                         SeekbarStyle.STUDIO_CONSOLE -> {
-                            val barCount = 64
+                            val barCount = 56
                             val gap = 2.dp.toPx()
                             val totalGap = gap * (barCount - 1)
                             val barWidth = (width - totalGap) / barCount
-                            val maxBarHeight = 34.dp.toPx()
+                            val maxBarHeight = 32.dp.toPx()
 
                             for (i in 0 until barCount) {
                                 val seed = (trackKey?.hashCode() ?: 42) + i * 31
-                                val sinVal = kotlin.math.sin(i * 0.18) * 0.4 + 0.5
+                                val sinVal = sin(i * 0.2) * 0.4 + 0.5
                                 val hashVal = (kotlin.math.abs(seed) % 100) / 100.0
                                 val amp = ((sinVal * 0.6 + hashVal * 0.4).toFloat() * 0.85f + 0.15f).coerceIn(0.15f, 1.0f)
 
                                 val barX = i * (barWidth + gap)
                                 val isPlayed = (barX + barWidth / 2f) <= thumbX
                                 val h = amp * maxBarHeight
-                                val barColor = if (isPlayed) primaryColor else textColor.copy(alpha = 0.35f)
+                                val barColor = if (isPlayed) primaryColor else inactiveColor
 
                                 drawRoundRect(
                                     color = barColor,
@@ -378,9 +239,9 @@ fun WavySeekBar(
                                 )
                             }
 
-                            // Interactive playhead scrubber line
+                            // Interactive playhead needle
                             drawLine(
-                                color = primaryColor,
+                                color = secondaryColor,
                                 start = Offset(thumbX, centerY - maxBarHeight / 2f - 2.dp.toPx()),
                                 end = Offset(thumbX, centerY + maxBarHeight / 2f + 2.dp.toPx()),
                                 strokeWidth = 2.5.dp.toPx(),
@@ -389,8 +250,8 @@ fun WavySeekBar(
                         }
 
                         SeekbarStyle.CAPSULE_PILL -> {
-                            val pillH = 10.dp.toPx()
-                            val cRadius = CornerRadius(5.dp.toPx(), 5.dp.toPx())
+                            val pillH = 12.dp.toPx()
+                            val cRadius = CornerRadius(6.dp.toPx(), 6.dp.toPx())
                             drawRoundRect(
                                 color = inactiveColor,
                                 topLeft = Offset(0f, centerY - pillH / 2f),
@@ -398,8 +259,13 @@ fun WavySeekBar(
                                 cornerRadius = cRadius,
                             )
                             if (thumbX > 0f) {
+                                val activeBrush = Brush.horizontalGradient(
+                                    colors = listOf(primaryColor, secondaryColor),
+                                    startX = 0f,
+                                    endX = thumbX,
+                                )
                                 drawRoundRect(
-                                    color = primaryColor,
+                                    brush = activeBrush,
                                     topLeft = Offset(0f, centerY - pillH / 2f),
                                     size = Size(thumbX, pillH),
                                     cornerRadius = cRadius,
@@ -407,7 +273,7 @@ fun WavySeekBar(
                             }
                             drawCircle(
                                 color = primaryColor,
-                                radius = 8.dp.toPx(),
+                                radius = 9.dp.toPx(),
                                 center = Offset(thumbX, centerY),
                             )
                         }
@@ -435,23 +301,23 @@ fun WavySeekBar(
             }
 
             if (showTimeLabels) {
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 2.dp),
+                        .padding(horizontal = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         formatMs(shownMs),
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         color = textColor,
                     )
                     Text(
                         formatMs(boundedDurationMs),
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         color = textColor,
                     )
                 }

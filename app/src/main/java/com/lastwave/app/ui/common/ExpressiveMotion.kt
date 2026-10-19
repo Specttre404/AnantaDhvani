@@ -114,7 +114,7 @@ fun Modifier.expressivePressScale(
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) targetScale else 1f,
-        animationSpec = ExpressiveMotion.spatialFast(),
+        animationSpec = ExpressiveMotionTokens.BouncySpring,
         label = "expressivePressScale",
     )
     return this.scale(scale)

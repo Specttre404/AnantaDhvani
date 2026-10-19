@@ -335,6 +335,7 @@ fun SettingsScreen(
     var showYtLibraryVisibilitySheet by remember { mutableStateOf(false) }
     var showYtDisconnectConfirm by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showAdvancedSubsystemsSheet by remember { mutableStateOf(false) }
     val currentLanguage = remember(misc.appLanguageTag) { AppLanguage.fromTag(misc.appLanguageTag) }
 
     // Sends the user to Android's own Notification Listener access screen
@@ -827,83 +828,15 @@ fun SettingsScreen(
                         onBatterySaverToggle = viewModel::setScreenOffBatterySaver,
                         onMetroHubToggle = viewModel::setMetroHubEnabled,
                     )
-                    StreamBufferTuningCard(
-                        minBufferMs = misc.minBufferMs,
-                        maxBufferMs = misc.maxBufferMs,
-                        playbackBufferMs = misc.bufferForPlaybackMs,
-                        onBufferChange = viewModel::setBufferTuning,
+                    SettingsActionCard(
+                        icon = Icons.Filled.Tune,
+                        iconContainer = MaterialTheme.colorScheme.primaryContainer,
+                        iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        title = "Advanced Audio Engineering & Hardware Tuning",
+                        subtitle = "Stream buffers, FIR convolution, crossfeed, USB direct output, DSP & telemetry",
+                        onClick = { showAdvancedSubsystemsSheet = true },
+                        position = GroupPosition.SINGLE,
                     )
-                    StreamCodecCard(
-                        currentCodec = misc.preferredAudioCodec,
-                        onSelectCodec = viewModel::setPreferredAudioCodec,
-                    )
-                    CacheQuotaCard(
-                        currentQuotaMb = misc.cacheQuotaMb,
-                        onSelectQuotaMb = viewModel::setCacheQuotaMb,
-                    )
-                    CrossfeedPresetsCard(
-                        enabled = misc.crossfeedEnabled,
-                        levelDb = misc.crossfeedLevelDb,
-                        cutoffHz = misc.crossfeedCutoffHz,
-                        onToggle = viewModel::setCrossfeedEnabled,
-                        onChange = { lvl, cut -> viewModel.setCrossfeedLevelDb(lvl); viewModel.setCrossfeedCutoffHz(cut) },
-                    )
-                    SilenceTrimmingCard(
-                        thresholdDb = misc.silenceThresholdDb,
-                        minDurationMs = misc.minSilenceDurationMs,
-                        onChange = viewModel::setSilenceSettings,
-                    )
-                    MiniPlayerSwipeCard(
-                        currentStyle = misc.miniPlayerSwipeStyle,
-                        onSelectStyle = viewModel::setMiniPlayerSwipeStyle,
-                    )
-                    LyricsTypographyCard(
-                        fontSize = misc.lyricsFontSize,
-                        lineSpacing = misc.lyricsLineSpacing,
-                        blurRadius = misc.lyricsInactiveBlurRadius,
-                        onChange = viewModel::setLyricsTypographySettings,
-                    )
-                    NavigationBarTabsCard(
-                        visibleTabs = misc.visibleNavTabs,
-                        onToggleTab = viewModel::toggleNavTab,
-                    )
-                    DownloadConcurrencyCard(
-                        concurrency = misc.downloadConcurrency,
-                        wifiOnly = misc.downloadWifiOnly,
-                        onConcurrencyChange = viewModel::setDownloadConcurrency,
-                        onWifiOnlyChange = viewModel::setDownloadWifiOnly,
-                    )
-                    LibraryFoldersAndExclusionCard(
-                        settings = misc,
-                        onAddScanFolder = viewModel::addCustomScanFolder,
-                        onRemoveScanFolder = viewModel::removeCustomScanFolder,
-                        onAddExcludedFolder = viewModel::addCustomExcludedFolder,
-                        onRemoveExcludedFolder = viewModel::removeCustomExcludedFolder,
-                    )
-                    AudioOffloadCard(
-                        enabled = misc.audioOffloadEnabled,
-                        onToggle = viewModel::setAudioOffloadEnabled,
-                    )
-                    ConvolutionIrCard(
-                        wetLevel = misc.convolutionWetLevel,
-                        onSelectFile = { irPickerLauncher.launch("audio/*") },
-                        onWetChange = viewModel::setConvolutionWetLevel,
-                        player = playerViewModel.player,
-                    )
-                    DecoupledSpeedPitchCard(player = playerViewModel.player)
-                    UsbDirectOutputCard(
-                        enabled = misc.audioOffloadEnabled,
-                        onToggle = viewModel::setAudioOffloadEnabled,
-                    )
-                    AutoEqCard(
-                        onOpenSearch = { showAutoEqSheet = true },
-                    )
-                    AudiophileThemePaletteCard(
-                        onSelectPreset = viewModel::setAudiophilePalette,
-                    )
-                    MetroEInkTypographyStudioCard()
-                    NamidaLibraryTagArchiveCard()
-                    NetworkProxyResilienceCard()
                 }
             }
 
@@ -1765,6 +1698,106 @@ fun SettingsScreen(
                 }
             }.onFailure {
                 viewModel.showToast("Failed to import EQ profile")
+            }
+        }
+    }
+
+    if (showAdvancedSubsystemsSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAdvancedSubsystemsSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "Advanced Audio Engineering & Hardware Tuning",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                StreamBufferTuningCard(
+                    minBufferMs = misc.minBufferMs,
+                    maxBufferMs = misc.maxBufferMs,
+                    playbackBufferMs = misc.bufferForPlaybackMs,
+                    onBufferChange = viewModel::setBufferTuning,
+                )
+                StreamCodecCard(
+                    currentCodec = misc.preferredAudioCodec,
+                    onSelectCodec = viewModel::setPreferredAudioCodec,
+                )
+                CacheQuotaCard(
+                    currentQuotaMb = misc.cacheQuotaMb,
+                    onSelectQuotaMb = viewModel::setCacheQuotaMb,
+                )
+                CrossfeedPresetsCard(
+                    enabled = misc.crossfeedEnabled,
+                    levelDb = misc.crossfeedLevelDb,
+                    cutoffHz = misc.crossfeedCutoffHz,
+                    onToggle = viewModel::setCrossfeedEnabled,
+                    onChange = { lvl, cut -> viewModel.setCrossfeedLevelDb(lvl); viewModel.setCrossfeedCutoffHz(cut) },
+                )
+                SilenceTrimmingCard(
+                    thresholdDb = misc.silenceThresholdDb,
+                    minDurationMs = misc.minSilenceDurationMs,
+                    onChange = viewModel::setSilenceSettings,
+                )
+                MiniPlayerSwipeCard(
+                    currentStyle = misc.miniPlayerSwipeStyle,
+                    onSelectStyle = viewModel::setMiniPlayerSwipeStyle,
+                )
+                LyricsTypographyCard(
+                    fontSize = misc.lyricsFontSize,
+                    lineSpacing = misc.lyricsLineSpacing,
+                    blurRadius = misc.lyricsInactiveBlurRadius,
+                    onChange = viewModel::setLyricsTypographySettings,
+                )
+                NavigationBarTabsCard(
+                    visibleTabs = misc.visibleNavTabs,
+                    onToggleTab = viewModel::toggleNavTab,
+                )
+                DownloadConcurrencyCard(
+                    concurrency = misc.downloadConcurrency,
+                    wifiOnly = misc.downloadWifiOnly,
+                    onConcurrencyChange = viewModel::setDownloadConcurrency,
+                    onWifiOnlyChange = viewModel::setDownloadWifiOnly,
+                )
+                LibraryFoldersAndExclusionCard(
+                    settings = misc,
+                    onAddScanFolder = viewModel::addCustomScanFolder,
+                    onRemoveScanFolder = viewModel::removeCustomScanFolder,
+                    onAddExcludedFolder = viewModel::addCustomExcludedFolder,
+                    onRemoveExcludedFolder = viewModel::removeCustomExcludedFolder,
+                )
+                AudioOffloadCard(
+                    enabled = misc.audioOffloadEnabled,
+                    onToggle = viewModel::setAudioOffloadEnabled,
+                )
+                ConvolutionIrCard(
+                    wetLevel = misc.convolutionWetLevel,
+                    onSelectFile = { irPickerLauncher.launch("audio/*") },
+                    onWetChange = viewModel::setConvolutionWetLevel,
+                    player = playerViewModel.player,
+                )
+                DecoupledSpeedPitchCard(player = playerViewModel.player)
+                UsbDirectOutputCard(
+                    enabled = misc.audioOffloadEnabled,
+                    onToggle = viewModel::setAudioOffloadEnabled,
+                )
+                AutoEqCard(
+                    onOpenSearch = { showAutoEqSheet = true },
+                )
+                AudiophileThemePaletteCard(
+                    onSelectPreset = viewModel::setAudiophilePalette,
+                )
+                MetroEInkTypographyStudioCard()
+                NetworkProxyResilienceCard()
+                Spacer(Modifier.height(32.dp))
             }
         }
     }
@@ -4002,197 +4035,7 @@ private fun MetroEInkTypographyStudioCard() {
     }
 }
 
-@Composable
-private fun NamidaLibraryTagArchiveCard() {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    var tagTitle by remember { mutableStateOf("Ananta Continuum (24-Bit Studio Master)") }
-    var tagArtist by remember { mutableStateOf("Ishan • Audiophile Ensemble") }
-    var tagAlbum by remember { mutableStateOf("Session IV: Acoustic Reference") }
-    var tagYear by remember { mutableStateOf("2026") }
-    var tagGenre by remember { mutableStateOf("Progressive Instrumental") }
-    var lrcOffsetMs by remember { mutableFloatStateOf(0f) }
-    var activeFolderNode by remember { mutableStateOf("/storage/emulated/0/Music/HiRes_FLAC") }
-    var artworkStatus by remember { mutableStateOf("Embedded 1400x1400 Lossless PNG (2.4 MB)") }
 
-    val artworkPicker = androidx.activity.compose.rememberLauncherForActivityResult(
-        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent(),
-    ) { uri: android.net.Uri? ->
-        if (uri != null) {
-            artworkStatus = "Injected Custom Cover: ${uri.lastPathSegment?.substringAfterLast('/') ?: "cover.png"}"
-            android.widget.Toast.makeText(context, "High-Res Cover Art Injected into Container", android.widget.Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    val folderTree = listOf(
-        "/storage/emulated/0/Music/HiRes_FLAC" to "48 files • 24/96 FLAC",
-        "/storage/emulated/0/Music/DSD_PCM_Vault" to "19 files • 32-Bit WAV",
-        "/storage/emulated/0/Music/Vinyl_Masters" to "32 files • 24/192 FLAC",
-        "/storage/emulated/0/Music/Instrumental_Sessions" to "27 files • ALAC/FLAC",
-    )
-
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        border = androidx.compose.foundation.BorderStroke(
-            width = 1.dp,
-            brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                colors = listOf(Color(0xFF00F0FF).copy(alpha = 0.45f), Color(0xFFFFC700).copy(alpha = 0.35f)),
-            ),
-        ),
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Canvas(modifier = Modifier.matchParentSize()) {
-                drawCircle(
-                    color = Color(0xFF00F0FF).copy(alpha = 0.07f),
-                    radius = size.minDimension * 0.55f,
-                    center = androidx.compose.ui.geometry.Offset(size.width * 0.9f, size.height * 0.15f),
-                )
-                drawCircle(
-                    color = Color(0xFFFFC700).copy(alpha = 0.06f),
-                    radius = size.minDimension * 0.5f,
-                    center = androidx.compose.ui.geometry.Offset(size.width * 0.1f, size.height * 0.85f),
-                )
-            }
-
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(
-                    text = "Namida Tag Editor, Artwork & Folder Tree Studio",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    ),
-                )
-                Text(
-                    text = "ID3v2.4 / Vorbis / MP4 container metadata writer, high-res cover art injector & direct directory tree browser",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-
-                // Upgraded 40A: In-App ID3v2 / Vorbis / MP4 Audio Tag Editor
-                Text("Audio Container Metadata Editor (ID3v2.4 / Vorbis / MP4)", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFF00F0FF))
-                OutlinedTextField(
-                    value = tagTitle,
-                    onValueChange = { tagTitle = it },
-                    label = { Text("Track Title") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = tagArtist,
-                        onValueChange = { tagArtist = it },
-                        label = { Text("Artist") },
-                        singleLine = true,
-                        modifier = Modifier.weight(1f),
-                    )
-                    OutlinedTextField(
-                        value = tagYear,
-                        onValueChange = { tagYear = it },
-                        label = { Text("Year") },
-                        singleLine = true,
-                        modifier = Modifier.weight(0.45f),
-                    )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = tagAlbum,
-                        onValueChange = { tagAlbum = it },
-                        label = { Text("Album") },
-                        singleLine = true,
-                        modifier = Modifier.weight(1f),
-                    )
-                    OutlinedTextField(
-                        value = tagGenre,
-                        onValueChange = { tagGenre = it },
-                        label = { Text("Genre") },
-                        singleLine = true,
-                        modifier = Modifier.weight(0.8f),
-                    )
-                }
-
-                Text("Embedded LRC Lyric Timestamp Offset: ${if (lrcOffsetMs >= 0) "+" else ""}${lrcOffsetMs.toInt()} ms", style = MaterialTheme.typography.labelSmall, color = Color(0xFFFFC700))
-                Slider(
-                    value = lrcOffsetMs,
-                    onValueChange = { lrcOffsetMs = it },
-                    valueRange = -2000f..2000f,
-                )
-
-                Button(
-                    onClick = {
-                        android.widget.Toast.makeText(context, "Committed ID3v2.4/Vorbis tags & LRC offset to audio file", android.widget.Toast.LENGTH_SHORT).show()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Write Metadata Tags to Audio File", fontWeight = FontWeight.Bold)
-                }
-
-                // Upgraded 41A: Cover Artwork Extractor & Injector
-                Text("Embedded Artwork Status: $artworkStatus", style = MaterialTheme.typography.labelSmall, color = Color(0xFF00F0FF))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedButton(
-                        onClick = {
-                            artworkStatus = "Exported 1400x1400 PNG to /Pictures/AnantaCovers/"
-                            android.widget.Toast.makeText(context, "Extracted embedded cover to gallery", android.widget.Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("Extract Cover Art", style = MaterialTheme.typography.labelSmall)
-                    }
-                    OutlinedButton(
-                        onClick = { artworkPicker.launch("image/*") },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text("Inject New Cover", style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-
-                // Upgraded 42A: Hierarchical Folder Tree Browser
-                Text("Hierarchical Storage Directory Browser", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        folderTree.forEach { (folderPath, codecBadge) ->
-                            val isSelected = activeFolderNode == folderPath
-                            Surface(
-                                onClick = { activeFolderNode = folderPath },
-                                shape = RoundedCornerShape(10.dp),
-                                color = if (isSelected) Color(0xFF00F0FF).copy(alpha = 0.16f) else Color.Transparent,
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp).fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        text = "📁 ${folderPath.substringAfterLast('/')}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    )
-                                    Text(
-                                        text = codecBadge,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun NetworkProxyResilienceCard() {

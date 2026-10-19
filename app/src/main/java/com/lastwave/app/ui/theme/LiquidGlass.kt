@@ -319,9 +319,9 @@ fun LiquidGlassIconButton(
 fun Modifier.liquidGlassSurface(
     shape: Shape = RoundedCornerShape(24.dp),
     blurRadius: Dp = 20.dp,
-    tintColor: Color = Color(0xCC0D121F),
+    tintColor: Color = Color(0xFF0B0F1A),
     borderWidth: Dp = 1.dp,
-    specularAlpha: Float = 0.45f,
+    specularAlpha: Float = 0.55f,
 ): Modifier = this
     .graphicsLayer {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && blurRadius > 0.dp) {
@@ -336,23 +336,17 @@ fun Modifier.liquidGlassSurface(
         this.shape = shape
     }
     .background(
-        brush = Brush.verticalGradient(
-            colors = listOf(
-                tintColor.copy(alpha = 0.85f),
-                tintColor.copy(alpha = 0.65f)
-            )
-        ),
+        color = tintColor.copy(alpha = 0.75f),
         shape = shape
     )
     .border(
         BorderStroke(
             width = borderWidth,
-            brush = Brush.linearGradient(
+            brush = Brush.verticalGradient(
                 colors = listOf(
                     Color.White.copy(alpha = specularAlpha),
-                    Color(0xFF00F0FF).copy(alpha = specularAlpha * 0.8f),
-                    Color.White.copy(alpha = specularAlpha * 0.15f),
-                    Color(0xFFFF2E93).copy(alpha = specularAlpha * 0.5f)
+                    Color(0xFF00F0FF).copy(alpha = specularAlpha * 0.73f),
+                    Color(0xFFFF2E93).copy(alpha = specularAlpha * 0.45f)
                 )
             )
         ),

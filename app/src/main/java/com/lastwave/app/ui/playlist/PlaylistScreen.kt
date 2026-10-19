@@ -238,7 +238,9 @@ fun PlaylistScreen(
                         pl.title.equals("Titan", ignoreCase = true) ||
                         pl.title.contains("Titan", ignoreCase = true) ||
                         pl.title.contains("Episodes for Later", ignoreCase = true) ||
-                        pl.title.contains("Podcast", ignoreCase = true)
+                        pl.title.contains("Podcast", ignoreCase = true) ||
+                        pl.title.equals("Serene Reverie", ignoreCase = true) ||
+                        pl.title.contains("Serene Reverie", ignoreCase = true)
                     }
                 }
 
