@@ -72,30 +72,30 @@ enum class MiniPlayerSwipeStyle(val id: String, val title: String) {
 }
 
 enum class SeekbarStyle(val id: String, val title: String, val description: String) {
-    WAVY_FLUID("wavy_fluid", "Wavy Fluid", "Multi-frequency sine wave undulating during playback and flattening on pause."),
-    SEGMENTED_DASH("segmented_dash", "Segmented Dash", "High-tech discrete dashed time bar with glowing progress heads."),
-    MINIMAL_PILL("minimal_pill", "Minimal Pill", "Ultra-slim line that expands into a tactile pill on touch."),
-    STUDIO_CONSOLE("studio_console", "Studio Console", "Precision analog mixing desk fader with tick marks and exact time readout."),
-    CAPSULE_PILL("capsule_pill", "Capsule Pill", "Tactile stadium capsule slider with smooth progress fill.");
+    WAVY_FLUID("wavy_fluid", "Android 17 Wavy Fluid", "Live sine-wave harmonic oscillation flattening to a straight needle on pause."),
+    CAPSULE_PILL("capsule_pill", "ViVi Capsule Stadium", "Material 3 Expressive stadium capsule track with smooth progress fill."),
+    STUDIO_CONSOLE("studio_console", "Analog Mixing Console", "Real-time hardware console fader with discrete channel telemetry."),
+    SEGMENTED_DASH("segmented_dash", "Metro Segmented Dash", "Discrete time blocks with micro-gap precision tracking."),
+    MINIMAL_PILL("minimal_pill", "Cider Minimal Needle", "Ultra-thin precision audiophile hairline needle with glowing head."),
+    PRISM_SPECTRUM("prism_spectrum", "Prism Neon Ribbon", "Dual-gradient luminous harmonic ribbon with animated phase shift.");
 
     companion object {
-        fun fromId(id: String?): SeekbarStyle =
-            entries.firstOrNull { it.id == id } ?: WAVY_FLUID
+        fun fromId(id: String?): SeekbarStyle = entries.firstOrNull { it.id == id } ?: WAVY_FLUID
     }
 }
 
 enum class PlayerStyle(val id: String, val title: String, val description: String) {
     MODERN_M3("modern_m3", "Modern M3 Expressive", "Adaptive layout with clean typography, dynamic spacing, and floating action dock"),
-    CLASSIC("classic", "Classic", "Centered square artwork with balanced linear controllers and full transport rows"),
+    CLASSIC("classic", "Classic Hi-Fi", "Centered square artwork with balanced linear controllers and full transport rows"),
     IMMERSIVE_FULLSCREEN("immersive_fullscreen", "Immersive Fullscreen", "Edge-to-edge artwork presentation with subtle semi-transparent controls"),
-    MINIMALIST("minimalist", "Minimalist", "Typography-first distraction-free mode with essential controls only"),
-    COMPACT_DOCK("compact_dock", "Compact Dock", "One-handed reachability layout with controls closer to the bottom"),
+    MINIMALIST("minimalist", "Minimalist Typography", "Typography-first distraction-free mode with essential controls only"),
+    COMPACT_DOCK("compact_dock", "Compact One-Handed Dock", "One-handed reachability layout with controls closer to the bottom"),
     CAROUSEL("carousel", "Card Carousel", "Swipeable horizontal card stack with upcoming queue items"),
-    SPLIT_SCREEN("split_screen", "Split Screen Dual-Pane", "Dual-pane landscape/tablet layout displaying artwork & controls beside synchronized lyrics");
+    SPLIT_SCREEN("split_screen", "Split Screen Dual-Pane", "Dual-pane landscape/tablet layout displaying artwork and controls beside synchronized lyrics"),
+    CIDER_PANORAMIC("cider_panoramic", "Cider Panoramic Glass", "Wide-aspect ratio desktop-class player layout with frosted specular sidebar");
 
     companion object {
-        fun fromId(id: String?): PlayerStyle =
-            entries.firstOrNull { it.id == id } ?: MODERN_M3
+        fun fromId(id: String?): PlayerStyle = entries.firstOrNull { it.id == id } ?: MODERN_M3
     }
 }
 

@@ -1,26 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Glass Ring -->
     <path
-        android:pathData="M 54,28 A 26,26 0 1,1 53.99,28 Z"
-        android:strokeWidth="3"
-        android:strokeColor="#FF000000"
+        android:pathData="M 54,26 A 28,28 0 1,1 53.99,26 Z"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
         android:fillColor="#00000000" />
-
-    <!-- Soundwave -->
     <path
-        android:pathData="M 24,54 C 30,54 34,36 42,36 C 50,36 53,72 61,72 C 69,72 72,42 79,42 C 82,42 84,54 88,54"
-        android:strokeWidth="6.5"
-        android:strokeColor="#FF000000"
+        android:pathData="M 22,54 C 28,54 32,34 40,34 C 48,34 50,74 58,74 C 66,74 70,40 78,40 C 82,40 84,54 86,54"
+        android:strokeWidth="5.5"
+        android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
-
-    <!-- Pulse Node -->
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M 61,72 m -3.5,0 a 3.5,3.5 0 1,0 7,0 a 3.5,3.5 0 1,0 -7,0" />
 </vector>

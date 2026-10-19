@@ -1,5 +1,6 @@
 package com.lastwave.app.ui.common
 
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -9,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun ExpressiveHeader(
@@ -49,22 +53,31 @@ fun ExpressiveHeader(
     actions: @Composable RowScope.() -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDark = isSystemInDarkTheme()
     val titleGradient = if (isDark) {
         Brush.verticalGradient(listOf(Color.White, Color(0xFFE2E8F0)))
     } else {
         Brush.verticalGradient(listOf(Color(0xFF0F172A), Color(0xFF334155)))
     }
 
-    val infiniteTransition = rememberInfiniteTransition(label = "header_aura")
-    val phase by infiniteTransition.animateFloat(
+    val infiniteTransition = rememberInfiniteTransition(label = "fluent_header_aura")
+    val phaseAngle by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 2f * Math.PI.toFloat(),
+        targetValue = (2f * Math.PI).toFloat(),
         animationSpec = infiniteRepeatable(
-            animation = tween(12000, easing = LinearEasing),
+            animation = tween(14000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart,
         ),
         label = "phase_angle",
+    )
+    val breathingPulse by infiniteTransition.animateFloat(
+        initialValue = 0.85f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "pulse_scale",
     )
 
     Box(
@@ -73,22 +86,28 @@ fun ExpressiveHeader(
             .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
-            val cx1 = size.width * 0.35f + kotlin.math.sin(phase.toDouble()).toFloat() * 40f
-            val cy1 = size.height * 0.5f + kotlin.math.cos(phase.toDouble()).toFloat() * 15f
+            val cx1 = size.width * 0.28f + sin(phaseAngle.toDouble()).toFloat() * 45f
+            val cy1 = size.height * 0.45f + cos(phaseAngle.toDouble()).toFloat() * 18f
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFF00F0FF).copy(alpha = 0.08f), Color.Transparent),
+                    colors = listOf(
+                        (if (isDark) Color(0xFF00F0FF) else Color(0xFF0284C7)).copy(alpha = if (isDark) 0.10f else 0.08f),
+                        Color.Transparent,
+                    ),
                     center = Offset(cx1, cy1),
-                    radius = size.width * 0.65f,
+                    radius = size.width * 0.60f * breathingPulse,
                 ),
             )
-            val cx2 = size.width * 0.75f - kotlin.math.cos(phase.toDouble()).toFloat() * 30f
-            val cy2 = size.height * 0.5f - kotlin.math.sin(phase.toDouble()).toFloat() * 15f
+            val cx2 = size.width * 0.78f - cos(phaseAngle.toDouble()).toFloat() * 40f
+            val cy2 = size.height * 0.55f - sin(phaseAngle.toDouble()).toFloat() * 18f
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFFFF2E93).copy(alpha = 0.06f), Color.Transparent),
+                    colors = listOf(
+                        (if (isDark) Color(0xFFFF2E93) else Color(0xFFE11D48)).copy(alpha = if (isDark) 0.08f else 0.06f),
+                        Color.Transparent,
+                    ),
                     center = Offset(cx2, cy2),
-                    radius = size.width * 0.55f,
+                    radius = size.width * 0.50f * breathingPulse,
                 ),
             )
         }
@@ -100,7 +119,7 @@ fun ExpressiveHeader(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.weight(1f),
             ) {
                 if (onBack != null) {
@@ -109,10 +128,10 @@ fun ExpressiveHeader(
                         modifier = Modifier
                             .size(42.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.45f)),
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.55f)),
                     ) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.onSurface,
                         )
@@ -125,7 +144,7 @@ fun ExpressiveHeader(
                             fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.ExtraBold,
                             brush = titleGradient,
-                            letterSpacing = (-0.5).sp,
+                            letterSpacing = (-0.6).sp,
                         ),
                     )
                     if (!subtitle.isNullOrBlank()) {
@@ -140,7 +159,7 @@ fun ExpressiveHeader(
             }
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 content = actions,
             )
@@ -148,22 +167,24 @@ fun ExpressiveHeader(
     }
 }
 
-/** A trailing action icon for [ExpressiveHeader] — a glowing liquid-glass surface
- *  with gradient border and vivid cyan icon tinting. */
 @Composable
 fun HeaderActionIcon(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
 ) {
+    val isDark = isSystemInDarkTheme()
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        color = Color(0xFF101626).copy(alpha = 0.85f),
+        shape = RoundedCornerShape(16.dp),
+        color = if (isDark) Color(0xFF101626).copy(alpha = 0.85f) else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.75f),
         border = BorderStroke(
             width = 1.dp,
             brush = Brush.linearGradient(
-                colors = listOf(Color(0xFF00F0FF).copy(alpha = 0.55f), Color(0xFFFF2E93).copy(alpha = 0.45f)),
+                colors = listOf(
+                    (if (isDark) Color(0xFF00F0FF) else Color(0xFF0284C7)).copy(alpha = 0.55f),
+                    (if (isDark) Color(0xFFFF2E93) else Color(0xFFE11D48)).copy(alpha = 0.45f),
+                ),
             ),
         ),
         modifier = Modifier.size(42.dp),
@@ -172,7 +193,7 @@ fun HeaderActionIcon(
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = Color(0xFF00F0FF),
+                tint = if (isDark) Color(0xFF00F0FF) else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp),
             )
         }

@@ -1900,6 +1900,7 @@ private fun FullPlayer(
                                             com.lastwave.app.data.local.PlayerStyle.IMMERSIVE_FULLSCREEN -> 420.dp
                                             com.lastwave.app.data.local.PlayerStyle.CAROUSEL -> 340.dp
                                             com.lastwave.app.data.local.PlayerStyle.SPLIT_SCREEN -> 280.dp
+                                            com.lastwave.app.data.local.PlayerStyle.CIDER_PANORAMIC -> 360.dp
                                             else -> 380.dp
                                         }
                                         val artworkSize = (minOf(maxWidth, maxHeight) - 12.dp)

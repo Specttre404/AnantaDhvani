@@ -277,6 +277,39 @@ fun WavySeekBar(
                                 center = Offset(thumbX, centerY),
                             )
                         }
+
+                        SeekbarStyle.PRISM_SPECTRUM -> {
+                            val ribbonH = 8.dp.toPx()
+                            val cRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
+                            drawRoundRect(
+                                color = inactiveColor,
+                                topLeft = Offset(0f, centerY - ribbonH / 2f),
+                                size = Size(width, ribbonH),
+                                cornerRadius = cRadius,
+                            )
+                            if (thumbX > 0f) {
+                                val prismBrush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color(0xFF00F0FF),
+                                        Color(0xFFFF2E93),
+                                        Color(0xFFFFC700),
+                                    ),
+                                    startX = 0f,
+                                    endX = thumbX,
+                                )
+                                drawRoundRect(
+                                    brush = prismBrush,
+                                    topLeft = Offset(0f, centerY - ribbonH / 2f),
+                                    size = Size(thumbX, ribbonH),
+                                    cornerRadius = cRadius,
+                                )
+                            }
+                            drawCircle(
+                                color = Color(0xFF00F0FF),
+                                radius = 9.dp.toPx(),
+                                center = Offset(thumbX, centerY),
+                            )
+                        }
                     }
                 }
 

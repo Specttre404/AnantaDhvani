@@ -64,7 +64,7 @@
 
     <application
         android:name=".LastWaveApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:appCategory="audio"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
