@@ -77,6 +77,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.lastwave.app.ui.theme.liquidGlassSurface
+import com.lastwave.app.ui.common.expressivePressScale
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -236,9 +238,11 @@ fun FeedScreen(
             ) {
                 items(FeedCategoryFilter.entries) { filter ->
                     val selected = filter == activeFilter
+                    val interaction = remember { MutableInteractionSource() }
                     FilterChip(
                         selected = selected,
                         onClick = { activeFilter = filter },
+                        interactionSource = interaction,
                         label = {
                             Text(
                                 filter.label,
@@ -246,7 +250,8 @@ fun FeedScreen(
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                             )
                         },
-                        shape = CircleShape,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.expressivePressScale(interaction),
                     )
                 }
             }

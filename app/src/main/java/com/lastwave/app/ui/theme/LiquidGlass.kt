@@ -1,8 +1,10 @@
 package com.lastwave.app.ui.theme
 
 import android.os.Build
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -309,3 +311,50 @@ fun LiquidGlassIconButton(
         )
     }
 }
+
+/**
+ * iOS Liquid Glass container architecture inspired by Lelonio/Square.
+ * Blends frosted translucent backdrop refraction with a dual-stop specular reflection border.
+ */
+fun Modifier.liquidGlassSurface(
+    shape: Shape = RoundedCornerShape(24.dp),
+    blurRadius: Dp = 20.dp,
+    tintColor: Color = Color(0xCC0D121F),
+    borderWidth: Dp = 1.dp,
+    specularAlpha: Float = 0.45f,
+): Modifier = this
+    .graphicsLayer {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && blurRadius > 0.dp) {
+            val blurPx = blurRadius.toPx()
+            renderEffect = android.graphics.RenderEffect.createBlurEffect(
+                blurPx,
+                blurPx,
+                android.graphics.Shader.TileMode.CLAMP
+            ).asComposeRenderEffect()
+        }
+        clip = true
+        this.shape = shape
+    }
+    .background(
+        brush = Brush.verticalGradient(
+            colors = listOf(
+                tintColor.copy(alpha = 0.85f),
+                tintColor.copy(alpha = 0.65f)
+            )
+        ),
+        shape = shape
+    )
+    .border(
+        BorderStroke(
+            width = borderWidth,
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    Color.White.copy(alpha = specularAlpha),
+                    Color(0xFF00F0FF).copy(alpha = specularAlpha * 0.8f),
+                    Color.White.copy(alpha = specularAlpha * 0.15f),
+                    Color(0xFFFF2E93).copy(alpha = specularAlpha * 0.5f)
+                )
+            )
+        ),
+        shape = shape
+    )

@@ -14,6 +14,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -23,6 +25,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+
+object ExpressiveMotionTokens {
+    // ViVi Music's bouncy spring physics for interactive surfaces
+    val BouncySpring = spring<Float>(
+        dampingRatio = 0.68f,
+        stiffness = 380f,
+    )
+    val SmoothSpring = spring<Float>(
+        dampingRatio = Spring.DampingRatioNoBouncy,
+        stiffness = Spring.StiffnessMediumLow,
+    )
+}
 
 /** Shared, restrained Material 3 Expressive motion language for the app. */
 object ExpressiveMotion {
