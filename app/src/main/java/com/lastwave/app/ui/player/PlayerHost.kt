@@ -3540,6 +3540,7 @@ private fun SpatialAudioPuckSheet(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -3569,7 +3570,28 @@ private fun SpatialAudioPuckSheet(
                         .height(180.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Canvas(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                                .pointerInput(Unit) {
+                                    detectDragGestures { change, _ ->
+                                        change.consume()
+                                        val centerPtX = size.width * 0.5f
+                                        val centerPtY = size.height * 0.5f
+                                        val radarRadius = (size.width.coerceAtMost(size.height) * 0.5f) * 0.42f
+                                        val dx = change.position.x - centerPtX
+                                        val dy = change.position.y - centerPtY
+                                        val dist = kotlin.math.sqrt(dx * dx + dy * dy)
+                                        val newRoom = (dist / radarRadius.coerceAtLeast(1f)).coerceIn(0.1f, 1.5f)
+                                        val angleRad = kotlin.math.atan2(dx.toDouble(), -dy.toDouble()).toFloat()
+                                        val newAzimuth = ((angleRad / (Math.PI.toFloat() * 1.5f)) + 0.5f).coerceIn(0.0f, 1.0f)
+                                        roomSize = newRoom
+                                        azimuthAngle = newAzimuth
+                                        player.setSpatialAudio(true, roomSize, azimuthAngle, elevationAngle, headTrackingGain)
+                                    }
+                                },
+                        ) {
                             val centerPt = androidx.compose.ui.geometry.Offset(size.width * 0.5f, size.height * 0.5f)
                             val radarRadius = size.minDimension * 0.42f
 
