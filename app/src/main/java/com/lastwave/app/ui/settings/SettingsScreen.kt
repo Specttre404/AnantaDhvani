@@ -4180,7 +4180,7 @@ private fun NamidaLibraryTagArchiveCard() {
                                     Text(
                                         text = codecBadge,
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFF00F0FF),
+                                        color = MaterialTheme.colorScheme.primary,
                                     )
                                 }
                             }
