@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -83,7 +84,8 @@ fun ExpressiveHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .statusBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 8.dp),
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             val cx1 = size.width * 0.28f + sin(phaseAngle.toDouble()).toFloat() * 45f
@@ -91,7 +93,7 @@ fun ExpressiveHeader(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        (if (isDark) Color(0xFF00F0FF) else Color(0xFF0284C7)).copy(alpha = if (isDark) 0.10f else 0.08f),
+                        (if (isDark) Color(0xFF00F0FF) else Color(0xFF0284C7)).copy(alpha = if (isDark) 0.12f else 0.08f),
                         Color.Transparent,
                     ),
                     center = Offset(cx1, cy1),
@@ -103,7 +105,7 @@ fun ExpressiveHeader(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        (if (isDark) Color(0xFFFF2E93) else Color(0xFFE11D48)).copy(alpha = if (isDark) 0.08f else 0.06f),
+                        (if (isDark) Color(0xFFFF2E93) else Color(0xFFE11D48)).copy(alpha = if (isDark) 0.10f else 0.06f),
                         Color.Transparent,
                     ),
                     center = Offset(cx2, cy2),

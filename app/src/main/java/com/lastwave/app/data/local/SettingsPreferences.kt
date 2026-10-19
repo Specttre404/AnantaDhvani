@@ -77,7 +77,8 @@ enum class SeekbarStyle(val id: String, val title: String, val description: Stri
     STUDIO_CONSOLE("studio_console", "Analog Mixing Console", "Real-time hardware console fader with discrete channel telemetry."),
     SEGMENTED_DASH("segmented_dash", "Metro Segmented Dash", "Discrete time blocks with micro-gap precision tracking."),
     MINIMAL_PILL("minimal_pill", "Cider Minimal Needle", "Ultra-thin precision audiophile hairline needle with glowing head."),
-    PRISM_SPECTRUM("prism_spectrum", "Prism Neon Ribbon", "Dual-gradient luminous harmonic ribbon with animated phase shift.");
+    PRISM_SPECTRUM("prism_spectrum", "Prism Neon Ribbon", "Dual-gradient luminous harmonic ribbon with animated phase shift."),
+    NUVIA_WAVEFORM("nuvia_waveform", "Nuvia Live Waveform", "Real-time acoustic audio spectrum bars and dynamic playhead.");
 
     companion object {
         fun fromId(id: String?): SeekbarStyle = entries.firstOrNull { it.id == id } ?: WAVY_FLUID

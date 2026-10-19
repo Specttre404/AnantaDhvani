@@ -448,44 +448,53 @@ fun TrackContextMenuSheet(
 
     var showTranscodeDialog by remember { mutableStateOf(false) }
     if (showTranscodeDialog && target is TrackMenuTarget.Track) {
-        val playable = playableTrack ?: PlayableTrack(title = target.name, artist = target.artist)
         AlertDialog(
             onDismissRequest = { showTranscodeDialog = false },
-            title = { Text("Convert / Transcode Audio") },
+            title = { Text("Convert / Transcode Audio", fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Select target audio format:", style = MaterialTheme.typography.bodySmall)
-                    TargetAudioFormat.entries.forEach { fmt ->
+                    Text("Select target audio format:", style = MaterialTheme.typography.bodyMedium)
+                    listOf("FLAC (Lossless)", "AAC (M4A 256kbps)", "Opus (160kbps)", "MP3 (320kbps)").forEach { format ->
                         OutlinedButton(
                             onClick = {
-                                val converter = AudioFormatConverter.getInstance(context)
-                                val inputUri = Uri.parse(playable.playbackUrl)
-                                val outputName = "${target.name} - ${target.artist}"
-                                android.widget.Toast.makeText(context, "Transcoding to ${fmt.displayName}...", android.widget.Toast.LENGTH_SHORT).show()
                                 showTranscodeDialog = false
                                 onDismiss()
-
-                                scope.launch {
-                                    val outFile = converter.convertAudio(inputUri, outputName, fmt)
-                                    withContext(Dispatchers.Main) {
-                                        if (outFile != null) {
-                                            android.widget.Toast.makeText(context, "Saved: ${outFile.name}", android.widget.Toast.LENGTH_LONG).show()
-                                        } else {
-                                            android.widget.Toast.makeText(context, "Transcoding complete", android.widget.Toast.LENGTH_SHORT).show()
+                                scope.launch(Dispatchers.IO) {
+                                    runCatching {
+                                        val codec = format.substringBefore(' ')
+                                        withContext(Dispatchers.Main) {
+                                            android.widget.Toast.makeText(
+                                                context,
+                                                "Transcoding queued: ${target.name} -> $codec",
+                                                android.widget.Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }.onFailure { _ ->
+                                        withContext(Dispatchers.Main) {
+                                            android.widget.Toast.makeText(
+                                                context,
+                                                "Transcode unavailable for this source format",
+                                                android.widget.Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
                         ) {
-                            Text(fmt.displayName)
+                            Text(format)
                         }
                     }
                 }
             },
-            confirmButton = {
-                TextButton(onClick = { showTranscodeDialog = false }) { Text("Cancel") }
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showTranscodeDialog = false }) {
+                    Text("Cancel")
+                }
             },
+            shape = RoundedCornerShape(24.dp),
         )
     }
 

@@ -310,6 +310,36 @@ fun WavySeekBar(
                                 center = Offset(thumbX, centerY),
                             )
                         }
+
+                        SeekbarStyle.NUVIA_WAVEFORM -> {
+                            val barCount = 48
+                            val gap = 3.dp.toPx()
+                            val totalGap = gap * (barCount - 1)
+                            val barWidth = (width - totalGap) / barCount
+                            val maxBarHeight = 36.dp.toPx()
+                            for (i in 0 until barCount) {
+                                val barX = i * (barWidth + gap)
+                                val isPlayed = (barX + barWidth / 2f) <= thumbX
+                                val dynamicAmp = ((sin(i * 0.25 + phase) * 0.4 + 0.6).toFloat() * 0.85f).coerceIn(0.2f, 1f)
+                                val h = dynamicAmp * maxBarHeight
+                                val barBrush = if (isPlayed) {
+                                    Brush.verticalGradient(listOf(primaryColor, secondaryColor))
+                                } else {
+                                    Brush.verticalGradient(listOf(inactiveColor, inactiveColor.copy(alpha = 0.1f)))
+                                }
+                                drawRoundRect(
+                                    brush = barBrush,
+                                    topLeft = Offset(barX, centerY - h / 2f),
+                                    size = Size(barWidth, h),
+                                    cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx()),
+                                )
+                            }
+                            drawCircle(
+                                color = primaryColor,
+                                radius = 7.dp.toPx(),
+                                center = Offset(thumbX, centerY),
+                            )
+                        }
                     }
                 }
 

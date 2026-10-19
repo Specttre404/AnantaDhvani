@@ -10,8 +10,8 @@
         android:strokeColor="#FFFFFF"
         android:fillColor="#00000000" />
     <path
-        android:pathData="M 22,54 C 28,54 32,34 40,34 C 48,34 50,74 58,74 C 66,74 70,40 78,40 C 82,40 84,54 86,54"
-        android:strokeWidth="5.5"
+        android:pathData="M 22,54 C 28,54 32,32 40,32 C 48,32 50,76 58,76 C 66,76 70,38 78,38 C 82,38 84,54 86,54"
+        android:strokeWidth="6.0"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
