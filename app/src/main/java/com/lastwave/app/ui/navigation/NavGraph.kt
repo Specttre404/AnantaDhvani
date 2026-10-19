@@ -1,5 +1,6 @@
 package com.lastwave.app.ui.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +16,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
@@ -599,14 +603,17 @@ fun LastWaveNavHost(
 
 @Composable
 private fun LaunchGate() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0B0F1A)),
+        contentAlignment = Alignment.Center,
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Surface(
                 shape = RoundedCornerShape(28.dp),
-                color = MaterialTheme.colorScheme.primaryContainer,
-                tonalElevation = 6.dp,
-                shadowElevation = 10.dp,
-                modifier = Modifier.size(88.dp),
+                color = Color.Transparent,
+                modifier = Modifier.size(96.dp),
             ) {
                 androidx.compose.foundation.Image(
                     painter = painterResource(com.lastwave.app.R.drawable.ic_launcher_foreground),
@@ -615,7 +622,15 @@ private fun LaunchGate() {
                 )
             }
             Spacer(Modifier.height(18.dp))
-            Text("LASTWAVEX", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Ananta Dhvani",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    letterSpacing = (-0.5).sp,
+                ),
+            )
             Spacer(Modifier.height(20.dp))
             ExpressiveLoadingIndicator(message = "Preparing your music")
         }
