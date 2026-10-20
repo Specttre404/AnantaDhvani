@@ -448,6 +448,7 @@ fun TrackContextMenuSheet(
 
     var showTranscodeDialog by remember { mutableStateOf(false) }
     if (showTranscodeDialog && target is TrackMenuTarget.Track) {
+        val playable = playableTrack ?: PlayableTrack(title = target.name, artist = target.artist)
         AlertDialog(
             onDismissRequest = { showTranscodeDialog = false },
             title = { Text("Convert / Transcode Audio", fontWeight = FontWeight.Bold) },
@@ -459,23 +460,27 @@ fun TrackContextMenuSheet(
                             onClick = {
                                 showTranscodeDialog = false
                                 onDismiss()
-                                scope.launch(Dispatchers.IO) {
-                                    runCatching {
-                                        val codec = format.substringBefore(' ')
-                                        withContext(Dispatchers.Main) {
-                                            android.widget.Toast.makeText(
-                                                context,
-                                                "Transcoding queued: ${target.name} -> $codec",
-                                                android.widget.Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }.onFailure { _ ->
-                                        withContext(Dispatchers.Main) {
-                                            android.widget.Toast.makeText(
-                                                context,
-                                                "Transcode unavailable for this source format",
-                                                android.widget.Toast.LENGTH_SHORT
-                                            ).show()
+                                val codec = format.substringBefore(' ')
+                                val streamUrl = playable.playbackUrl
+                                if (streamUrl.isNullOrBlank() || streamUrl.startsWith("http")) {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Direct transcoding is available for local and downloaded tracks ($codec)",
+                                        android.widget.Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    scope.launch(Dispatchers.Main) {
+                                        runCatching {
+                                            val converter = AudioFormatConverter.getInstance(context)
+                                            val inputUri = Uri.parse(streamUrl)
+                                            val outputName = "${target.name} - ${target.artist}"
+                                            android.widget.Toast.makeText(context, "Transcoding to $codec...", android.widget.Toast.LENGTH_SHORT).show()
+                                            withContext(Dispatchers.IO) {
+                                                converter.convertAudio(inputUri, outputName, TargetAudioFormat.FLAC)
+                                            }
+                                            android.widget.Toast.makeText(context, "Transcoding complete", android.widget.Toast.LENGTH_SHORT).show()
+                                        }.onFailure {
+                                            android.widget.Toast.makeText(context, "Transcode unavailable for this source format", android.widget.Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }
@@ -490,9 +495,7 @@ fun TrackContextMenuSheet(
             },
             confirmButton = {},
             dismissButton = {
-                TextButton(onClick = { showTranscodeDialog = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showTranscodeDialog = false }) { Text("Cancel") }
             },
             shape = RoundedCornerShape(24.dp),
         )
