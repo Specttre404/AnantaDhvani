@@ -2605,7 +2605,7 @@ private fun MainControls(
     isTranslucent: Boolean = false,
     ambientPrimary: Color? = null,
 ) {
-    val fabBackground = if (isTranslucent) Color.White else (ambientPrimary ?: Color(0xFF00F0FF))
+    val fabBackground = if (isTranslucent) Color.White else (ambientPrimary ?: MaterialTheme.colorScheme.primary)
     val fabForeground = if (fabBackground.luminance() > 0.5f) Color(0xFF050811) else Color.White
 
     val prevInteraction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
