@@ -17,24 +17,26 @@ class AppIconManager @Inject constructor(
             val darkComponent = ComponentName(context, "com.lastwave.app.MainActivityDark")
             val lightComponent = ComponentName(context, "com.lastwave.app.MainActivityLight")
             val pm = context.packageManager
-            val currentDarkState = pm.getComponentEnabledSetting(darkComponent)
             val isDark = iconTheme == AppIconTheme.DARK
+            val targetEnable = if (isDark) darkComponent else lightComponent
+            val targetDisable = if (isDark) lightComponent else darkComponent
 
-            if (isDark && currentDarkState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED) return
-            if (!isDark && currentDarkState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) return
+            if (pm.getComponentEnabledSetting(targetEnable) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
+                return
+            }
 
             pm.setComponentEnabledSetting(
-                if (isDark) darkComponent else lightComponent,
+                targetEnable,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP
             )
             pm.setComponentEnabledSetting(
-                if (isDark) lightComponent else darkComponent,
+                targetDisable,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP
             )
         } catch (e: Exception) {
-            android.util.Log.e("AppIconManager", "Error safely updating launcher component", e)
+            android.util.Log.e("AppIconManager", "Safe icon switch error", e)
         }
     }
 }
