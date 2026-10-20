@@ -46,6 +46,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.graphics.Shape
@@ -2598,7 +2599,15 @@ private fun SeekBar(
 }
 
 @Composable
-private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslucent: Boolean = false) {
+private fun MainControls(
+    state: MusicPlayerState,
+    player: MusicPlayer,
+    isTranslucent: Boolean = false,
+    ambientPrimary: Color? = null,
+) {
+    val fabBackground = if (isTranslucent) Color.White else (ambientPrimary ?: Color(0xFF00F0FF))
+    val fabForeground = if (fabBackground.luminance() > 0.5f) Color(0xFF050811) else Color.White
+
     val prevInteraction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     val isPrevPressed by prevInteraction.collectIsPressedAsState()
     val prevScale by animateFloatAsState(if (isPrevPressed) 0.85f else 1.0f, ExpressiveMotion.spatialSpring(), label = "prevScale")
@@ -2648,8 +2657,8 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
             onClick = player::togglePlayPause,
             interactionSource = playInteraction,
             shape = CircleShape,
-            color = Color(0xFF00F0FF),
-            contentColor = Color(0xFF050811),
+            color = fabBackground,
+            contentColor = fabForeground,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier
@@ -2663,11 +2672,11 @@ private fun MainControls(state: MusicPlayerState, player: MusicPlayer, isTranslu
                 if (state.isBuffering) {
                     ExpressiveInlineLoadingIndicator(
                         size = if (isTranslucent) 28.dp else 30.dp,
-                        color = Color(0xFF050811),
+                        color = fabForeground,
                         strokeWidth = 3.dp,
                     )
                 } else {
-                    AnimatedPlayPauseIcon(state.isPlaying, Modifier.size(if (isTranslucent) 36.dp else 39.dp), tint = Color(0xFF050811))
+                    AnimatedPlayPauseIcon(state.isPlaying, Modifier.size(if (isTranslucent) 36.dp else 39.dp), tint = fabForeground)
                 }
             }
         }
