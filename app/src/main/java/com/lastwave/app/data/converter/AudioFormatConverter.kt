@@ -47,6 +47,9 @@ class AudioFormatConverter @Inject constructor(
         onProgressUpdate: ((Float) -> Unit)? = null,
     ): File? = withContext(Dispatchers.IO) {
         try {
+            runCatching {
+                context.contentResolver.openInputStream(inputUri)?.close()
+            }
             _progress.value = 0.0f
             _status.value = "Starting ${targetFormat.displayName} conversion..."
             onProgressUpdate?.invoke(0.0f)

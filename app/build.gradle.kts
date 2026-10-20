@@ -211,6 +211,14 @@ android {
 }
 
 dependencies {
+    // Media3 Alpha Line
+    implementation(libs.androidx.media3.exoplayer)
+
+    // Explicit Compose Canary/Alpha Overrides (Takes precedence over BOM)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.foundation)
+
     implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
     implementation("org.nanohttpd:nanohttpd:2.3.1")
     implementation(libs.androidx.core.ktx)
@@ -230,12 +238,6 @@ dependencies {
     implementation(libs.material)
 
     implementation(platform(libs.androidx.compose.bom))
-    // Canary & Alpha M3 Expressive explicit overrides
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.animation)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.media3.exoplayer)
-
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.ai)
     implementation(libs.firebase.appcheck.playintegrity)
