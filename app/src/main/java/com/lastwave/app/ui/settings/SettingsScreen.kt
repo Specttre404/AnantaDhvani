@@ -4221,56 +4221,43 @@ private fun AppIconSelectorCard(
     onSelectIcon: (AppIconTheme) -> Unit,
 ) {
     Card(
-        shape = CardOuterShape,
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(Icons.Filled.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Column {
                     Text("App Launcher Icon", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text("Choose Material 3 Expressive launcher icon theme", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                AppIconTheme.entries.forEach { iconTheme ->
-                    val isSelected = iconTheme == currentTheme
-                    Surface(
-                        onClick = { onSelectIcon(iconTheme) },
-                        shape = RoundedCornerShape(18.dp),
-                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
-                        border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(14.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(if (iconTheme == AppIconTheme.DARK) Color(0xFF0B0D13) else Color(0xFFF2F4F8)),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    painter = painterResource(if (iconTheme == AppIconTheme.DARK) R.drawable.ic_launcher_dark_foreground else R.drawable.ic_launcher_light_foreground),
-                                    contentDescription = iconTheme.title,
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(38.dp),
-                                )
-                            }
-                            Text(
-                                iconTheme.title,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
+                Surface(
+                    onClick = { onSelectIcon(AppIconTheme.DARK) },
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFF0B0F1A),
+                    border = BorderStroke(if (currentTheme == AppIconTheme.DARK) 2.dp else 1.dp, if (currentTheme == AppIconTheme.DARK) MaterialTheme.colorScheme.primary else Color(0x33FFFFFF)),
+                    modifier = Modifier.weight(1f).height(90.dp),
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        Icon(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(42.dp))
+                        Spacer(Modifier.height(4.dp))
+                        Text("Expressive Dark", style = MaterialTheme.typography.labelSmall, color = Color.White, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                Surface(
+                    onClick = { onSelectIcon(AppIconTheme.LIGHT) },
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFFF8FAFC),
+                    border = BorderStroke(if (currentTheme == AppIconTheme.LIGHT) 2.dp else 1.dp, if (currentTheme == AppIconTheme.LIGHT) MaterialTheme.colorScheme.primary else Color(0x33000000)),
+                    modifier = Modifier.weight(1f).height(90.dp),
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        Icon(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(42.dp))
+                        Spacer(Modifier.height(4.dp))
+                        Text("Expressive Light", style = MaterialTheme.typography.labelSmall, color = Color(0xFF0F172A), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
