@@ -54,7 +54,7 @@ android {
 
     defaultConfig {
         applicationId = "com.specttre404.lastwavex"
-        minSdk = (project.findProperty("minSdk") as? String)?.toIntOrNull() ?: 29
+        minSdk = 31
         targetSdk = 35
         versionCode = 19
         versionName = "1.6.0"
@@ -108,7 +108,7 @@ android {
                     "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
                 )
                 cFlags += "-Wl,-z,max-page-size=16384"
-                cppFlags += "-Wl,-z,max-page-size=16384"
+                cppFlags += listOf("-Wl,-z,max-page-size=16384", "-std=c++26", "-O3", "-flto")
             }
         }
     }
@@ -172,8 +172,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
         // Required by org.jellyfin.media3:media3-ffmpeg-decoder AAR metadata.
         isCoreLibraryDesugaringEnabled = true
     }
@@ -230,6 +230,12 @@ dependencies {
     implementation(libs.material)
 
     implementation(platform(libs.androidx.compose.bom))
+    // Canary & Alpha M3 Expressive explicit overrides
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.media3.exoplayer)
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.ai)
     implementation(libs.firebase.appcheck.playintegrity)
@@ -238,7 +244,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.kyant.backdrop)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     debugImplementation(libs.androidx.ui.tooling)
@@ -271,11 +276,9 @@ dependencies {
 
     // Native in-app audio playback, background service, system media
     // controls, Bluetooth/headset controls and a MediaController-backed UI.
-    implementation("androidx.media3:media3-exoplayer:1.2.1")
-    implementation("androidx.media3:media3-exoplayer-hls:1.2.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.6.0-alpha02")
     // Segmented provider-module path: DASH chunk source + CDM decryption.
-    // Pinned to the same 1.2.1 line as exoplayer/hls to avoid binary mismatch.
-    implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.6.0-alpha02")
     // MediaBrowserServiceCompat/MediaSessionCompat bridge used by Android
     // Auto to browse the LastWave library and control the same player.
     implementation("androidx.media:media:1.7.0")
@@ -316,8 +319,12 @@ dependencies {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         optIn.add("androidx.compose.foundation.ExperimentalFoundationApi")
+        optIn.add("kotlin.RequiresOptIn")
+        optIn.add("androidx.compose.material3.ExperimentalMaterial3ExpressiveApi")
+        optIn.add("androidx.compose.animation.ExperimentalSharedTransitionApi")
+        optIn.add("androidx.media3.common.util.UnstableApi")
     }
 }
 

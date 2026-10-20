@@ -1801,7 +1801,7 @@ fun SettingsScreen(
                 )
                 MetroEInkTypographyStudioCard()
                 NetworkProxyResilienceCard()
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(48.dp))
             }
         }
     }
