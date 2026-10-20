@@ -1709,7 +1709,7 @@ fun SettingsScreen(
             onDismissRequest = { showAdvancedSubsystemsSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.fillMaxHeight(0.90f),
+            modifier = Modifier.fillMaxHeight(0.92f),
         ) {
             Column(
                 modifier = Modifier
