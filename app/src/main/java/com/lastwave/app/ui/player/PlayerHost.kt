@@ -1794,7 +1794,7 @@ private fun FullPlayer(
                                 seekbarStyle = seekbarStyle,
                                 onSeek = player::seekTo,
                             )
-                            MainControls(state = state, player = player)
+                            MainControls(state = state, player = player, ambientPrimary = ambientColor)
                             PlayerUtilityControls(state = state, player = player)
                         }
                         Column(
@@ -2289,7 +2289,7 @@ private fun FullPlayer(
                                         modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
                                         contentAlignment = Alignment.Center,
                                     ) {
-                                        MainControls(state, player, isTranslucent = false)
+                                        MainControls(state, player, isTranslucent = false, ambientPrimary = ambientColor)
                                     }
 
                                     Spacer(Modifier.height(16.dp))

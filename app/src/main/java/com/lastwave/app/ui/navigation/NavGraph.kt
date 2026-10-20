@@ -209,7 +209,7 @@ fun LastWaveNavHost(
                 }
             }
 
-            LaunchGate()
+            com.lastwave.app.ui.splash.SplashScreen()
         }
 
         composable(Screen.Login.route) {
@@ -597,42 +597,6 @@ fun LastWaveNavHost(
                     },
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun LaunchGate() {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0B0F1A)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Surface(
-                shape = RoundedCornerShape(28.dp),
-                color = Color.Transparent,
-                modifier = Modifier.size(96.dp),
-            ) {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(com.lastwave.app.R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-            Spacer(Modifier.height(18.dp))
-            Text(
-                "Ananta Dhvani",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
-                    letterSpacing = (-0.5).sp,
-                ),
-            )
-            Spacer(Modifier.height(20.dp))
-            ExpressiveLoadingIndicator(message = "Preparing your music")
         }
     }
 }

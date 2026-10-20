@@ -93,7 +93,7 @@ fun ExpressiveHeader(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        (if (isDark) Color(0xFF00F0FF) else Color(0xFF0284C7)).copy(alpha = if (isDark) 0.12f else 0.08f),
+                        (if (isDark) Color(0xFF00F0FF) else Color(0xFF0284C7)).copy(alpha = if (isDark) 0.28f else 0.22f),
                         Color.Transparent,
                     ),
                     center = Offset(cx1, cy1),
@@ -105,7 +105,7 @@ fun ExpressiveHeader(
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        (if (isDark) Color(0xFFFF2E93) else Color(0xFFE11D48)).copy(alpha = if (isDark) 0.10f else 0.06f),
+                        (if (isDark) Color(0xFFFF2E93) else Color(0xFFE11D48)).copy(alpha = if (isDark) 0.22f else 0.18f),
                         Color.Transparent,
                     ),
                     center = Offset(cx2, cy2),
