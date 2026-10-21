@@ -1,14 +1,10 @@
 package com.lastwave.app.audio
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.BatteryManager
 import android.os.Environment
 import android.os.PowerManager
 import android.os.StatFs
@@ -18,6 +14,45 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+
+data class AutoEqProfile(
+    val modelName: String,
+    val bandGains: FloatArray // 10-band adjustments in dB (-12.0f to +12.0f)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as AutoEqProfile
+        if (modelName != other.modelName) return false
+        if (!bandGains.contentEquals(other.bandGains)) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = modelName.hashCode()
+        result = 31 * result + bandGains.contentHashCode()
+        return result
+    }
+}
+
+object AutoEqDatabase {
+    fun findProfile(deviceName: String): FloatArray? {
+        val lower = deviceName.lowercase()
+        return when {
+            lower.contains("wh-1000xm") || lower.contains("wf-1000xm") ->
+                floatArrayOf(-1.5f, -2.0f, -0.5f, 0.0f, 1.2f, 2.0f, 1.5f, -0.5f, 1.0f, 0.5f)
+            lower.contains("airpods") ->
+                floatArrayOf(2.5f, 1.8f, 0.5f, -0.5f, -1.0f, 0.5f, 1.8f, 2.2f, 1.0f, -0.5f)
+            lower.contains("galaxy buds") ->
+                floatArrayOf(0.5f, 0.0f, -0.5f, 0.5f, 1.0f, 0.0f, -1.2f, 0.8f, 1.5f, 0.0f)
+            lower.contains("pixel buds") ->
+                floatArrayOf(1.0f, 0.5f, -0.5f, 0.0f, 0.8f, 1.2f, -0.5f, 1.0f, 1.2f, 0.0f)
+            lower.contains("dac") || lower.contains("apple") || lower.contains("dongle") ->
+                floatArrayOf(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+            else -> null
+        }
+    }
+}
 
 @Singleton
 class AutoHardwareAudioTuner @Inject constructor(
@@ -39,6 +74,7 @@ class AutoHardwareAudioTuner @Inject constructor(
         val crossfeedRecommended: Boolean,
         val hapticsEnabled: Boolean,
         val powerSaveActive: Boolean,
+        val autoEqGains: FloatArray? = null,
     )
 
     private val _currentProfile = MutableStateFlow<HardwareAudioProfile?>(null)
@@ -68,6 +104,9 @@ class AutoHardwareAudioTuner @Inject constructor(
             it.type == AudioDeviceInfo.TYPE_BLE_HEADSET
         }
         val deviceName = usbDevice?.productName?.toString() ?: devices.firstOrNull { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP }?.productName?.toString() ?: "Internal Audio"
+
+        // AutoEQ Endpoint Target Profile Routing
+        val autoEqGains = AutoEqDatabase.findProfile(deviceName)
 
         // 3. Network & Connection Speed Adaptation
         val activeNetwork = connectivityManager.activeNetwork
@@ -109,6 +148,7 @@ class AutoHardwareAudioTuner @Inject constructor(
             crossfeedRecommended = isHeadphones,
             hapticsEnabled = isHeadphones && !isPowerSave,
             powerSaveActive = isPowerSave,
+            autoEqGains = autoEqGains,
         )
 
         _currentProfile.value = profile

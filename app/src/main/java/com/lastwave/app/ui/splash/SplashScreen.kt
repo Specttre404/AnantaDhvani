@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,9 +32,35 @@ import com.lastwave.app.R
 import com.lastwave.app.ui.common.ExpressiveLoadingIndicator
 
 @Composable
-fun SplashScreen(
+fun AnantaSplashScreen(
+    onAnimationFinish: () -> Unit = {},
+    onAnimationComplete: () -> Unit = onAnimationFinish,
     modifier: Modifier = Modifier,
 ) {
+    val isDark = isSystemInDarkTheme()
+    val splashBg = if (isDark) Color(0xFF0B0F1A) else Color(0xFFFFFFFF)
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(splashBg),
+        contentAlignment = Alignment.Center,
+    ) {
+        SplashScreen(onAnimationComplete = onAnimationComplete, isDark = isDark)
+    }
+}
+
+@Composable
+fun SplashScreen(
+    onAnimationFinish: () -> Unit = {},
+    onAnimationComplete: () -> Unit = onAnimationFinish,
+    isDark: Boolean = isSystemInDarkTheme(),
+    modifier: Modifier = Modifier,
+) {
+    val splashBg = if (isDark) Color(0xFF0B0F1A) else Color(0xFFFFFFFF)
+    val textColor = if (isDark) Color.White else Color(0xFF0F172A)
+    val logoRes = if (isDark) R.drawable.ic_launcher_foreground else R.drawable.ic_launcher_foreground_light
+
     val alphaAnim = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
@@ -41,12 +68,13 @@ fun SplashScreen(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
         )
+        onAnimationComplete()
     }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF0B0F1A))
+            .background(splashBg)
             .alpha(alphaAnim.value),
         contentAlignment = Alignment.Center,
     ) {
@@ -57,7 +85,7 @@ fun SplashScreen(
                 modifier = Modifier.size(96.dp),
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    painter = painterResource(logoRes),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -68,7 +96,7 @@ fun SplashScreen(
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
+                    color = textColor,
                     letterSpacing = (-0.5).sp,
                 ),
             )

@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.SkipNext
@@ -100,6 +101,9 @@ fun ExpressiveMiniPlayer(
     var offsetX by remember { mutableFloatStateOf(0f) }
     val animatedOffsetX = remember { Animatable(0f) }
 
+    // Screen State Throttling
+    val isScreenOn by com.lastwave.app.ui.visualizer.VisualizerStateHolder.isScreenOn.collectAsStateWithLifecycle()
+
     // Vinyl Rotation Physics
     val infiniteTransition = rememberInfiniteTransition(label = "miniplayer_physics")
     val continuousAngle by infiniteTransition.animateFloat(
@@ -111,7 +115,7 @@ fun ExpressiveMiniPlayer(
         ),
         label = "vinyl_rotation",
     )
-    val rotationAngle = if (enableVinylRotation && playbackState.isPlaying) continuousAngle else 0f
+    val rotationAngle = if (isScreenOn && enableVinylRotation && playbackState.isPlaying) continuousAngle else 0f
 
     // Ambient Halo Animation
     val pulseScale by infiniteTransition.animateFloat(
@@ -123,6 +127,7 @@ fun ExpressiveMiniPlayer(
         ),
         label = "ambient_pulse",
     )
+    val activePulseScale = if (isScreenOn) pulseScale else 1f
 
     Box(
         modifier = modifier
@@ -158,8 +163,8 @@ fun ExpressiveMiniPlayer(
             modifier = Modifier
                 .matchParentSize()
                 .graphicsLayer {
-                    scaleX = pulseScale
-                    scaleY = pulseScale
+                    scaleX = activePulseScale
+                    scaleY = activePulseScale
                     alpha = if (isDark) 0.35f else 0.22f
                 },
         ) {

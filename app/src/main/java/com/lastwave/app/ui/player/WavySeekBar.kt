@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -59,6 +61,7 @@ fun WavySeekBar(
     trackKey: String? = null,
     showTimeLabels: Boolean = true,
     seekbarStyle: SeekbarStyle = SeekbarStyle.WAVY_FLUID,
+    ambientColor: Color? = null,
 ) {
     val interactionSource = remember(trackKey) { MutableInteractionSource() }
     val dragging by interactionSource.collectIsDraggedAsState()
@@ -81,8 +84,8 @@ fun WavySeekBar(
         0f
     }
 
-    val primaryColor = if (isTranslucent) Color(0xFF00F0FF) else Color(0xFF00F0FF)
-    val secondaryColor = Color(0xFFFF2E93)
+    val primaryColor = ambientColor ?: Color(0xFF00F0FF)
+    val secondaryColor = MaterialTheme.colorScheme.secondary.takeIf { ambientColor != null } ?: Color(0xFFFF2E93)
     val inactiveColor = Color.White.copy(alpha = 0.22f)
     val textColor = Color(0xFFCBD5E1)
 
@@ -394,4 +397,87 @@ private fun formatMs(ms: Long): String {
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
     return "%d:%02d".format(minutes, seconds)
+}
+
+private fun buildHarmonicSinePath(activeWidth: Float, height: Float, densityPx: Float): Path {
+    val path = Path()
+    if (activeWidth <= 0f) return path
+    val centerY = height / 2f
+    val wavePeriodPx = 28f * densityPx
+    val waveAmpPx = 7f * densityPx
+    path.moveTo(0f, centerY)
+    var x = 0f
+    val step = 2f * densityPx
+    while (x <= activeWidth) {
+        val waveY = centerY + sin((x / wavePeriodPx) * 2 * PI).toFloat() * waveAmpPx
+        path.lineTo(x, waveY)
+        x += step
+    }
+    path.lineTo(activeWidth, centerY)
+    return path
+}
+
+@Composable
+fun WavySeekbar(
+    progress: Float,
+    durationMs: Long,
+    positionMs: Long,
+    onSeek: (Float) -> Unit,
+    ambientColor: Color?,
+    modifier: Modifier = Modifier,
+) {
+    // Dynamic palette extracted from album art; fallback to dynamic primary
+    val trackAccent = ambientColor ?: MaterialTheme.colorScheme.primary
+    val trackSecondary = MaterialTheme.colorScheme.secondary
+
+    val activeWaveBrush = remember(trackAccent, trackSecondary) {
+        Brush.horizontalGradient(
+            colors = listOf(
+                trackAccent,
+                trackSecondary,
+                trackAccent.copy(alpha = 0.85f),
+            ),
+        )
+    }
+
+    val density = LocalDensity.current.density
+
+    Canvas(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(36.dp)
+            .pointerInput(durationMs, positionMs) {
+                detectTapGestures { offset ->
+                    if (size.width > 0) {
+                        onSeek((offset.x / size.width).coerceIn(0f, 1f))
+                    }
+                }
+            },
+    ) {
+        val centerY = size.height / 2f
+        val activeWidth = size.width * progress.coerceIn(0f, 1f)
+
+        // 1. Inactive baseline
+        drawLine(
+            color = trackAccent.copy(alpha = 0.22f),
+            start = Offset(0f, centerY),
+            end = Offset(size.width, centerY),
+            strokeWidth = 4.dp.toPx(),
+            cap = StrokeCap.Round,
+        )
+
+        // 2. Active harmonic sine wave
+        drawPath(
+            path = buildHarmonicSinePath(activeWidth, size.height, density),
+            brush = activeWaveBrush,
+            style = Stroke(width = 4.5.dp.toPx(), cap = StrokeCap.Round),
+        )
+
+        // 3. Dynamic scrubber thumb
+        drawCircle(
+            color = trackAccent,
+            radius = 7.dp.toPx(),
+            center = Offset(activeWidth, centerY),
+        )
+    }
 }

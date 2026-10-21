@@ -38,6 +38,7 @@ class DisplaySleepPowerGuard @Inject constructor(
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     _isScreenOn.value = false
+                    com.lastwave.app.ui.visualizer.VisualizerStateHolder.isScreenOn.value = false
                     scope.launch {
                         val settings = runCatching { settingsPreferences.settings.first() }.getOrNull()
                         if (settings?.screenOffBatterySaver == true) {
@@ -47,6 +48,7 @@ class DisplaySleepPowerGuard @Inject constructor(
                 }
                 Intent.ACTION_SCREEN_ON -> {
                     _isScreenOn.value = true
+                    com.lastwave.app.ui.visualizer.VisualizerStateHolder.isScreenOn.value = true
                     Log.i("DisplaySleepPowerGuard", "Screen On: Guard disengaged, resuming full visualizer frame clocks")
                 }
             }

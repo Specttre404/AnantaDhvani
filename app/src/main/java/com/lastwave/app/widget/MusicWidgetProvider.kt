@@ -14,6 +14,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
 import android.widget.RemoteViews
+import androidx.palette.graphics.Palette
 import com.lastwave.app.MainActivity
 import com.lastwave.app.R
 import com.lastwave.app.playback.MusicPlaybackService
@@ -62,7 +63,6 @@ class MusicWidgetProvider : AppWidgetProvider() {
         ) {
             val views = RemoteViews(context.packageName, R.layout.widget_music_expressive)
 
-            // Open App Intent
             val openAppIntent = Intent(context, MainActivity::class.java)
             val openPendingIntent = PendingIntent.getActivity(
                 context, 0, openAppIntent,
@@ -70,12 +70,10 @@ class MusicWidgetProvider : AppWidgetProvider() {
             )
             views.setOnClickPendingIntent(R.id.widget_container, openPendingIntent)
 
-            // Action Intents (Broadcast to this receiver)
             views.setOnClickPendingIntent(R.id.widget_btn_play_pause, getActionIntent(context, ACTION_PLAY_PAUSE, widgetId))
             views.setOnClickPendingIntent(R.id.widget_btn_next, getActionIntent(context, ACTION_NEXT, widgetId))
             views.setOnClickPendingIntent(R.id.widget_btn_prev, getActionIntent(context, ACTION_PREVIOUS, widgetId))
 
-            // Metadata & State
             views.setTextViewText(R.id.widget_track_title, title)
             views.setTextViewText(R.id.widget_track_artist, artist)
             views.setImageViewResource(
@@ -83,12 +81,20 @@ class MusicWidgetProvider : AppWidgetProvider() {
                 if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
             )
 
-            // High-Resolution Artwork
+            // Dynamic Palette Extraction (Album Art Color Matching)
+            var accentColor = 0xFF7F52FF.toInt()
             if (artwork != null) {
                 views.setImageViewBitmap(R.id.widget_artwork, getRoundedBitmap(artwork, 32f))
+                val palette = Palette.from(artwork).generate()
+                accentColor = palette.getVibrantColor(palette.getDominantColor(0xFF7F52FF.toInt()))
             } else {
                 views.setImageViewResource(R.id.widget_artwork, R.mipmap.ic_launcher)
             }
+
+            // Apply dynamic accent tint to transport controls
+            views.setInt(R.id.widget_btn_prev, "setColorFilter", accentColor)
+            views.setInt(R.id.widget_btn_next, "setColorFilter", accentColor)
+            views.setImageViewBitmap(R.id.widget_btn_play_pause, createTintedFabBitmap(accentColor, isPlaying))
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
@@ -120,6 +126,37 @@ class MusicWidgetProvider : AppWidgetProvider() {
             canvas.drawRoundRect(rectF, radius, radius, paint)
             paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
             canvas.drawBitmap(bitmap, rect, rect, paint)
+            return output
+        }
+
+        private fun createTintedFabBitmap(accentColor: Int, isPlaying: Boolean): Bitmap {
+            val size = 96
+            val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(output)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = accentColor
+                style = Paint.Style.FILL
+            }
+            canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+
+            val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = 0xFF0B0F1A.toInt()
+                style = Paint.Style.FILL
+            }
+            val cx = size / 2f
+            val cy = size / 2f
+            if (isPlaying) {
+                canvas.drawRoundRect(cx - 14f, cy - 16f, cx - 4f, cy + 16f, 4f, 4f, iconPaint)
+                canvas.drawRoundRect(cx + 4f, cy - 16f, cx + 14f, cy + 16f, 4f, 4f, iconPaint)
+            } else {
+                val path = android.graphics.Path().apply {
+                    moveTo(cx - 10f, cy - 16f)
+                    lineTo(cx + 14f, cy)
+                    lineTo(cx - 10f, cy + 16f)
+                    close()
+                }
+                canvas.drawPath(path, iconPaint)
+            }
             return output
         }
     }

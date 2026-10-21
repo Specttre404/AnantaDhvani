@@ -4,8 +4,10 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.net.wifi.WifiManager
 import android.os.PowerManager
@@ -146,9 +148,29 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
     private var playbackWifiLock: WifiManager.WifiLock? = null
     private var currentMiscSettings = com.lastwave.app.data.local.MiscSettings()
 
+    private val screenStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> {
+                    // Pause visualizer shaders & FFT calculations
+                    com.lastwave.app.ui.visualizer.VisualizerStateHolder.isScreenOn.value = false
+                }
+                Intent.ACTION_SCREEN_ON -> {
+                    // Resume visualizer
+                    com.lastwave.app.ui.visualizer.VisualizerStateHolder.isScreenOn.value = true
+                }
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         displaySleepPowerGuard.register()
+        val screenFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+        }
+        registerReceiver(screenStateReceiver, screenFilter)
         scope.launch {
             settingsPreferences.settings.collect { settings ->
                 currentMiscSettings = settings
@@ -496,6 +518,7 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
 
     override fun onDestroy() {
         displaySleepPowerGuard.unregister()
+        runCatching { unregisterReceiver(screenStateReceiver) }
         shakeDetector?.stop()
         shakeDetector = null
         runCatching { if (playbackWakeLock?.isHeld == true) playbackWakeLock?.release() }

@@ -203,6 +203,7 @@ class HomeViewModel @Inject constructor(
     private val viewingProfileState: com.lastwave.app.data.repository.ViewingProfileState,
     private val settingsPreferences: com.lastwave.app.data.local.SettingsPreferences,
     private val scrobbleRepository: com.lastwave.app.data.repository.ScrobbleRepository,
+    val audioRecognitionManager: com.lastwave.app.data.recognition.AudioRecognitionManager,
 ) : ViewModel() {
 
     companion object {

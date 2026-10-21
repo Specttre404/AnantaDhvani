@@ -43,6 +43,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -168,6 +170,19 @@ private fun PeriodDropdown(period: String, onChange: (String) -> Unit) {
     }
 }
 
+fun getGenreGradient(genreTitle: String): Brush {
+    val (startColor, endColor) = when (genreTitle.lowercase()) {
+        "romantic", "love" -> Color(0xFFFF2E93) to Color(0xFFFF8E53)
+        "party", "dance" -> Color(0xFF7F00FF) to Color(0xFFE100FF)
+        "chill", "relax" -> Color(0xFF00B4DB) to Color(0xFF0083B0)
+        "workout", "energy" -> Color(0xFFFF416C) to Color(0xFFFF4B2B)
+        "focus", "study" -> Color(0xFF11998E) to Color(0xFF38EF7D)
+        "devotional", "spiritual" -> Color(0xFFF7971E) to Color(0xFFFFD200)
+        else -> Color(0xFF4B0082) to Color(0xFF00F0FF)
+    }
+    return Brush.linearGradient(listOf(startColor, endColor))
+}
+
 @Composable
 private fun GenreBarRow(
     name: String,
@@ -176,6 +191,7 @@ private fun GenreBarRow(
     modifier: Modifier = Modifier,
 ) {
     val animated by animateFloatAsState(targetValue = percent.coerceIn(0.03f, 1f), animationSpec = tween(600), label = "genreBar")
+    val gradient = getGenreGradient(name)
     Column(modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(name.replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
@@ -188,7 +204,7 @@ private fun GenreBarRow(
                     .fillMaxWidth(animated)
                     .height(10.dp)
                     .clip(RoundedCornerShape(50))
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(gradient),
             )
         }
     }

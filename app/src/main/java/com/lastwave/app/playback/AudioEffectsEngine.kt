@@ -51,12 +51,18 @@ class AudioEffectsEngine @Inject constructor(
     @Volatile private var bitPerfectActive = false
     @Volatile private var loudnessNormalizationEnabled = true
     @Volatile private var subBassHapticsEnabled = true
+    @Volatile private var parametricEqGains: FloatArray? = null
 
     fun setSubBassHapticsEnabled(enabled: Boolean) {
         subBassHapticsEnabled = enabled
     }
 
     fun isSubBassHapticsEnabled(): Boolean = subBassHapticsEnabled
+
+    fun setParametricEqBands(gains: FloatArray) {
+        parametricEqGains = gains
+        requestApply()
+    }
 
     private var attachedSessionId = C.AUDIO_SESSION_ID_UNSET
     private var toneEffect: ToneEffect? = null
@@ -187,7 +193,10 @@ class AudioEffectsEngine @Inject constructor(
             val userGain = if (userEqEnabled) {
                 equalizerSettings.gainsDb.getOrElse(index) { 0f }
             } else 0f
-            val combined = studioGain + userGain
+            val autoEqGain = parametricEqGains?.let { gains ->
+                if (gains.isNotEmpty()) gains[index % gains.size] else 0f
+            } ?: 0f
+            val combined = studioGain + userGain + autoEqGain
             if (combined.isFinite()) combined.coerceIn(-EQ_MAX_GAIN_DB, EQ_MAX_GAIN_DB) else 0f
         }
 

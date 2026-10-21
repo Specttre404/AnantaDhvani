@@ -10,7 +10,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,6 +79,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.People
 import androidx.compose.animation.AnimatedVisibility
@@ -167,6 +173,7 @@ fun HomeScreen(
     }
 
     var menuTrack by remember { mutableStateOf<HomeTrack?>(null) }
+    var showAudioRecognitionSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -176,9 +183,75 @@ fun HomeScreen(
                     title = "Ananta Dhvani",
                     modifier = Modifier.adaptiveContentWidth(maxWidth = 860.dp),
                     actions = {
-                        HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
-                        HeaderActionIcon(Icons.Filled.Search, "Search", onOpenSearch)
-                        HeaderActionIcon(Icons.Filled.Settings, "Settings", onOpenSettings)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.padding(end = 4.dp),
+                        ) {
+                            // Explore Genres & Moods
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .clickable(onClick = onOpenDiscover),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Explore,
+                                    contentDescription = "Explore Genres and Moods",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                            }
+
+                            // Search
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .clickable(onClick = onOpenSearch),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Search,
+                                    contentDescription = "Search",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                            }
+
+                            // Sound Recognition
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .clickable(onClick = { showAudioRecognitionSheet = true }),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.GraphicEq,
+                                    contentDescription = "Sound Recognition",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                            }
+
+                            // Settings (Completely isolated hit boundary)
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .clickable(onClick = onOpenSettings),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Settings,
+                                    contentDescription = "Settings",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                            }
+                        }
                     },
                 )
             }
@@ -420,6 +493,23 @@ fun HomeScreen(
         )
     }
 
+    if (showAudioRecognitionSheet) {
+        val musicPlayer = com.lastwave.app.ui.player.LocalMusicPlayer.current
+        com.lastwave.app.ui.common.AudioRecognitionSheet(
+            recognitionManager = viewModel.audioRecognitionManager,
+            onDismiss = { showAudioRecognitionSheet = false },
+            onPlayRecognizedTrack = { song ->
+                showAudioRecognitionSheet = false
+                musicPlayer.play(
+                    com.lastwave.app.playback.PlayableTrack(
+                        title = song.title,
+                        artist = song.artist,
+                        videoId = song.query,
+                    ),
+                )
+            },
+        )
+    }
 }
 
 private suspend fun snapshotFlowNearEnd(listState: LazyListState, onNearEnd: () -> Unit) {

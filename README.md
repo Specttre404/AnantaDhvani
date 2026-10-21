@@ -141,6 +141,8 @@ These are exceptional, high-utility open-source Android projects that I personal
 ## 📋 Changelog Highlights (Post-v1.6.0 Releases)
 
 ### Version 1.6.4-HDR (Current Release)
+* **Dynamic Widget Theme Extraction**: Integrated AndroidX Palette in `MusicWidgetProvider.kt` to extract vibrant accent colors from active album art, dynamically tinting transport controls and playback controls.
+* **Real AutoEQ Target Routing**: Integrated `AutoEqDatabase` within `AutoHardwareAudioTuner.kt` to identify connected audio endpoints (Sony WH/WF-1000XM, Apple AirPods, Samsung Galaxy Buds, Google Pixel Buds, USB DACs) and output matched parametric EQ target profiles.
 * **Silent Audio Automation**: Completely removed the manual 16-studio bottom sheet from Settings. Subsystems now run silently in the background via `AutoHardwareAudioTuner.kt`.
 * **Audio Device Hot-Plug Callback**: Registered an `AudioDeviceCallback` with `AudioManager` in `MusicPlayer.kt` to trigger hardware profile updates whenever headphones, USB DACs, or Bluetooth devices are connected or removed.
 * **Clean Vector Branding**: Purged dark and light background blocks from `.github/assets/logo.svg`, leaving a transparent, unbroken tri-color soundwave vector with zero dots.

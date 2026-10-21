@@ -57,6 +57,10 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Whatshot
@@ -209,6 +213,8 @@ fun FeedScreen(
         }
     }
 
+    var showAudioRecognitionSheet by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter,
@@ -221,9 +227,75 @@ fun FeedScreen(
             ExpressiveHeader(
                 title = "Ananta Dhvani",
                 actions = {
-                    HeaderActionIcon(Icons.Filled.Explore, "Discover Radar", onOpenDiscover)
-                    HeaderActionIcon(Icons.Filled.Search, "Search", onOpenSearch)
-                    HeaderActionIcon(Icons.Filled.Settings, "Settings", onOpenSettings)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(end = 4.dp),
+                    ) {
+                        // Explore Genres & Moods
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .clickable(onClick = onOpenDiscover),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Explore,
+                                contentDescription = "Explore Genres and Moods",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(22.dp),
+                            )
+                        }
+
+                        // Search
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .clickable(onClick = onOpenSearch),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Search,
+                                contentDescription = "Search",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(22.dp),
+                            )
+                        }
+
+                        // Sound Recognition
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .clickable(onClick = { showAudioRecognitionSheet = true }),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.GraphicEq,
+                                contentDescription = "Sound Recognition",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(22.dp),
+                            )
+                        }
+
+                        // Settings (Completely isolated hit boundary)
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .clickable(onClick = onOpenSettings),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Settings,
+                                contentDescription = "Settings",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(22.dp),
+                            )
+                        }
+                    }
                 },
             )
 
@@ -670,6 +742,24 @@ fun FeedScreen(
             ),
             playbackSourceLabel = "Home",
             onDismiss = { menuTrack = null },
+        )
+    }
+
+    if (showAudioRecognitionSheet) {
+        val musicPlayer = LocalMusicPlayer.current
+        com.lastwave.app.ui.common.AudioRecognitionSheet(
+            recognitionManager = viewModel.audioRecognitionManager,
+            onDismiss = { showAudioRecognitionSheet = false },
+            onPlayRecognizedTrack = { song ->
+                showAudioRecognitionSheet = false
+                musicPlayer.play(
+                    PlayableTrack(
+                        title = song.title,
+                        artist = song.artist,
+                        videoId = song.query,
+                    ),
+                )
+            },
         )
     }
 }

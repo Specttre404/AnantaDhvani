@@ -52,6 +52,7 @@ class FeedViewModel @Inject constructor(
     private val musicPlayer: MusicPlayer,
     private val innerTube: InnerTubeMusicApi,
     private val ytAuth: YtMusicAuthManager,
+    val audioRecognitionManager: com.lastwave.app.data.recognition.AudioRecognitionManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState())

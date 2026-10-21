@@ -20,6 +20,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 private data class Particle3D(
     val phi: Float,
     val theta: Float,
@@ -37,6 +39,7 @@ fun OrbitalParticleSphereView(
     var rotX by remember { mutableFloatStateOf(0.2f) }
     var rotY by remember { mutableFloatStateOf(0.3f) }
     var animPhase by remember { mutableFloatStateOf(0f) }
+    val isScreenOn by VisualizerStateHolder.isScreenOn.collectAsStateWithLifecycle()
 
     val (bassEnergy, midEnergy, trebleEnergy) = remember(pcmData) {
         if (pcmData.isEmpty()) Triple(0f, 0f, 0f)
@@ -61,7 +64,8 @@ fun OrbitalParticleSphereView(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isScreenOn) {
+        if (!isScreenOn) return@LaunchedEffect
         while (true) {
             withFrameMillis {
                 animPhase += 0.016f * (1f + trebleEnergy * 2f)

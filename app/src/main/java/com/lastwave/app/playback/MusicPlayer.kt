@@ -2131,6 +2131,11 @@ class MusicPlayer @Inject constructor(
         runCatching {
             audioEffectsEngine.setSubBassHapticsEnabled(profile.hapticsEnabled)
         }
+
+        // 3. AutoEQ Headphone Target Profile
+        com.lastwave.app.audio.AutoEqDatabase.findProfile(profile.connectedDeviceName)?.let { gains ->
+            runCatching { audioEffectsEngine.setParametricEqBands(gains) }
+        }
     }
 
     fun setSlowedReverb(enabled: Boolean) {
