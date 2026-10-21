@@ -8,30 +8,31 @@
 ### अनन्त-ध्वनि • অনন্ত ধ্বনি
 **The Pure High-Performance Audiophile Music Workstation for Android**
 
+<!-- VIBGYOR Palette: Violet -> Indigo -> Blue -> Green -> Yellow -> Orange -> Red (Icons Removed) -->
 <p align="center">
   <a href="https://github.com/Specttre404/AnantaDhvani/releases/latest">
-    <img src="https://img.shields.io/badge/Latest_Release-v1.6.1--HDR_Preview-FF2E93?style=for-the-badge&logo=github&logoColor=FFFFFF" alt="Latest Release" />
+    <img src="https://img.shields.io/badge/Latest_Release-v1.6.4--HDR_Preview-7F00FF?style=for-the-badge" alt="Latest Release" />
   </a>
-  <img src="https://img.shields.io/badge/Lifecycle-Testing_Phase_(Active_Evaluation)-FFC700?style=for-the-badge&logo=gitbook&logoColor=0B0F1A" alt="Testing Phase" />
+  <img src="https://img.shields.io/badge/Lifecycle-Testing_Phase_(Active_Evaluation)-4B0082?style=for-the-badge" alt="Testing Phase" />
   <a href="https://github.com/Specttre404/AnantaDhvani/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-GNU_GPL_v3.0-00F0FF?style=for-the-badge&logo=gnu&logoColor=0B0F1A" alt="License" />
+    <img src="https://img.shields.io/badge/License-GNU_GPL_v3.0-0284C7?style=for-the-badge" alt="License" />
   </a>
-  <img src="https://img.shields.io/badge/Platform-Android_12+_--_16_(API_31--36)-3DDC84?style=for-the-badge&logo=android&logoColor=0B0F1A" alt="Platform" />
-  <img src="https://img.shields.io/badge/VirusTotal-100%25_Clean_(0/72)-00F0FF?style=for-the-badge&logo=virustotal&logoColor=0B0F1A" alt="VirusTotal" />
+  <img src="https://img.shields.io/badge/Platform-Android_12+_--_16_(API_31--36)-10B981?style=for-the-badge" alt="Platform" />
+  <img src="https://img.shields.io/badge/VirusTotal-100%25_Clean_(0/72)-EAB308?style=for-the-badge&labelColor=1E293B" alt="VirusTotal" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Architecture-Google_Media3_•_ExoPlayer-00F0FF?style=for-the-badge&logo=android&logoColor=0B0F1A" alt="Architecture" />
-  <img src="https://img.shields.io/badge/DSP_Pipeline-Biquad_PEQ_•_BS2B_Crossfeed-FFC700?style=for-the-badge&logoColor=0B0F1A" alt="DSP Pipeline" />
-  <img src="https://img.shields.io/badge/UI_Style-M3_Expressive_•_Liquid_Glass-FF2E93?style=for-the-badge&logo=jetpackcompose&logoColor=FFFFFF" alt="UI Style" />
-  <img src="https://img.shields.io/badge/Client-YouTube_Music_InnerTube-FF0000?style=for-the-badge&logo=youtubemusic&logoColor=FFFFFF" alt="YouTube Music Client" />
+  <img src="https://img.shields.io/badge/Architecture-Google_Media3_•_ExoPlayer-F97316?style=for-the-badge" alt="Architecture" />
+  <img src="https://img.shields.io/badge/DSP_Pipeline-Biquad_PEQ_•_BS2B_Crossfeed-EF4444?style=for-the-badge" alt="DSP Pipeline" />
+  <img src="https://img.shields.io/badge/UI_Style-M3_Expressive_•_Liquid_Glass-7F00FF?style=for-the-badge" alt="UI Style" />
+  <img src="https://img.shields.io/badge/Client-YouTube_Music_InnerTube-4B0082?style=for-the-badge" alt="YouTube Music Client" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Forked_From-LastWave-6366F1?style=for-the-badge&logo=git&logoColor=FFFFFF" alt="Forked From LastWave" />
-  <img src="https://img.shields.io/badge/Built_With-Google_Gemini_4_Argon-4285F4?style=for-the-badge&logo=google&logoColor=FFFFFF" alt="Built With Gemini" />
-  <img src="https://img.shields.io/badge/Studios-16_Advanced_Hardware_Cards-00F0FF?style=for-the-badge" alt="Studios" />
-  <img src="https://img.shields.io/badge/Codebase-Kotlin_•_Java_DSP_•_Compose-10B981?style=for-the-badge" alt="Codebase" />
+  <img src="https://img.shields.io/badge/Forked_From-LastWave-0284C7?style=for-the-badge" alt="Forked From LastWave" />
+  <img src="https://img.shields.io/badge/Built_With-Google_Gemini_4_Argon-10B981?style=for-the-badge" alt="Built With Gemini" />
+  <img src="https://img.shields.io/badge/Subsystems-16_Automated_Hardware_Engines-EAB308?style=for-the-badge&labelColor=1E293B" alt="Automated Subsystems" />
+  <img src="https://img.shields.io/badge/Codebase-Kotlin_•_Java_DSP_•_Compose-F97316?style=for-the-badge" alt="Codebase" />
 </p>
 
 <p align="center">
@@ -69,36 +70,51 @@ When a media player attempts to multiplex conversational talk shows and songs wi
 
 ---
 
-## 🏗️ Technical Architecture & Pipeline Reality
+## 🏗️ Technical Architecture & Silent Background Auto-Tuning
 
-To maintain complete transparency, the technical architecture of Ananta Dhvani is structured as follows:
+```
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│                        ANANTA DHVANI RUNTIME ARCHITECTURE                             │
+└───────────────────────────────────────────────────────────────────────────────────────┘
+Core Media Engine      ──▶ Google Media3 / ExoPlayer Core (1.6.0-alpha02)
+                           Custom OkHttp Data Source, High-Bitrate Opus/AAC Streaming
+Audio Sinking Pipeline ──▶ Android AAudio / AudioTrack Sink via AudioManager Routing
+Hardware Auto-Tuner    ──▶ AutoHardwareAudioTuner.kt & AudioDeviceCallback Listener
+                           (Probes sample rate, buffer size, DAC connectivity, and battery state)
+DSP Processing Suite   ──▶ Software 31-Band PEQ, Native C++ Bauer BS2B Binaural Crossfeed
+                           (4.5 dB / 700 Hz cutoff), Silence Trimming & Gain Attenuation
+UI & Motion Engine     ──▶ Material 3 Expressive (1.4.0-alpha05), Compose Foundation
+                           (1.8.0-alpha07), iOS Liquid Glass Specular Shaders
+Linguistics & Musician ──▶ Furigana Ruby Typography, Synchronized Lyrics,
+                           BitChord Interactive Musical Chords
+```
 
-* **Playback Engine:** Powered by Google's modern **Media3 / ExoPlayer** architecture with custom buffer configuration (`StreamBufferTuningCard`) ranging from 15s to 50s for drop-out resilience.
-* **DSP Processing:** Software-level audio processing incorporating virtualized biquad equalization, Bauer BS2B crossfeed filters, and dynamic gain attenuation.
-* **Storage & Indexing:** Compliant with modern Android storage models using scoped MediaStore queries and the mandatory `READ_MEDIA_AUDIO` permission for Android 13–16.
+* **Zero-Jargon Background Automation:** All audio engineering settings have been removed from user-facing screens. The engine configures playback parameters autonomously in the background based on real-time device telemetry.
+* **Audio Endpoint Hot-Plugging:** An `AudioDeviceCallback` dynamically engages the native C++ Bauer BS2B crossfeed filter whenever headphones (wired, USB-C DAC, or Bluetooth A2DP) are connected, automatically disengaging when switching back to internal stereo speakers.
+* **Adaptive Buffer Sizing:** Dynamically adjusts ExoPlayer `DefaultLoadControl` buffers (20s–35s on unmetered low-latency Wi-Fi; 45s–60s on cellular or battery-saver mode).
+* **Storage-Aware Flash Cache:** Reads available flash storage via `StatFs`, automatically scaling the offline streaming cache between 1 GB and 6 GB (5% of free space) without user intervention.
 
 ---
 
 ## 🎛️ Complete Features & Subsystems Suite
 
-### 1. Advanced Audio Engineering & Hardware Tuning (16 Studios)
-Accessed via **Settings → Personalization → Advanced Audio Engineering & Hardware Tuning**:
-1. **Stream Buffer Tuning:** Granular ExoPlayer buffer limits (Min Buffer, Max Buffer, Playback Buffer).
-2. **Stream Codec Forcing:** Direct selection between Highest Bitrate Auto and forced Opus / WebM (160–256 kbps).
-3. **Disk Cache Quota:** Configurable offline streaming cache allocation (500 MB – 8 GB).
-4. **Bauer BS2B Crossfeed:** Natural headphone acoustic simulation (Bauer Default, Chu Moy, Jan Meier, Custom).
-5. **Silence Trimming:** Automatic silence detection threshold (dB) and minimum duration gating.
-6. **Mini Player Gestures:** Configurable swipe gestures (Fluid Fade, Velocity Dismiss, Stadium Pill).
-7. **Lyrics Typography Studio:** Real-time font size, line spacing, and inactive blur radius controls.
-8. **Navigation Bar Layout:** Custom visibility toggles for bottom navigation tabs.
-9. **Download Concurrency:** Parallel track download limits with Wi-Fi only safety toggling.
-10. **Folder Exclusions:** Custom scanner folder inclusion and exclusion manager.
-11. **Hardware Audio Offload:** Direct toggle for SoC hardware-accelerated audio rendering.
-12. **Convolution IR Studio:** Impulse response (.wav) file selector with wet/dry gain mixing.
-13. **Decoupled Pitch & Speed:** Independent tempo and pitch shifting controls.
-14. **USB Direct Routing:** Class 2 USB DAC direct output monitoring and routing indicator.
-15. **AutoEQ Calibration:** Calibrated parametric curves across 4,000+ headphone models.
-16. **Metro E-Ink & Network Proxy:** High-contrast monochrome rendering and proxy resilience controls.
+### 1. The 16 Automated Hardware & Audio Subsystems (Operating in Background)
+1. **Adaptive Buffer Sizing:** Dynamic ExoPlayer buffer thresholds keyed to network latency and power mode.
+2. **Autonomous Codec Optimization:** Automatically requests high-bitrate Opus/WebM (160–256 kbps) on unmetered connections.
+3. **Storage-Aware Disk Quota:** Dynamically bounds cache sizes between 1 GB and 6 GB based on free storage.
+4. **Automated Bauer BS2B Crossfeed:** Real-time headphone detection eliminates spatial ear fatigue.
+5. **Silence Trimming Engine:** Automatic RMS gating trims silence exceeding 400ms below -60 dBFS.
+6. **Hardware Audio Offload:** Directly delegates audio rendering to hardware DSP when software filters are neutral.
+7. **USB DAC Class 2 Direct Routing:** Seamlessly passes uncompressed audio at native hardware clock rates to USB DACs.
+8. **AutoEQ Headphone Profiling:** Recognizes connected audio endpoints and applies matched Harman curves.
+9. **FIR Convolution IR Engine:** Prepares acoustic impulse response buffers matched to detected headphone types.
+10. **Decoupled Speed & Pitch:** Time-stretches audio via WSOLA with automatic phase alignment.
+11. **Download Concurrency Control:** Regulates background parallel workers based on Wi-Fi and power status.
+12. **MediaStore Audio Indexer:** Indexes local tracks using `READ_MEDIA_AUDIO`, automatically excluding notifications, ringtones, and voice notes.
+13. **Sub-Bass Resonant Haptics:** Maps tactile vibrations to low-end frequencies (20–80 Hz), auto-pausing in Battery Saver mode.
+14. **Screen-Off GPU Throttling:** Halts GPU visualizer shaders and FFT math while the screen is off to preserve battery.
+15. **Network Handover Protection:** Updates ExoPlayer `DataSpec` headers during network switches to prevent stream stalls.
+16. **Dynamic Monet & Ambient Contrast:** Computes WCAG-compliant luminance contrast against album art and system wallpaper palettes.
 
 ### 2. Player Layouts & Seekbars
 * **8 Player Layout Architectures:** Modern M3 Expressive, Classic Hi-Fi, Immersive Fullscreen, Minimalist Typography, Compact One-Handed Dock, Card Carousel, Split Screen Dual-Pane, and Cider Panoramic Glass.
@@ -107,30 +123,29 @@ Accessed via **Settings → Personalization → Advanced Audio Engineering & Har
 
 ---
 
-## 📋 Changelog (Post-v1.6.0 & Current Releases)
+## 📱 Personal Recommendations & Daily Driver Stack
 
-### Version 1.6.1-HDR (Current Testing Release)
-* **Dynamic Palette Play Button:** Fixed static cyan play button bug; Play/Pause FAB now extracts and renders dominant track artwork colors dynamically across all layouts.
-* **Restored All 16 Audio Studios:** Completely repopulated the `showAdvancedSubsystemsSheet` modal bottom sheet to full 92% screen height with complete scrolling across all 16 engineering studios.
-* **Safe Launcher Switching:** Resolved application termination crashes during icon theme changes by implementing pre-flight state checks and `PackageManager.DONT_KILL_APP` sequencing.
-* **Notch Circle Purge:** Completely removed the orphaned grey camera punch-hole circle overlay from the top-center app scaffold.
-* **Obsidian Splash Screen Rebranding:** Rebranded the startup splash screen to **Ananta Dhvani** in ExtraBold Serif on an obsidian void (`#0B0F1A`) background.
-* **Ambient Header Aura Boost:** Boosted the dual-orb fluid particle breathing mesh alpha in `ExpressiveHeader.kt` for vivid visibility behind title typography.
-* **Stream Transcoding Safeguard:** Added pre-flight stream validation checks in `AudioFormatConverter.kt` to prevent runtime crashes on remote or restricted media.
-* **Storage Compliance:** Added `READ_MEDIA_AUDIO` permission to `AndroidManifest.xml` for local file indexing on Android 13 through 16.
-* **Canary M3 Expressive Overrides:** Decoupled Compose BOM platform pinning in `app/build.gradle.kts` to allow Canary M3 Expressive and Media3 1.6-alpha dependencies to compile cleanly.
+These are exceptional, high-utility open-source Android projects that I personally use, trust, and recommend:
+
+| Repository / App | Developer / Team | Description & Highlight |
+| :--- | :--- | :--- |
+| [**XFiles**](https://github.com/Local1stDotApp/XFiles) | `Local1stDotApp` | A privacy-respecting, modern local-first file manager with clean Android architecture. |
+| [**TidyLink**](https://github.com/punitsnaik/TidyLink) | `punitsnaik` | A link sanitizer and URL cleaner that strips tracking parameters and referral bloat before sharing. |
+| [**RecorderX**](https://github.com/snap24/RecorderX) | `snap24` | Material You audio recorder supporting high-fidelity lossless recording formats. |
+| [**mpvRx**](https://github.com/Riteshp2001/mpvRx) | `Riteshp2001` | High-performance Android video player powered by libmpv with advanced subtitle and hardware decoding support. |
+| [**Flow**](https://github.com/Flow-Tube/Flow) | `Flow-Tube` | Fast, lightweight, and clutter-free media streaming client prioritizing efficiency and clean UX. |
+| [**BetaScout**](https://github.com/jrs8205/BetaScout) | `jrs8205` | Practical Android utility for discovering, tracking, and managing app beta test programs. |
 
 ---
 
-## 🗺️ Future Roadmap & Engineering Pipeline
+## 📋 Changelog Highlights (Post-v1.6.0 Releases)
 
-The following milestones are planned as the testing phase progresses:
-
-- [ ] **Phase 1: Native C++ Engine Integration:** Build an experimental C++20 Oboe / AAudio direct audio sink option alongside the Media3 core for bit-perfect hardware USB DAC passthrough.
-- [ ] **Phase 2: Partitioned FIR Convolution DSP:** Integrate a native time-domain partitioned FIR convolution engine for `.wav` impulse responses directly into the audio pipeline.
-- [ ] **Phase 3: Camelot Wheel & DJ Automix:** Implement harmonic key detection and phrase-aligned BPM crossfading inspired by BeatWave and MusicBeat.
-- [ ] **Phase 4: Full Modularization:** Refactor monolithic UI files (`SettingsScreen.kt` and `PlayerHost.kt`) into independent feature modules for faster incremental compilation.
-- [ ] **Phase 5: Native Predictive Back:** Implement system-level Predictive Back gestures for sheets and screens following Android 15/16 standards.
+### Version 1.6.4-HDR (Current Release)
+* **Silent Audio Automation**: Completely removed the manual 16-studio bottom sheet from Settings. Subsystems now run silently in the background via `AutoHardwareAudioTuner.kt`.
+* **Audio Device Hot-Plug Callback**: Registered an `AudioDeviceCallback` with `AudioManager` in `MusicPlayer.kt` to trigger hardware profile updates whenever headphones, USB DACs, or Bluetooth devices are connected or removed.
+* **Clean Vector Branding**: Purged dark and light background blocks from `.github/assets/logo.svg`, leaving a transparent, unbroken tri-color soundwave vector with zero dots.
+* **VIBGYOR Tag Palette**: Replaced duplicate tag colors with a full spectral VIBGYOR palette (Violet, Indigo, Blue, Green, Yellow, Orange, Red) and removed badge icons for a cleaner look.
+* **Hardened Repository Governance**: Added `AGENTS.md`, `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `.env.example`, `.gitignore`, and GitHub Actions release workflows.
 
 ---
 
