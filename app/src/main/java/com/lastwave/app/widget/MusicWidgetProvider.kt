@@ -13,16 +13,36 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
-import android.os.Build
 import android.widget.RemoteViews
 import com.lastwave.app.MainActivity
 import com.lastwave.app.R
+import com.lastwave.app.playback.MusicPlaybackService
 
 class MusicWidgetProvider : AppWidgetProvider() {
 
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        when (intent.action) {
+            ACTION_PLAY_PAUSE -> sendServiceCommand(context, MusicPlaybackService.ACTION_TOGGLE_PLAYBACK)
+            ACTION_NEXT -> sendServiceCommand(context, MusicPlaybackService.ACTION_SKIP_NEXT)
+            ACTION_PREVIOUS -> sendServiceCommand(context, MusicPlaybackService.ACTION_SKIP_PREVIOUS)
+        }
+    }
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (widgetId in appWidgetIds) {
-            updateWidget(context, appWidgetManager, widgetId, "Ananta Dhvani", "Tap to open", false, null)
+            updateWidget(context, appWidgetManager, widgetId, "Ananta Dhvani", "Tap to play", false, null)
+        }
+    }
+
+    private fun sendServiceCommand(context: Context, serviceAction: String) {
+        val serviceIntent = Intent(context, MusicPlaybackService::class.java).apply {
+            action = serviceAction
+        }
+        try {
+            context.startService(serviceIntent)
+        } catch (_: Exception) {
+            context.startForegroundService(serviceIntent)
         }
     }
 
@@ -42,7 +62,7 @@ class MusicWidgetProvider : AppWidgetProvider() {
         ) {
             val views = RemoteViews(context.packageName, R.layout.widget_music_expressive)
 
-            // Open App on Click
+            // Open App Intent
             val openAppIntent = Intent(context, MainActivity::class.java)
             val openPendingIntent = PendingIntent.getActivity(
                 context, 0, openAppIntent,
@@ -50,12 +70,12 @@ class MusicWidgetProvider : AppWidgetProvider() {
             )
             views.setOnClickPendingIntent(R.id.widget_container, openPendingIntent)
 
-            // Setup Playback Action Intents
+            // Action Intents (Broadcast to this receiver)
             views.setOnClickPendingIntent(R.id.widget_btn_play_pause, getActionIntent(context, ACTION_PLAY_PAUSE, widgetId))
             views.setOnClickPendingIntent(R.id.widget_btn_next, getActionIntent(context, ACTION_NEXT, widgetId))
             views.setOnClickPendingIntent(R.id.widget_btn_prev, getActionIntent(context, ACTION_PREVIOUS, widgetId))
 
-            // Metadata text
+            // Metadata & State
             views.setTextViewText(R.id.widget_track_title, title)
             views.setTextViewText(R.id.widget_track_artist, artist)
             views.setImageViewResource(
@@ -63,7 +83,7 @@ class MusicWidgetProvider : AppWidgetProvider() {
                 if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
             )
 
-            // High-Res Circular / Rounded Artwork
+            // High-Resolution Artwork
             if (artwork != null) {
                 views.setImageViewBitmap(R.id.widget_artwork, getRoundedBitmap(artwork, 32f))
             } else {
@@ -91,13 +111,13 @@ class MusicWidgetProvider : AppWidgetProvider() {
             )
         }
 
-        private fun getRoundedBitmap(bitmap: Bitmap, cornerRadius: Float): Bitmap {
+        private fun getRoundedBitmap(bitmap: Bitmap, radius: Float): Bitmap {
             val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(output)
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
             val rect = Rect(0, 0, bitmap.width, bitmap.height)
             val rectF = RectF(rect)
-            canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, paint)
+            canvas.drawRoundRect(rectF, radius, radius, paint)
             paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
             canvas.drawBitmap(bitmap, rect, rect, paint)
             return output

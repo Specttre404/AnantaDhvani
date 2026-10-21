@@ -463,9 +463,9 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                 val query = intent.getStringExtra(android.app.SearchManager.QUERY)
                 if (!query.isNullOrBlank()) musicPlayer.resume()
             }
-            ACTION_PREVIOUS -> musicPlayer.previous()
-            ACTION_TOGGLE -> musicPlayer.togglePlayPause()
-            ACTION_NEXT -> musicPlayer.next()
+            ACTION_PREVIOUS, ACTION_SKIP_PREVIOUS -> musicPlayer.previous()
+            ACTION_TOGGLE, ACTION_TOGGLE_PLAYBACK -> musicPlayer.togglePlayPause()
+            ACTION_NEXT, ACTION_SKIP_NEXT -> musicPlayer.next()
             ACTION_SHUFFLE -> musicPlayer.toggleShuffle()
             ACTION_REPEAT -> musicPlayer.cycleRepeatMode()
             ACTION_STOP -> musicPlayer.stopAndClear()
@@ -1205,6 +1205,9 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         const val ACTION_SHUFFLE = "com.lastwave.app.playback.SHUFFLE"
         const val ACTION_REPEAT = "com.lastwave.app.playback.REPEAT"
         const val ACTION_STOP = "com.lastwave.app.playback.STOP"
+        const val ACTION_TOGGLE_PLAYBACK = "com.lastwave.app.playback.action.TOGGLE_PLAYBACK"
+        const val ACTION_SKIP_NEXT = "com.lastwave.app.playback.action.SKIP_NEXT"
+        const val ACTION_SKIP_PREVIOUS = "com.lastwave.app.playback.action.SKIP_PREVIOUS"
     }
 }
 
