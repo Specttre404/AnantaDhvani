@@ -794,12 +794,26 @@ class MusicPlayer @Inject constructor(
             }
         }
         val profile = autoHardwareAudioTuner.probeAndApply()
+        applyAutoTunedRouting(profile)
+
+        val audioManager = appContext.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+        audioManager?.registerAudioDeviceCallback(object : android.media.AudioDeviceCallback() {
+            override fun onAudioDevicesAdded(addedDevices: Array<out android.media.AudioDeviceInfo>?) {
+                val updatedProfile = autoHardwareAudioTuner.probeAndApply()
+                applyAutoTunedRouting(updatedProfile)
+            }
+
+            override fun onAudioDevicesRemoved(removedDevices: Array<out android.media.AudioDeviceInfo>?) {
+                val updatedProfile = autoHardwareAudioTuner.probeAndApply()
+                applyAutoTunedRouting(updatedProfile)
+            }
+        }, null)
 
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                profile.recommendedBufferDurationMs,
-                profile.recommendedBufferDurationMs + 15000,
-                2500,
+                profile.minBufferMs,
+                profile.maxBufferMs,
+                profile.playbackBufferMs,
                 5000
             )
             .setPrioritizeTimeOverSizeThresholds(true)
@@ -2103,6 +2117,14 @@ class MusicPlayer @Inject constructor(
 
     fun setCrossfeedPreset(presetId: Int) {
         runCatching { nativeAudioEngine.get().setCrossfeedPreset(presetId) }
+    }
+
+    fun applyAutoTunedRouting(profile: com.lastwave.app.audio.AutoHardwareAudioTuner.HardwareAudioProfile) {
+        if (profile.crossfeedRecommended) {
+            runCatching { nativeAudioEngine.get().setCrossfeed(enabled = true, levelDb = 4.5f, cutoffHz = 700f) }
+        } else {
+            runCatching { nativeAudioEngine.get().setCrossfeed(enabled = false) }
+        }
     }
 
     fun setSlowedReverb(enabled: Boolean) {

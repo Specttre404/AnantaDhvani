@@ -1,9 +1,21 @@
 package com.lastwave.app.audio
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.BatteryManager
+import android.os.Environment
+import android.os.PowerManager
+import android.os.StatFs
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,37 +28,101 @@ class AutoHardwareAudioTuner @Inject constructor(
         val optimalBufferSize: Int,
         val isLowLatencySupported: Boolean,
         val isHeadphonesConnected: Boolean,
-        val recommendedBufferDurationMs: Int,
-        val forceOpusHighBitrate: Boolean
+        val isUsbDacConnected: Boolean,
+        val connectedDeviceName: String,
+        val minBufferMs: Int,
+        val maxBufferMs: Int,
+        val playbackBufferMs: Int,
+        val dynamicCacheQuotaMb: Int,
+        val downloadConcurrency: Int,
+        val isOffloadViable: Boolean,
+        val crossfeedRecommended: Boolean,
+        val hapticsEnabled: Boolean,
+        val powerSaveActive: Boolean,
     )
+
+    private val _currentProfile = MutableStateFlow<HardwareAudioProfile?>(null)
+    val currentProfile: StateFlow<HardwareAudioProfile?> = _currentProfile.asStateFlow()
 
     fun probeAndApply(): HardwareAudioProfile {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        // 1. Hardware Audio Clock & Buffer Telemetry
         val sampleRateStr = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
         val framesPerBufferStr = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)
-
         val sampleRate = sampleRateStr?.toIntOrNull() ?: 48000
         val bufferFrames = framesPerBufferStr?.toIntOrNull() ?: 256
         val hasLowLatency = context.packageManager.hasSystemFeature("android.hardware.audio.low_latency")
         val hasProAudio = context.packageManager.hasSystemFeature("android.hardware.audio.pro")
 
+        // 2. Audio Endpoint Routing
         val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
-        val isHeadphones = devices.any {
+        val usbDevice = devices.firstOrNull { it.type == AudioDeviceInfo.TYPE_USB_DEVICE || it.type == AudioDeviceInfo.TYPE_USB_HEADSET }
+        val isUsbDac = usbDevice != null
+        val isHeadphones = isUsbDac || devices.any {
             it.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
             it.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-            it.type == AudioDeviceInfo.TYPE_USB_HEADSET ||
+            it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
             it.type == AudioDeviceInfo.TYPE_BLE_HEADSET
         }
+        val deviceName = usbDevice?.productName?.toString() ?: devices.firstOrNull { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP }?.productName?.toString() ?: "Internal Audio"
 
-        val bufferDuration = if (hasLowLatency || hasProAudio) 25000 else 40000
+        // 3. Network & Connection Speed Adaptation
+        val activeNetwork = connectivityManager.activeNetwork
+        val caps = connectivityManager.getNetworkCapabilities(activeNetwork)
+        val isUnmetered = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED) == true
+        val isHighSpeed = caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true || caps?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
 
-        return HardwareAudioProfile(
+        // 4. Power & Battery Status
+        val isPowerSave = powerManager.isPowerSaveMode
+
+        // 5. Dynamic Buffer Calculations
+        val minBuf = when {
+            isPowerSave -> 45000
+            isHighSpeed && hasLowLatency -> 20000
+            isUnmetered -> 25000
+            else -> 35000
+        }
+        val maxBuf = minBuf + 15000
+
+        // 6. Dynamic Storage Cache Allocation (5% of available free storage, bound 1GB - 6GB)
+        val dynamicCache = calculateOptimalCacheQuota()
+
+        // 7. Parallel Worker Scaling
+        val downloadWorkers = if (isUnmetered && isHighSpeed && !isPowerSave) 4 else 1
+
+        val profile = HardwareAudioProfile(
             optimalSampleRate = sampleRate,
             optimalBufferSize = bufferFrames,
             isLowLatencySupported = hasLowLatency,
             isHeadphonesConnected = isHeadphones,
-            recommendedBufferDurationMs = bufferDuration,
-            forceOpusHighBitrate = true
+            isUsbDacConnected = isUsbDac,
+            connectedDeviceName = deviceName,
+            minBufferMs = minBuf,
+            maxBufferMs = maxBuf,
+            playbackBufferMs = 2500,
+            dynamicCacheQuotaMb = dynamicCache,
+            downloadConcurrency = downloadWorkers,
+            isOffloadViable = !isPowerSave && (hasLowLatency || hasProAudio),
+            crossfeedRecommended = isHeadphones,
+            hapticsEnabled = isHeadphones && !isPowerSave,
+            powerSaveActive = isPowerSave,
         )
+
+        _currentProfile.value = profile
+        return profile
+    }
+
+    private fun calculateOptimalCacheQuota(): Int {
+        return try {
+            val stat = StatFs(Environment.getDataDirectory().path)
+            val availableBytes = stat.availableBlocksLong * stat.blockSizeLong
+            val fivePercentMb = (availableBytes * 0.05 / (1024 * 1024)).toInt()
+            fivePercentMb.coerceIn(1024, 6144)
+        } catch (_: Exception) {
+            2048
+        }
     }
 }
