@@ -2,5 +2,4 @@
 # Format: <sha256>  <filename>
 
 # v1.6.4-HDR Production Release (Target: Android 12+ API 31-36)
-# Generate after release compilation:
-# Get-FileHash "app/build/outputs/apk/release/app-release.apk" -Algorithm SHA256
+ED6A5AACD3612AB9B5E7E9938CD54E9D630BFA149D0A4212B1834466AFB4DC59  app-release.apk
