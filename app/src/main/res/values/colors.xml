@@ -5,4 +5,7 @@
 
     <!-- LastWaveX App Icon Background: Deep Obsidian Slate -->
     <color name="ic_launcher_background">#0F1115</color>
+
+    <!-- Pure white for light theme adaptive icon background -->
+    <color name="white">#FFFFFF</color>
 </resources>

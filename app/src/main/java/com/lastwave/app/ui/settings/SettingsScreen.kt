@@ -337,7 +337,6 @@ fun SettingsScreen(
     var showYtLibraryVisibilitySheet by remember { mutableStateOf(false) }
     var showYtDisconnectConfirm by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
-    var showAdvancedSubsystemsSheet by remember { mutableStateOf(false) }
     val currentLanguage = remember(misc.appLanguageTag) { AppLanguage.fromTag(misc.appLanguageTag) }
 
     // Sends the user to Android's own Notification Listener access screen
@@ -829,15 +828,6 @@ fun SettingsScreen(
                         onExpressiveNotificationToggle = viewModel::setExpressiveNotificationEnabled,
                         onBatterySaverToggle = viewModel::setScreenOffBatterySaver,
                         onMetroHubToggle = viewModel::setMetroHubEnabled,
-                    )
-                    SettingsActionCard(
-                        icon = Icons.Filled.Tune,
-                        iconContainer = MaterialTheme.colorScheme.primaryContainer,
-                        iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        title = "Advanced Audio Engineering & Hardware Tuning",
-                        subtitle = "Stream buffers, FIR convolution, crossfeed, USB direct output, DSP & telemetry",
-                        onClick = { showAdvancedSubsystemsSheet = true },
-                        position = GroupPosition.SINGLE,
                     )
                 }
             }
@@ -1700,108 +1690,6 @@ fun SettingsScreen(
                 }
             }.onFailure {
                 viewModel.showToast("Failed to import EQ profile")
-            }
-        }
-    }
-
-    if (showAdvancedSubsystemsSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showAdvancedSubsystemsSheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.fillMaxHeight(0.92f),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-                    .windowInsetsPadding(WindowInsets.navigationBars),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Text(
-                    text = "Advanced Audio Engineering & Hardware Tuning",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                StreamBufferTuningCard(
-                    minBufferMs = misc.minBufferMs,
-                    maxBufferMs = misc.maxBufferMs,
-                    playbackBufferMs = misc.bufferForPlaybackMs,
-                    onBufferChange = viewModel::setBufferTuning,
-                )
-                StreamCodecCard(
-                    currentCodec = misc.preferredAudioCodec,
-                    onSelectCodec = viewModel::setPreferredAudioCodec,
-                )
-                CacheQuotaCard(
-                    currentQuotaMb = misc.cacheQuotaMb,
-                    onSelectQuotaMb = viewModel::setCacheQuotaMb,
-                )
-                CrossfeedPresetsCard(
-                    enabled = misc.crossfeedEnabled,
-                    levelDb = misc.crossfeedLevelDb,
-                    cutoffHz = misc.crossfeedCutoffHz,
-                    onToggle = viewModel::setCrossfeedEnabled,
-                    onChange = { lvl, cut -> viewModel.setCrossfeedLevelDb(lvl); viewModel.setCrossfeedCutoffHz(cut) },
-                )
-                SilenceTrimmingCard(
-                    thresholdDb = misc.silenceThresholdDb,
-                    minDurationMs = misc.minSilenceDurationMs,
-                    onChange = viewModel::setSilenceSettings,
-                )
-                MiniPlayerSwipeCard(
-                    currentStyle = misc.miniPlayerSwipeStyle,
-                    onSelectStyle = viewModel::setMiniPlayerSwipeStyle,
-                )
-                LyricsTypographyCard(
-                    fontSize = misc.lyricsFontSize,
-                    lineSpacing = misc.lyricsLineSpacing,
-                    blurRadius = misc.lyricsInactiveBlurRadius,
-                    onChange = viewModel::setLyricsTypographySettings,
-                )
-                NavigationBarTabsCard(
-                    visibleTabs = misc.visibleNavTabs,
-                    onToggleTab = viewModel::toggleNavTab,
-                )
-                DownloadConcurrencyCard(
-                    concurrency = misc.downloadConcurrency,
-                    wifiOnly = misc.downloadWifiOnly,
-                    onConcurrencyChange = viewModel::setDownloadConcurrency,
-                    onWifiOnlyChange = viewModel::setDownloadWifiOnly,
-                )
-                LibraryFoldersAndExclusionCard(
-                    settings = misc,
-                    onAddScanFolder = viewModel::addCustomScanFolder,
-                    onRemoveScanFolder = viewModel::removeCustomScanFolder,
-                    onAddExcludedFolder = viewModel::addCustomExcludedFolder,
-                    onRemoveExcludedFolder = viewModel::removeCustomExcludedFolder,
-                )
-                AudioOffloadCard(
-                    enabled = misc.audioOffloadEnabled,
-                    onToggle = viewModel::setAudioOffloadEnabled,
-                )
-                ConvolutionIrCard(
-                    wetLevel = misc.convolutionWetLevel,
-                    onSelectFile = { irPickerLauncher.launch("audio/*") },
-                    onWetChange = viewModel::setConvolutionWetLevel,
-                    player = playerViewModel.player,
-                )
-                DecoupledSpeedPitchCard(player = playerViewModel.player)
-                UsbDirectOutputCard(
-                    enabled = misc.audioOffloadEnabled,
-                    onToggle = viewModel::setAudioOffloadEnabled,
-                )
-                AutoEqCard(
-                    onOpenSearch = { showAutoEqSheet = true },
-                )
-                AudiophileThemePaletteCard(
-                    onSelectPreset = viewModel::setAudiophilePalette,
-                )
-                MetroEInkTypographyStudioCard()
-                NetworkProxyResilienceCard()
-                Spacer(Modifier.height(48.dp))
             }
         }
     }

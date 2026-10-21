@@ -36,7 +36,7 @@ class AppIconManager @Inject constructor(
                 PackageManager.DONT_KILL_APP
             )
         } catch (e: Exception) {
-            android.util.Log.e("AppIconManager", "Safe icon switch error", e)
+            android.util.Log.e("AppIconManager", "Icon switch failed", e)
         }
     }
 }

@@ -119,7 +119,7 @@ import com.lastwave.app.ui.theme.LocalLiquidGlass
 import com.lastwave.app.ui.theme.liquidGlassContainerColor
 import com.lastwave.app.ui.theme.liquidGlassChrome
 
-private val SearchHeaderShape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+private val SearchHeaderShape = androidx.compose.ui.graphics.RectangleShape
 
 private val EXPLORE_GENRES = listOf(
     "Pop", "Rock", "Hip-Hop", "Lo-Fi", "Electronic", "Indie",

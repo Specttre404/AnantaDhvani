@@ -276,15 +276,15 @@ fun PlaylistScreen(
                                         Surface(
                                             shape = RoundedCornerShape(24.dp),
                                             color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                            border = BorderStroke(1.dp, Color(0xFF00F0FF).copy(alpha = 0.3f)),
+                                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                                             onClick = { onOpenPlaylist(id) },
                                             modifier = Modifier.width(170.dp),
                                         ) {
                                             Column(Modifier.padding(14.dp)) {
-                                                Icon(icon, contentDescription = null, tint = Color(0xFF00F0FF))
+                                                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                                 Spacer(Modifier.height(8.dp))
                                                 Text(title, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1)
-                                                Text(sub, style = MaterialTheme.typography.labelSmall, color = Color(0xFF00F0FF), fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                                                Text(sub, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, fontWeight = FontWeight.SemiBold, maxLines = 1)
                                             }
                                         }
                                     }
@@ -510,7 +510,7 @@ private fun CountPill(text: String) {
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        border = BorderStroke(1.dp, Color(0xFF00F0FF).copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
         modifier = Modifier.heightIn(min = 34.dp),
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
@@ -519,7 +519,7 @@ private fun CountPill(text: String) {
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF00F0FF),
+                    color = MaterialTheme.colorScheme.primary,
                 ),
                 modifier = Modifier.padding(horizontal = 13.dp, vertical = 6.dp),
             )

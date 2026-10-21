@@ -194,6 +194,7 @@ class MusicPlayer @Inject constructor(
     private val songPlayStatsRepository: dagger.Lazy<com.lastwave.app.data.repository.SongPlayStatsRepository>,
     private val sponsorBlockRepository: com.lastwave.app.data.sponsorblock.SponsorBlockRepository,
     private val audioDeviceManager: AudioDeviceManager,
+    private val autoHardwareAudioTuner: com.lastwave.app.audio.AutoHardwareAudioTuner,
 ) {
     val deviceTelemetry: StateFlow<AudioDeviceTelemetry> = audioDeviceManager.telemetry
 
@@ -792,18 +793,14 @@ class MusicPlayer @Inject constructor(
                 else -> dataSpec
             }
         }
-        val currentMisc = runCatching { kotlinx.coroutines.runBlocking { settingsPreferences.settings.first() } }.getOrNull()
-        val minBuf = currentMisc?.minBufferMs ?: 15_000
-        val maxBuf = currentMisc?.maxBufferMs ?: 50_000
-        val startBuf = currentMisc?.bufferForPlaybackMs ?: 2_500
-        val rebuf = currentMisc?.bufferForPlaybackAfterRebufferMs ?: 5_000
+        val profile = autoHardwareAudioTuner.probeAndApply()
 
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                /* minBufferMs = */ minBuf,
-                /* maxBufferMs = */ maxBuf,
-                /* bufferForPlaybackMs = */ startBuf,
-                /* bufferForPlaybackAfterRebufferMs = */ rebuf,
+                profile.recommendedBufferDurationMs,
+                profile.recommendedBufferDurationMs + 15000,
+                2500,
+                5000
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .setBackBuffer(15_000, true)
