@@ -1,1 +1,6 @@
-98C2E016CA563D11E5BEE81DCECF928CC55C1A47B3DFF481E66834C06784C5F5 *app-release.apk
+# Ananta Dhvani Release Binary SHA-256 Checksums
+# Format: <sha256>  <filename>
+
+# v1.6.4-HDR Production Release (Target: Android 12+ API 31-36)
+# Generate after release compilation:
+# Get-FileHash "app/build/outputs/apk/release/app-release.apk" -Algorithm SHA256
