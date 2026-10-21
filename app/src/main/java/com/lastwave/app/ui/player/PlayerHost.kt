@@ -593,6 +593,7 @@ fun PlayerHost(
                     onPlayPause = viewModel.player::togglePlayPause,
                     onNext = viewModel.player::next,
                     onPrevious = viewModel.player::previous,
+                    enableVinylRotation = true,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = if (hasBottomNavigation) 80.dp else 8.dp),

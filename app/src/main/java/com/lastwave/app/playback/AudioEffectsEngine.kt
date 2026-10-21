@@ -50,6 +50,13 @@ class AudioEffectsEngine @Inject constructor(
     @Volatile private var studioClarityEnabled = false
     @Volatile private var bitPerfectActive = false
     @Volatile private var loudnessNormalizationEnabled = true
+    @Volatile private var subBassHapticsEnabled = true
+
+    fun setSubBassHapticsEnabled(enabled: Boolean) {
+        subBassHapticsEnabled = enabled
+    }
+
+    fun isSubBassHapticsEnabled(): Boolean = subBassHapticsEnabled
 
     private var attachedSessionId = C.AUDIO_SESSION_ID_UNSET
     private var toneEffect: ToneEffect? = null

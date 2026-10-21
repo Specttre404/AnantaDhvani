@@ -2120,10 +2120,16 @@ class MusicPlayer @Inject constructor(
     }
 
     fun applyAutoTunedRouting(profile: com.lastwave.app.audio.AutoHardwareAudioTuner.HardwareAudioProfile) {
+        // 1. Crossfeed
         if (profile.crossfeedRecommended) {
             runCatching { nativeAudioEngine.get().setCrossfeed(enabled = true, levelDb = 4.5f, cutoffHz = 700f) }
         } else {
             runCatching { nativeAudioEngine.get().setCrossfeed(enabled = false) }
+        }
+
+        // 2. Sub-Bass Haptics based on hardware profile
+        runCatching {
+            audioEffectsEngine.setSubBassHapticsEnabled(profile.hapticsEnabled)
         }
     }
 
