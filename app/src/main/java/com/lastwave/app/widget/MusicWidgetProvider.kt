@@ -23,9 +23,9 @@ class MusicWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         when (intent.action) {
-            ACTION_PLAY_PAUSE -> sendServiceCommand(context, MusicPlaybackService.ACTION_TOGGLE_PLAYBACK)
-            ACTION_NEXT -> sendServiceCommand(context, MusicPlaybackService.ACTION_SKIP_NEXT)
-            ACTION_PREVIOUS -> sendServiceCommand(context, MusicPlaybackService.ACTION_SKIP_PREVIOUS)
+            ACTION_PLAY_PAUSE -> forwardToService(context, MusicPlaybackService.ACTION_TOGGLE_PLAYBACK)
+            ACTION_NEXT -> forwardToService(context, MusicPlaybackService.ACTION_SKIP_NEXT)
+            ACTION_PREVIOUS -> forwardToService(context, MusicPlaybackService.ACTION_SKIP_PREVIOUS)
         }
     }
 
@@ -35,14 +35,14 @@ class MusicWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private fun sendServiceCommand(context: Context, serviceAction: String) {
-        val serviceIntent = Intent(context, MusicPlaybackService::class.java).apply {
-            action = serviceAction
+    private fun forwardToService(context: Context, actionString: String) {
+        val intent = Intent(context, MusicPlaybackService::class.java).apply {
+            action = actionString
         }
         try {
-            context.startService(serviceIntent)
+            context.startService(intent)
         } catch (_: Exception) {
-            context.startForegroundService(serviceIntent)
+            context.startForegroundService(intent)
         }
     }
 
