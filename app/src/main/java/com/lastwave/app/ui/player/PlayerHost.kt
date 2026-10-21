@@ -587,18 +587,15 @@ fun PlayerHost(
         Box(Modifier.fillMaxSize()) {
             content()
             if (miniPlayerVisible) {
-                MiniPlayer(
-                    state = state,
-                    progressState = viewModel.progressState,
+                ExpressiveMiniPlayer(
+                    playbackState = state,
                     onExpand = { expanded = true },
-                    onToggle = viewModel.player::togglePlayPause,
-                    onPrevious = viewModel.player::previous,
+                    onPlayPause = viewModel.player::togglePlayPause,
                     onNext = viewModel.player::next,
-                    onClose = viewModel.player::stopAndClear,
-                    bottomPadding = if (hasBottomNavigation) 92.dp else 12.dp,
-                    edgeToEdge = !hasBottomNavigation,
-                    backdrop = null,
-                    modifier = Modifier.align(Alignment.BottomCenter),
+                    onPrevious = viewModel.player::previous,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = if (hasBottomNavigation) 80.dp else 8.dp),
                 )
             }
             AnimatedVisibility(
