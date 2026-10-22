@@ -11,7 +11,9 @@
   <meta name="color-scheme" content="dark light">
 
   <style>
-    /* Dynamic Theme Variables (Dark Mode Default) */
+    /* ==========================================================================
+       1. Android 17 Canary M3 Expressive & iOS Liquid Glass Dynamic Tokens
+       ========================================================================== */
     :root {
       --accent: #00F0FF;
       --accent-secondary: #7F52FF;
@@ -19,32 +21,42 @@
       --bg-void: #07090E;
       --bg-card: rgba(15, 20, 32, 0.72);
       --bg-card-solid: #0F1420;
-      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-glass: rgba(255, 255, 255, 0.14);
+      --border-specular: rgba(255, 255, 255, 0.28);
       --text-main: #F8FAFC;
       --text-muted: #94A3B8;
       --glow: rgba(0, 240, 255, 0.35);
-      --phone-rim: rgba(255, 255, 255, 0.18);
-      --phone-bezel: #0B0F1A;
-      --header-bg: rgba(7, 9, 14, 0.82);
+      --header-bg: rgba(7, 9, 14, 0.85);
       --code-bg: rgba(0, 0, 0, 0.65);
+      --phone-rim: rgba(255, 255, 255, 0.22);
+      --phone-bezel: #090D16;
+      --m3-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --liquid-glass-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.35),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.4);
     }
 
-    /* Light Mode Theme Overrides */
     [data-theme="light"] {
       --accent: #0284C7;
       --accent-secondary: #6366F1;
       --accent-tertiary: #E11D48;
-      --bg-void: #F1F5F9;
-      --bg-card: rgba(255, 255, 255, 0.82);
+      --bg-void: #F8FAFC;
+      --bg-card: rgba(255, 255, 255, 0.85);
       --bg-card-solid: #FFFFFF;
       --border-glass: rgba(15, 23, 42, 0.10);
+      --border-specular: rgba(255, 255, 255, 0.90);
       --text-main: #0F172A;
       --text-muted: #475569;
       --glow: rgba(2, 132, 199, 0.28);
+      --header-bg: rgba(248, 250, 252, 0.88);
+      --code-bg: rgba(241, 245, 249, 0.95);
       --phone-rim: rgba(15, 23, 42, 0.25);
       --phone-bezel: #0F172A;
-      --header-bg: rgba(241, 245, 249, 0.85);
-      --code-bg: rgba(241, 245, 249, 0.95);
+      --liquid-glass-shadow: 
+        0 20px 45px rgba(15, 23, 42, 0.08),
+        inset 0 1px 2px rgba(255, 255, 255, 0.95),
+        inset 0 -1px 1px rgba(15, 23, 42, 0.08);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -53,39 +65,40 @@
     body {
       background-color: var(--bg-void);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       overflow-x: hidden;
       line-height: 1.6;
-      transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.35s ease;
+      transition: background-color 0.4s var(--m3-spring), color 0.3s ease;
     }
 
-    /* Ambient Dynamic Reactive Glow Canvas */
+    /* Ambient Dynamic Mesh */
     .ambient-canvas {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      background: radial-gradient(circle 850px at var(--mx, 50%) var(--my, 20%), 
+      background: radial-gradient(circle 900px at var(--mx, 50%) var(--my, 20%), 
         var(--glow) 0%, 
-        rgba(127, 82, 255, 0.12) 40%, 
+        rgba(127, 82, 255, 0.12) 38%, 
         transparent 75%);
       transition: background 0.12s ease-out;
     }
 
-    /* Specular Navigation */
+    /* Liquid Glass Specular Navigation Bar */
     header {
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      backdrop-filter: blur(32px) saturate(210%);
+      -webkit-backdrop-filter: blur(32px) saturate(210%);
       background: var(--header-bg);
       border-bottom: 1px solid var(--border-glass);
-      padding: 1rem 2rem;
+      padding: 0.9rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: background 0.35s ease, border-color 0.35s ease;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+      transition: background 0.4s ease;
     }
 
     .brand {
@@ -98,29 +111,26 @@
       color: var(--text-main);
       text-decoration: none;
     }
-    .brand svg { filter: drop-shadow(0 0 10px var(--accent)); }
+    .brand svg { filter: drop-shadow(0 0 10px var(--accent)); transition: filter 0.3s; }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
+    .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.2s;
+      font-size: 0.92rem;
+      transition: color 0.2s, text-shadow 0.2s;
     }
     .nav-links a:hover {
       color: var(--accent);
       text-shadow: 0 0 10px var(--accent);
     }
+    @media (max-width: 820px) { .nav-links { display: none; } }
 
-    /* Light / Dark Mode Toggle Button */
     .theme-toggle-btn {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
+      box-shadow: var(--liquid-glass-shadow);
       color: var(--text-main);
       width: 42px;
       height: 42px;
@@ -129,28 +139,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.25s;
+      font-size: 1.1rem;
+      transition: all 0.3s var(--m3-spring);
     }
     .theme-toggle-btn:hover {
+      transform: scale(1.1) rotate(15deg);
       border-color: var(--accent);
-      box-shadow: 0 0 15px var(--glow);
-      transform: rotate(15deg) scale(1.05);
+      box-shadow: 0 0 20px var(--glow);
     }
 
     main {
       position: relative;
       z-index: 10;
-      max-width: 1200px;
+      max-width: 1220px;
       margin: 0 auto;
-      padding: 4rem 1.5rem;
+      padding: 3.5rem 1.5rem;
     }
 
-    /* Hero Section */
+    /* ==========================================================================
+       2. Hero Section & 3D Google Pixel 11 Pro XL Stage
+       ========================================================================== */
     .hero-split {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: 1.15fr 0.85fr;
       align-items: center;
-      gap: 4rem;
+      gap: 3.5rem;
       margin-bottom: 6rem;
     }
     @media (max-width: 960px) {
@@ -168,7 +181,7 @@
       box-shadow: 0 0 20px rgba(127, 82, 255, 0.35);
       font-size: 0.85rem;
       font-weight: 700;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       color: var(--accent);
     }
     .status-dot {
@@ -181,11 +194,11 @@
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 0.35; transform: scale(0.8); }
     }
 
     h1 {
-      font-size: clamp(2.5rem, 5.5vw, 4.4rem);
+      font-size: clamp(2.4rem, 5.2vw, 4.3rem);
       font-weight: 900;
       line-height: 1.08;
       letter-spacing: -1.5px;
@@ -197,35 +210,32 @@
     }
 
     .tagline {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--text-muted);
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
-    /* Live Dynamic Palette Selector */
+    /* M3 Expressive Dynamic Palette Engine */
     .palette-box {
       background: var(--bg-card);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
       border: 1px solid var(--border-glass);
-      border-radius: 20px;
-      padding: 1.25rem;
+      border-radius: 24px;
+      padding: 1.2rem;
       margin-bottom: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--liquid-glass-shadow);
+      text-align: left;
     }
     .palette-label {
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      margin-bottom: 10px;
     }
-    .palette-chips {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .palette-chips { display: flex; gap: 10px; flex-wrap: wrap; }
     .color-chip {
       display: flex;
       align-items: center;
@@ -235,32 +245,28 @@
       background: rgba(0, 0, 0, 0.08);
       border: 1px solid var(--border-glass);
       cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.2s;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transition: all 0.25s var(--m3-spring);
     }
     .color-chip:hover, .color-chip.active {
       border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 0 15px var(--glow);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 16px var(--glow);
     }
-    .color-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
+    .color-dot { width: 12px; height: 12px; border-radius: 50%; }
 
     /* Download Card */
     .download-card {
       background: var(--bg-card);
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      backdrop-filter: blur(32px) saturate(210%);
+      -webkit-backdrop-filter: blur(32px) saturate(210%);
       border: 1px solid var(--border-glass);
-      border-radius: 26px;
+      border-radius: 28px;
       padding: 2rem;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      box-shadow: var(--liquid-glass-shadow);
+      text-align: left;
     }
-
     .btn-download {
       display: flex;
       justify-content: center;
@@ -268,17 +274,17 @@
       gap: 12px;
       width: 100%;
       padding: 1.2rem;
-      border-radius: 18px;
+      border-radius: 20px;
       font-size: 1.15rem;
       font-weight: 800;
       color: #07090E;
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       text-decoration: none;
       box-shadow: 0 0 30px var(--glow);
-      transition: all 0.25s;
+      transition: all 0.25s var(--m3-spring);
     }
     .btn-download:hover {
-      transform: translateY(-3px) scale(1.01);
+      transform: translateY(-3px) scale(1.015);
       box-shadow: 0 0 45px var(--glow);
     }
 
@@ -296,7 +302,7 @@
       align-items: center;
       background: var(--code-bg);
       padding: 8px 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--border-glass);
       font-family: ui-monospace, monospace;
       font-size: 0.72rem;
@@ -307,20 +313,22 @@
       background: transparent;
       border: 1px solid var(--border-glass);
       color: var(--text-main);
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 700;
       margin-left: 8px;
-      transition: all 0.2s;
+      transition: all 0.2s var(--m3-spring);
       white-space: nowrap;
     }
     .btn-copy:hover {
       background: var(--accent);
       color: #000;
+      transform: scale(1.05);
     }
 
-    /* 3D Google Pixel 11 Pro XL Stage */
+    /* 3D Google Pixel 11 Pro XL Virtual Device */
     .stage-container {
       perspective: 1200px;
       display: flex;
@@ -328,37 +336,33 @@
       align-items: center;
     }
     .pixel-11-pro-xl {
-      width: 326px;
-      height: 672px;
+      width: 328px;
+      height: 676px;
       background: var(--phone-bezel);
-      border-radius: 46px;
+      border-radius: 48px;
       border: 4.5px solid var(--phone-rim);
       box-shadow: 
-        0 35px 80px rgba(0, 0, 0, 0.45),
-        0 0 55px var(--glow),
+        0 35px 85px rgba(0, 0, 0, 0.55),
+        0 0 60px var(--glow),
         inset 0 0 16px rgba(255, 255, 255, 0.12);
       transform-style: preserve-3d;
-      transform: rotateY(-12deg) rotateX(10deg);
-      transition: transform 0.1s ease-out, box-shadow 0.3s;
+      transform: rotateY(-10deg) rotateX(8deg);
+      transition: transform 0.15s ease-out, box-shadow 0.3s;
       overflow: hidden;
-      padding: 16px 16px 12px;
+      padding: 16px 16px 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       user-select: none;
-      position: relative;
     }
 
-    /* Pixel 11 Pro XL Top Punch-Hole Camera */
     .pixel-camera-punch {
       width: 14px;
       height: 14px;
       background: #000;
       border-radius: 50%;
-      margin: 0 auto 12px;
-      box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.35);
-      position: relative;
-      z-index: 20;
+      margin: 0 auto 10px;
+      box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.4);
     }
     .pixel-status-bar {
       display: flex;
@@ -368,15 +372,14 @@
       font-weight: 700;
       color: #CBD5E1;
       padding: 0 8px;
-      margin-top: -8px;
+      margin-top: -6px;
     }
 
-    /* Pixel Vinyl Record Player UI */
     .disc-container {
       position: relative;
       width: 216px;
       height: 216px;
-      margin: 18px auto;
+      margin: 16px auto;
       cursor: pointer;
     }
     .vinyl-disc {
@@ -408,32 +411,39 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #000;
-      box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
     }
 
     .song-meta { text-align: center; margin-bottom: 8px; }
     .song-title { font-weight: 800; font-size: 1.15rem; color: #FFF; }
     .song-artist { font-size: 0.85rem; color: #94A3B8; }
 
-    /* Wavy Seekbar Canvas inside Mockup */
     canvas#phoneSeekbar {
       width: 100%;
       height: 38px;
       display: block;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .controls-row {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
+    .btn-mock-nav {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #94A3B8;
+      transition: all 0.2s;
+    }
+    .btn-mock-nav:hover { color: #FFF; transform: scale(1.15); }
+
     .btn-mock-fab {
-      width: 52px;
-      height: 52px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
       background: var(--accent);
       box-shadow: 0 0 25px var(--accent);
@@ -443,11 +453,10 @@
       cursor: pointer;
       color: #000;
       font-size: 1.3rem;
-      transition: all 0.2s;
+      transition: all 0.2s var(--m3-spring);
     }
-    .btn-mock-fab:hover { transform: scale(1.08); }
+    .btn-mock-fab:hover { transform: scale(1.1); }
 
-    /* Pixel 11 Pro XL Bottom Navigation Pill Bar */
     .pixel-nav-bar {
       width: 96px;
       height: 4px;
@@ -456,15 +465,18 @@
       margin: 8px auto 2px;
     }
 
-    /* Interactive Sound Lab (Real Web Audio API) */
+    /* ==========================================================================
+       3. Interactive DSP Sound Lab (Web Audio API Synthesizer)
+       ========================================================================== */
     .lab-box {
       background: var(--bg-card);
-      backdrop-filter: blur(28px);
+      backdrop-filter: blur(32px) saturate(210%);
+      -webkit-backdrop-filter: blur(32px) saturate(210%);
       border: 1px solid var(--border-glass);
       border-radius: 32px;
       padding: 2.5rem;
       margin-bottom: 6rem;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--liquid-glass-shadow);
     }
     .lab-header {
       display: flex;
@@ -477,28 +489,25 @@
     .lab-title { font-size: 1.6rem; font-weight: 900; }
     .lab-desc { color: var(--text-muted); font-size: 0.95rem; }
 
-    .dsp-chips {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .dsp-chips { display: flex; gap: 10px; flex-wrap: wrap; }
     .dsp-chip {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
       color: var(--text-muted);
       padding: 8px 16px;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
       font-size: 0.88rem;
       font-weight: 700;
-      transition: all 0.2s;
+      transition: all 0.25s var(--m3-spring);
       user-select: none;
     }
     .dsp-chip.active {
       background: rgba(0, 240, 255, 0.15);
       border-color: var(--accent);
       color: var(--accent);
-      box-shadow: 0 0 16px var(--glow);
+      box-shadow: 0 0 18px var(--glow);
+      transform: scale(1.02);
     }
 
     canvas#spectrumVisualizer {
@@ -523,16 +532,18 @@
       color: #000;
       border: none;
       padding: 10px 22px;
-      border-radius: 12px;
+      border-radius: 14px;
       font-weight: 800;
       font-size: 0.9rem;
       cursor: pointer;
-      box-shadow: 0 0 18px var(--glow);
-      transition: all 0.2s;
+      box-shadow: 0 0 20px var(--glow);
+      transition: all 0.25s var(--m3-spring);
     }
-    .btn-test-tone:hover { transform: translateY(-2px); }
+    .btn-test-tone:hover { transform: translateY(-2px) scale(1.03); }
 
-    /* Bento Grid Subsystems */
+    /* ==========================================================================
+       4. Bento Grid: 16 Hardware Subsystems Architecture
+       ========================================================================== */
     .bento-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -541,53 +552,76 @@
     }
     .bento-card {
       background: var(--bg-card);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
       border: 1px solid var(--border-glass);
-      border-radius: 26px;
+      border-radius: 28px;
       padding: 2rem;
-      transition: all 0.25s;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s var(--m3-spring);
+      box-shadow: var(--liquid-glass-shadow);
     }
     .bento-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-6px);
       border-color: var(--accent);
-      box-shadow: 0 10px 30px var(--glow);
+      box-shadow: 0 15px 35px var(--glow);
     }
     .bento-card h3 {
-      font-size: 1.3rem;
+      font-size: 1.28rem;
       font-weight: 800;
       margin-bottom: 0.75rem;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .bento-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
+    .bento-card p { color: var(--text-muted); font-size: 0.95rem; }
 
-    /* Comparison Matrix */
+    /* ==========================================================================
+       5. Head-to-Head Comparison Matrix & Tech Specs
+       ========================================================================== */
     .matrix-section { margin-bottom: 6rem; }
     .matrix-card {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
-      border-radius: 26px;
+      border-radius: 28px;
       padding: 2rem;
       overflow-x: auto;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
+      box-shadow: var(--liquid-glass-shadow);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.95rem;
-    }
-    th, td {
-      padding: 1.1rem 1.25rem;
-      border-bottom: 1px solid var(--border-glass);
-    }
-    th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+    th, td { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border-glass); }
+    th { color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; }
     td strong { color: var(--accent); }
+
+    /* ==========================================================================
+       6. Disclaimer, Credits & Acknowledgements
+       ========================================================================== */
+    .legal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 28px;
+      padding: 2.25rem;
+      margin-bottom: 5rem;
+      box-shadow: var(--liquid-glass-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .legal-title { font-size: 1.35rem; font-weight: 900; }
+    .legal-body { font-size: 0.92rem; color: var(--text-muted); line-height: 1.7; }
+    .credits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-top: 0.5rem;
+    }
+    .credit-item {
+      background: rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-glass);
+      padding: 1rem 1.25rem;
+      border-radius: 18px;
+    }
+    .credit-item strong { color: var(--text-main); font-size: 0.95rem; display: block; margin-bottom: 4px; }
+    .credit-item span { color: var(--text-muted); font-size: 0.85rem; }
 
     footer {
       text-align: center;
@@ -602,6 +636,7 @@
 
   <div class="ambient-canvas" id="ambientMesh"></div>
 
+  <!-- Header -->
   <header>
     <a href="#" class="brand">
       <svg width="30" height="30" viewBox="0 0 108 108" fill="none">
@@ -620,11 +655,11 @@
     <div class="nav-actions">
       <nav class="nav-links">
         <a href="#lab">Sound Lab</a>
+        <a href="#subsystems">16 Subsystems</a>
         <a href="#matrix">Comparison</a>
-        <a href="#features">Architecture</a>
+        <a href="#credits">Acknowledgements</a>
         <a href="https://github.com/Specttre404/AnantaDhvani" target="_blank" rel="noopener">GitHub</a>
       </nav>
-      <!-- Light / Dark Mode Toggle Button -->
       <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
         <span id="themeIcon">☀️</span>
       </button>
@@ -632,7 +667,7 @@
   </header>
 
   <main>
-    <!-- Hero with 3D Google Pixel 11 Pro XL & Dynamic Palette Engine -->
+    <!-- Hero with 3D Google Pixel 11 Pro XL -->
     <section class="hero-split">
       <div>
         <div class="status-badge">
@@ -644,9 +679,9 @@
           The sovereign, high-fidelity music workstation for Android. Native Bauer BS2B binaural crossfeed, parametric AutoEQ target curve engine, and M3 Expressive liquid glass.
         </p>
 
-        <!-- Dynamic Palette Extraction Simulator -->
+        <!-- Dynamic Palette Engine Playground -->
         <div class="palette-box">
-          <div class="palette-label">🎨 Test Dynamic Album-Art Theming Engine</div>
+          <div class="palette-label">🎨 Test Dynamic Album-Art Palette Extraction</div>
           <div class="palette-chips">
             <div class="color-chip active" onclick="setPalette('#00F0FF', '#7F52FF', '#FF2E93', 'rgba(0,240,255,0.35)', this)">
               <span class="color-dot" style="background: #00F0FF;"></span> Cyber Cyan
@@ -663,6 +698,7 @@
           </div>
         </div>
 
+        <!-- Release Download Card -->
         <div class="download-card">
           <a id="downloadButton" href="https://github.com/Specttre404/AnantaDhvani/releases/latest" class="btn-download">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -685,7 +721,6 @@
       <!-- 3D Google Pixel 11 Pro XL Stage -->
       <div class="stage-container" id="stageContainer">
         <div class="pixel-11-pro-xl" id="phoneBody">
-          <!-- Pixel Top Camera Punch Hole & Status Bar -->
           <div>
             <div class="pixel-camera-punch"></div>
             <div class="pixel-status-bar">
@@ -694,7 +729,6 @@
             </div>
           </div>
 
-          <!-- Rotating Vinyl Mockup -->
           <div class="disc-container" onclick="togglePlayback()">
             <div class="vinyl-disc" id="vinylDisc">
               <div class="disc-art">32-bit FLAC</div>
@@ -702,26 +736,24 @@
           </div>
 
           <div class="song-meta">
-            <div class="song-title">Aashiqana Aalam Hai</div>
-            <div class="song-artist">Good Boy Bad Boy • Opus 160kbps</div>
+            <div class="song-title" id="mockTitle">Aashiqana Aalam Hai</div>
+            <div class="song-artist" id="mockArtist">Good Boy Bad Boy • Opus 160kbps</div>
           </div>
 
-          <!-- Harmonic Wavy Seekbar Canvas -->
-          <canvas id="phoneSeekbar" width="294" height="38"></canvas>
+          <canvas id="phoneSeekbar" width="296" height="38"></canvas>
 
           <div class="controls-row">
-            <span style="font-size: 1.5rem; cursor: pointer; color: #94A3B8;">⏮</span>
+            <span class="btn-mock-nav" onclick="prevTrack()">⏮</span>
             <div class="btn-mock-fab" id="phonePlayBtn" onclick="togglePlayback()">⏸</div>
-            <span style="font-size: 1.5rem; cursor: pointer; color: #94A3B8;">⏭</span>
+            <span class="btn-mock-nav" onclick="nextTrack()">⏭</span>
           </div>
 
-          <!-- Pixel 11 Pro XL Gesture Pill Navigation Bar -->
           <div class="pixel-nav-bar"></div>
         </div>
       </div>
     </section>
 
-    <!-- Interactive DSP Sound Lab (Web Audio API Synthesizer) -->
+    <!-- Interactive DSP Sound Lab -->
     <section id="lab" class="lab-box">
       <div class="lab-header">
         <div>
@@ -743,15 +775,15 @@
       </div>
     </section>
 
-    <!-- Bento Grid: 16 Hardware Subsystems -->
-    <section id="features" class="bento-grid">
+    <!-- 16 Hardware Subsystems Bento Grid -->
+    <section id="subsystems" class="bento-grid">
       <div class="bento-card">
         <h3>🎛️ 16 Silent Subsystems</h3>
         <p>Dynamic 20s–60s buffer resizing, autonomous Opus format selection, dynamic storage quotas, and screen-off GPU clock throttling.</p>
       </div>
       <div class="bento-card">
         <h3>🧊 iOS Liquid Glass UI</h3>
-        <p>Specular frosted glass refraction, live 360° rotating vinyl disc, ambient HDR breathing meshes, and 7 fluid harmonic seekbar engines.</p>
+        <p>Specular frosted glass refraction, live 360° rotating vinyl disc, ambient HDR breathing meshes, and 7 fluid harmonic seekbars.</p>
       </div>
       <div class="bento-card">
         <h3>🛡️ Sovereign Security</h3>
@@ -819,21 +851,61 @@
         </table>
       </div>
     </section>
+
+    <!-- Legal Disclaimer, Credits & Acknowledgements -->
+    <section id="credits" class="legal-card">
+      <div>
+        <div class="legal-title">⚖️ Legal Disclaimer & Fair Use</div>
+        <p class="legal-body">
+          Ananta Dhvani is an independent, non-commercial, open-source audiophile workstation created solely for educational and personal listening purposes under the GNU General Public License v3.0 (GNU GPL v3). Ananta Dhvani does not host, store, monetize, or distribute copyrighted media files. All streaming and scrobbling operations are performed directly client-side via public endpoints. All product names, logos, and brands (e.g., Android, Google Pixel, Sony, Apple) are property of their respective trademark holders.
+        </p>
+      </div>
+
+      <div>
+        <div class="legal-title">🤝 Credits & Acknowledgements</div>
+        <div class="credits-grid">
+          <div class="credit-item">
+            <strong>Ishan (@Specttre404)</strong>
+            <span>Lead Creator & Architect • Ananta Dhvani Fork</span>
+          </div>
+          <div class="credit-item">
+            <strong>Google Gemini</strong>
+            <span>AI Architecture & Pair Programming Collaborator</span>
+          </div>
+          <div class="credit-item">
+            <strong>LastWave / LastWaveX</strong>
+            <span>Upstream Android Foundation & Scrobbler Stack</span>
+          </div>
+          <div class="credit-item">
+            <strong>AutoEQ by Jaakkopasanen</strong>
+            <span>Parametric Headphone Measurement & Harman Curves</span>
+          </div>
+          <div class="credit-item">
+            <strong>Boris Mikhaylov</strong>
+            <span>Bauer Stereophonic-to-Binaural (BS2B) DSP Algorithm</span>
+          </div>
+          <div class="credit-item">
+            <strong>Google Android Team</strong>
+            <span>Material 3 Expressive Design System & Jetpack Compose</span>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer>
-    <p>Handcrafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> • <strong>Ananta Dhvani</strong> • GNU GPL v3</p>
+    <p>Handcrafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> • <strong>Ananta Dhvani</strong> • Licensed under GNU GPL v3</p>
   </footer>
 
   <script>
-    // 1. Mouse/Touch Dynamic Ambient Glow Tracking
+    // 1. Ambient Glow Tracker
     const glowMesh = document.getElementById('ambientMesh');
     window.addEventListener('pointermove', (e) => {
       glowMesh.style.setProperty('--mx', `${e.clientX}px`);
       glowMesh.style.setProperty('--my', `${e.clientY}px`);
     });
 
-    // 2. Light / Dark Mode Toggle with LocalStorage
+    // 2. Light / Dark Mode Toggle
     function toggleTheme() {
       const html = document.documentElement;
       const current = html.getAttribute('data-theme');
@@ -842,12 +914,11 @@
       document.getElementById('themeIcon').textContent = target === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('ananta_theme', target);
     }
-    // Initialize Theme Preference
     const savedTheme = localStorage.getItem('ananta_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-    // 3. 3D Pixel 11 Pro XL Gyroscope Tilt Physics
+    // 3. 3D Pixel 11 Pro XL Tilt
     const stage = document.getElementById('stageContainer');
     const phone = document.getElementById('phoneBody');
     stage.addEventListener('mousemove', (e) => {
@@ -857,10 +928,10 @@
       phone.style.transform = `rotateY(${x * 0.08}deg) rotateX(${-y * 0.08}deg) scale(1.02)`;
     });
     stage.addEventListener('mouseleave', () => {
-      phone.style.transform = `rotateY(-12deg) rotateX(10deg) scale(1)`;
+      phone.style.transform = `rotateY(-10deg) rotateX(8deg) scale(1)`;
     });
 
-    // 4. Dynamic Album Palette Extractor Engine
+    // 4. Palette Engine
     function setPalette(primary, secondary, tertiary, glow, el) {
       document.documentElement.style.setProperty('--accent', primary);
       document.documentElement.style.setProperty('--accent-secondary', secondary);
@@ -870,8 +941,32 @@
       el.classList.add('active');
     }
 
-    // 5. Interactive Pixel 11 Pro XL Playback Controls
+    // 5. Interactive Mock Track Carousel & Playback
     let isPlaying = true;
+    const tracks = [
+      { title: "Aashiqana Aalam Hai", artist: "Good Boy Bad Boy • Opus 160kbps", primary: "#00F0FF", secondary: "#7F52FF", tertiary: "#FF2E93" },
+      { title: "Starboy", artist: "The Weeknd • Daft Punk • 32-bit FLAC", primary: "#FF2E93", secondary: "#FF8E53", tertiary: "#7F00FF" },
+      { title: "Midnight City", artist: "M83 • Direct Master Lossless", primary: "#10B981", secondary: "#06B6D4", tertiary: "#6366F1" }
+    ];
+    let trackIndex = 0;
+
+    function updateTrackView() {
+      const t = tracks[trackIndex];
+      document.getElementById('mockTitle').textContent = t.title;
+      document.getElementById('mockArtist').textContent = t.artist;
+      document.documentElement.style.setProperty('--accent', t.primary);
+      document.documentElement.style.setProperty('--accent-secondary', t.secondary);
+      document.documentElement.style.setProperty('--accent-tertiary', t.tertiary);
+    }
+    function nextTrack() {
+      trackIndex = (trackIndex + 1) % tracks.length;
+      updateTrackView();
+    }
+    function prevTrack() {
+      trackIndex = (trackIndex - 1 + tracks.length) % tracks.length;
+      updateTrackView();
+    }
+
     const vinyl = document.getElementById('vinylDisc');
     const fab = document.getElementById('phonePlayBtn');
     function togglePlayback() {
@@ -898,7 +993,7 @@
       pCtx.lineTo(pCanvas.width, centerY);
       pCtx.stroke();
 
-      // Active harmonic sine wave
+      // Active harmonic wave
       if (isPlaying) seekPhase += 0.08;
       const activeWidth = pCanvas.width * 0.65;
       pCtx.beginPath();
@@ -924,7 +1019,7 @@
     }
     drawSeekbar();
 
-    // 7. Sound Lab: Real Web Audio API Synthesizer & Biquad Filters
+    // 7. Web Audio API Sound Lab
     let audioCtx = null;
     let osc = null;
     let gainNode = null;
@@ -937,8 +1032,7 @@
       dspState[type] = !dspState[type];
       document.getElementById(`chip${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.toggle('active', dspState[type]);
       if (biquadFilter && audioCtx) {
-        if (dspState.haptics) biquadFilter.gain.setValueAtTime(6, audioCtx.currentTime);
-        else biquadFilter.gain.setValueAtTime(0, audioCtx.currentTime);
+        biquadFilter.gain.setValueAtTime(dspState.haptics ? 6 : 0, audioCtx.currentTime);
       }
     }
 
@@ -1018,7 +1112,7 @@
     }
     renderSpectrum();
 
-    // 9. One-Click Copy Checksum
+    // 9. Copy Checksum
     function copyChecksum() {
       const text = document.getElementById('shaText').textContent;
       navigator.clipboard.writeText(text);
