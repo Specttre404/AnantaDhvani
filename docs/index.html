@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ananta Dhvani — Audiophile Music Workstation for Android</title>
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com; font-src 'self';">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
+
+  <style>
+    :root {
+      --bg-deep: oklch(0.10 0.02 260);
+      --bg-card: oklch(0.14 0.03 260 / 0.70);
+      --border-glass: oklch(0.9 0.05 200 / 0.18);
+      --neon-cyan: oklch(0.88 0.22 198);
+      --neon-violet: oklch(0.68 0.28 300);
+      --neon-magenta: oklch(0.72 0.32 350);
+      --text-main: oklch(0.98 0.01 260);
+      --text-muted: oklch(0.70 0.03 260);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .ambient-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at var(--x, 50%) var(--y, 20%), 
+        oklch(0.65 0.25 300 / 0.18) 0%, 
+        oklch(0.80 0.20 198 / 0.10) 35%, 
+        transparent 70%);
+      transition: background 0.15s ease-out;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      background: oklch(0.10 0.02 260 / 0.75);
+      border-bottom: 1px solid var(--border-glass);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand svg { filter: drop-shadow(0 0 10px var(--neon-cyan)); }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 5rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: oklch(0.20 0.05 300 / 0.6);
+      border: 1px solid var(--neon-violet);
+      box-shadow: 0 0 15px oklch(0.68 0.28 300 / 0.3);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--neon-cyan);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #00F0FF 0%, #7F52FF 50%, #FF2E93 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 30px oklch(0.68 0.28 300 / 0.35));
+    }
+
+    .tagline {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .download-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid var(--border-glass);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      border-radius: 28px;
+      padding: 2rem;
+      max-width: 620px;
+      margin: 0 auto 4rem;
+      text-align: left;
+    }
+
+    .btn-download {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 1.1rem;
+      border-radius: 18px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0B0F1A;
+      background: linear-gradient(90deg, #00F0FF, #7F52FF);
+      text-decoration: none;
+      box-shadow: 0 0 25px oklch(0.88 0.22 198 / 0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px oklch(0.88 0.22 198 / 0.7);
+    }
+
+    .telemetry-row {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .checksum-box {
+      background: oklch(0.08 0.02 260);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      word-break: break-all;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 2rem;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 10px 30px oklch(0.88 0.22 198 / 0.15);
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-canvas" id="glowMesh"></div>
+
+  <header>
+    <a href="#" class="brand">
+      <svg width="32" height="32" viewBox="0 0 108 108" fill="none">
+        <defs>
+          <linearGradient id="navWave" x1="30" y1="54" x2="78" y2="54" gradientUnits="userSpaceOnUse">
+            <stop offset="0.0" stop-color="#00F0FF" />
+            <stop offset="0.5" stop-color="#7F52FF" />
+            <stop offset="1.0" stop-color="#FF2E93" />
+          </linearGradient>
+        </defs>
+        <path d="M 30,54 C 36,54 38,32 46,32 C 54,32 52,76 62,76 C 70,76 72,54 78,54"
+          stroke="url(#navWave)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span>Ananta Dhvani</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Architecture</a>
+      <a href="https://github.com/Specttre404/AnantaDhvani" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span id="releaseVersion">v1.6.9-HDR Active</span>
+      </div>
+      <h1>Unbroken Signal Purity.</h1>
+      <p class="tagline">
+        The pure, high-performance audiophile workstation for Android. Designed with Material 3 Expressive, iOS Liquid Glass, and zero algorithmic bloat.
+      </p>
+
+      <div class="download-card">
+        <a id="downloadBtn" href="https://github.com/Specttre404/AnantaDhvani/releases/latest" class="btn-download">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+          </svg>
+          <span id="downloadText">Download Latest Release APK</span>
+        </a>
+        <div class="telemetry-row">
+          <div>Target Platform: <strong>Android 12+ (API 31–36)</strong></div>
+          <div>VirusTotal Integrity: <strong style="color: #10B981;">0 / 72 Flagged (100% Clean)</strong></div>
+          <div>SHA-256 Checksum:</div>
+          <div class="checksum-box" id="checksumText">0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="grid">
+      <div class="card">
+        <h3>🎛️ 16 Background Engines</h3>
+        <p>Silent hardware auto-tuning handles sample rate clocks, Bauer BS2B binaural crossfeed, adaptive 20s–60s buffers, and dynamic storage quotas without manual sliders.</p>
+      </div>
+
+      <div class="card">
+        <h3>🧊 iOS Liquid Glass UI</h3>
+        <p>Specular frosted glass refraction, live 360° rotating vinyl records, dynamic album-art color palettes, and 7 fluid harmonic seekbars.</p>
+      </div>
+
+      <div class="card">
+        <h3>🛡️ Sovereign Privacy</h3>
+        <p>Zero telemetry, zero user trackers, zero advertisements, cleartext traffic disabled, and completely open source under GNU GPL v3.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Crafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> • Forked from LastWave</p>
+  </footer>
+
+  <script>
+    const glow = document.getElementById('glowMesh');
+    window.addEventListener('pointermove', (e) => {
+      glow.style.setProperty('--x', `${e.clientX}px`);
+      glow.style.setProperty('--y', `${e.clientY}px`);
+    });
+
+    async function fetchLatestRelease() {
+      try {
+        const res = await fetch('https://api.github.com/repos/Specttre404/AnantaDhvani/releases/latest');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        if (data.tag_name) {
+          document.getElementById('releaseVersion').textContent = `${data.tag_name} Active`;
+        }
+
+        const apk = data.assets?.find(a => a.name.endsWith('.apk'));
+        if (apk) {
+          document.getElementById('downloadBtn').href = apk.browser_download_url;
+          document.getElementById('downloadText').textContent = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(1)} MB)`;
+        }
+      } catch (err) {
+        console.warn('Using fallback telemetry:', err);
+      }
+    }
+    fetchLatestRelease();
+  </script>
+</body>
+</html>
