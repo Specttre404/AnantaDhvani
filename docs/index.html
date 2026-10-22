@@ -42,7 +42,6 @@
         inset 0 -1px 1px rgba(0, 0, 0, 0.4);
     }
 
-    /* High-Contrast Light Mode Fixes (Resolves washed-out UI) */
     [data-theme="light"] {
       --accent: #0284C7;
       --accent-secondary: #4F46E5;
@@ -94,6 +93,7 @@
       transition: background 0.12s ease-out;
     }
 
+    /* Fixed Responsive Header (No collision on desktop site mode) */
     header {
       position: sticky;
       top: 0;
@@ -123,12 +123,12 @@
     .brand svg { filter: drop-shadow(0 0 10px var(--accent)); transition: filter 0.3s; }
 
     .nav-actions { display: flex; align-items: center; gap: clamp(0.75rem, 2vw, 1.5rem); }
-    .nav-links { display: flex; align-items: center; gap: clamp(0.75rem, 1.5vw, 1.4rem); }
+    .nav-links { display: flex; align-items: center; gap: clamp(0.75rem, 1.5vw, 1.25rem); }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       transition: color 0.2s, text-shadow 0.2s;
       white-space: nowrap;
     }
@@ -136,7 +136,7 @@
       color: var(--accent);
       text-shadow: 0 0 10px var(--accent);
     }
-    @media (max-width: 860px) { .nav-links { display: none; } }
+    @media (max-width: 900px) { .nav-links { display: none; } }
 
     .theme-toggle-btn {
       background: var(--bg-card);
@@ -339,7 +339,7 @@
       transform: scale(1.05);
     }
 
-    /* 3D Google Pixel 11 Pro XL Stage (Touch & Selection Fixed) */
+    /* 3D Google Pixel 11 Pro XL Stage (Touch & Magnifier Bubble Guard) */
     .stage-container {
       perspective: 1200px;
       display: flex;
@@ -371,6 +371,7 @@
       flex-direction: column;
       justify-content: space-between;
       user-select: none;
+      -webkit-user-select: none;
     }
     .pixel-11-pro-xl::before {
       content: '';
@@ -441,15 +442,16 @@
       box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
     }
 
-    .song-meta { text-align: center; margin-bottom: 8px; }
+    .song-meta { text-align: center; margin-bottom: 6px; }
     .song-title { font-weight: 800; font-size: 1.15rem; color: #FFF; }
     .song-artist { font-size: 0.85rem; color: #94A3B8; }
 
+    /* Fixed Seekbar Canvas: Explicit physical pixel dimensions prevent vanishing */
     canvas#phoneSeekbar {
-      width: 100%;
-      height: 42px;
+      width: 294px;
+      height: 40px;
       display: block;
-      margin-bottom: 6px;
+      margin: 0 auto 6px;
     }
 
     .controls-row {
@@ -533,7 +535,7 @@
 
     canvas#spectrumVisualizer {
       width: 100%;
-      height: 200px;
+      height: 190px;
       background: var(--code-bg);
       border-radius: 20px;
       border: 1px solid var(--border-glass);
@@ -593,7 +595,7 @@
     }
     .bento-card p { color: var(--text-muted); font-size: 0.95rem; }
 
-    /* Comparison Matrix (Overlapping Sticky Col Fixed) */
+    /* Comparison Matrix (Fixes Overlapping Column Collision) */
     .matrix-section { margin-bottom: 5.5rem; }
     .matrix-card {
       background: var(--bg-card);
@@ -604,16 +606,30 @@
       box-shadow: var(--liquid-glass-shadow);
       -webkit-overflow-scrolling: touch;
     }
+    .matrix-scroll-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: none;
+    }
+    @media (max-width: 768px) { .matrix-scroll-hint { display: block; } }
+
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
       font-size: 0.92rem;
-      min-width: 620px;
+      min-width: 680px;
     }
     th, td {
-      padding: 1.1rem 1.15rem;
+      padding: 1.1rem 1.2rem;
       border-bottom: 1px solid var(--border-glass);
+      white-space: nowrap;
+    }
+    th:first-child, td:first-child {
+      white-space: normal;
+      min-width: 180px;
+      font-weight: 800;
     }
     th { color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; }
     td strong { color: var(--accent); font-weight: 800; }
@@ -759,7 +775,8 @@
             <div class="song-artist" id="mockArtist">Good Boy Bad Boy • Opus 160kbps</div>
           </div>
 
-          <canvas id="phoneSeekbar"></canvas>
+          <!-- Fixed canvas sizing ensures seekbar never disappears in desktop site mode -->
+          <canvas id="phoneSeekbar" width="588" height="80"></canvas>
 
           <div class="controls-row">
             <span class="btn-mock-nav" onclick="prevTrack()">⏮</span>
@@ -786,7 +803,7 @@
         </div>
       </div>
 
-      <canvas id="spectrumVisualizer"></canvas>
+      <canvas id="spectrumVisualizer" width="1600" height="380"></canvas>
 
       <div class="audio-test-bar">
         <button class="btn-test-tone" id="btnAudioTone" onclick="toggleAudioSynthesizer()">▶ Play Acoustic Test Signal</button>
@@ -822,10 +839,11 @@
       </div>
     </section>
 
-    <!-- Comparison Matrix -->
+    <!-- Comparison Matrix (Scrollable Table Without Overlapping Text) -->
     <section id="matrix" class="matrix-section">
-      <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; text-align: center;">Audiophile Architecture Comparison</h2>
+      <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 1rem; text-align: center;">Audiophile Architecture Comparison</h2>
       <div class="matrix-card">
+        <div class="matrix-scroll-hint">👈 Swipe table horizontally to inspect all specs 👉</div>
         <table>
           <thead>
             <tr>
@@ -931,13 +949,12 @@
       html.setAttribute('data-theme', target);
       document.getElementById('themeIcon').textContent = target === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('ananta_theme', target);
-      initCanvasBuffers();
     }
     const savedTheme = localStorage.getItem('ananta_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-    // 3. Isolated Touch & Mouse Tilt
+    // 3. Isolated Touch & Mouse Tilt (No Android selection magnifier)
     const stage = document.getElementById('stageContainer');
     const phone = document.getElementById('phoneBody');
     let isInteracting = false;
@@ -955,7 +972,7 @@
       const deltaY = Math.max(-14, Math.min(14, (e.clientY - initialY) * -0.12));
       phone.style.transform = `rotateY(${deltaX}deg) rotateX(${deltaY}deg) scale(1.02)`;
     });
-    const releaseTilt = (e) => {
+    const releaseTilt = () => {
       if (!isInteracting) return;
       isInteracting = false;
       phone.style.transform = `rotateY(-8deg) rotateX(6deg) scale(1)`;
@@ -1003,56 +1020,31 @@
       fab.textContent = isPlaying ? '⏸' : '▶';
     }
 
-    // 6. Stable Canvas Buffer Initialization (Fixes vanishing seekbar)
+    // 6. In-Mockup Wavy Seekbar Canvas (Rock-solid fixed coordinate system)
     const pCanvas = document.getElementById('phoneSeekbar');
     const pCtx = pCanvas.getContext('2d');
-    const specCanvas = document.getElementById('spectrumVisualizer');
-    const sCtx = specCanvas.getContext('2d');
-
-    let pLogicalW = 294, pLogicalH = 42;
-    let sLogicalW = 1000, sLogicalH = 200;
-
-    function initCanvasBuffers() {
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-
-      const pRect = pCanvas.getBoundingClientRect();
-      pLogicalW = pRect.width > 0 ? Math.round(pRect.width) : 294;
-      pLogicalH = pRect.height > 0 ? Math.round(pRect.height) : 42;
-      pCanvas.width = Math.round(pLogicalW * dpr);
-      pCanvas.height = Math.round(pLogicalH * dpr);
-
-      const sRect = specCanvas.getBoundingClientRect();
-      sLogicalW = sRect.width > 0 ? Math.round(sRect.width) : 1000;
-      sLogicalH = sRect.height > 0 ? Math.round(sRect.height) : 200;
-      specCanvas.width = Math.round(sLogicalW * dpr);
-      specCanvas.height = Math.round(sLogicalH * dpr);
-    }
-    window.addEventListener('resize', initCanvasBuffers);
-    setTimeout(initCanvasBuffers, 100);
-
-    // 7. Wavy Seekbar Render Loop
     let seekPhase = 0;
+
     function renderSeekbar() {
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
       pCtx.save();
-      pCtx.scale(dpr, dpr);
-      pCtx.clearRect(0, 0, pLogicalW, pLogicalH);
+      pCtx.scale(2, 2); // 2x Retina scale onto 588x80 physical buffer
+      pCtx.clearRect(0, 0, 294, 40);
 
       const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      const centerY = pLogicalH / 2;
+      const centerY = 20;
 
-      // Inactive Track
+      // Inactive track
       pCtx.beginPath();
       pCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       pCtx.lineWidth = 4;
       pCtx.lineCap = 'round';
       pCtx.moveTo(4, centerY);
-      pCtx.lineTo(pLogicalW - 4, centerY);
+      pCtx.lineTo(290, centerY);
       pCtx.stroke();
 
-      // Active Harmonic Wave
+      // Active harmonic wave
       if (isPlaying) seekPhase += 0.08;
-      const activeWidth = (pLogicalW - 8) * 0.65;
+      const activeWidth = 190; // 65% scrub
       pCtx.beginPath();
       pCtx.strokeStyle = accent;
       pCtx.lineWidth = 4;
@@ -1077,7 +1069,7 @@
     }
     renderSeekbar();
 
-    // 8. Sound Lab Synthesizer
+    // 7. Harmonized Sound Lab Synthesizer
     let audioCtx = null;
     let oscRoot = null, oscFifth = null;
     let masterGain = null, lowFilter = null;
@@ -1133,31 +1125,30 @@
       }
     }
 
-    // 9. Spectrum Visualizer
+    // 8. Sound Lab Canvas Spectrum Analyzer
+    const specCanvas = document.getElementById('spectrumVisualizer');
+    const sCtx = specCanvas.getContext('2d');
     let specPhase = 0;
-    function renderSpectrum() {
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      sCtx.save();
-      sCtx.scale(dpr, dpr);
-      sCtx.clearRect(0, 0, sLogicalW, sLogicalH);
 
+    function renderSpectrum() {
+      sCtx.clearRect(0, 0, specCanvas.width, specCanvas.height);
       const bars = 48;
-      const barWidth = Math.max(3, sLogicalW / bars - 3);
+      const barWidth = (specCanvas.width / bars) - 6;
       specPhase += isTonePlaying ? 0.08 : 0.04;
 
       for (let i = 0; i < bars; i++) {
-        let h = Math.sin(specPhase + i * 0.22) * 35 + 55;
-        if (isTonePlaying) h += Math.sin(specPhase * 1.5 + i * 0.1) * 25 + 30;
+        let h = Math.sin(specPhase + i * 0.22) * 70 + 110;
+        if (isTonePlaying) h += Math.sin(specPhase * 1.5 + i * 0.1) * 50 + 60;
 
-        if (dspState.haptics && i < 10) h += 40;
+        if (dspState.haptics && i < 10) h += 80;
         if (dspState.crossfeed && i >= 12 && i < 28) h *= 0.85;
-        if (dspState.autoeq && i >= 30) h += 25;
+        if (dspState.autoeq && i >= 30) h += 50;
 
-        const x = i * (barWidth + 3);
-        const barH = Math.min(h, sLogicalH - 12);
-        const y = sLogicalH - barH;
+        const x = i * (barWidth + 6);
+        const barH = Math.min(h, specCanvas.height - 24);
+        const y = specCanvas.height - barH;
 
-        const grad = sCtx.createLinearGradient(0, y, 0, sLogicalH);
+        const grad = sCtx.createLinearGradient(0, y, 0, specCanvas.height);
         grad.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
         grad.addColorStop(0.5, getComputedStyle(document.documentElement).getPropertyValue('--accent-secondary').trim());
         grad.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--accent-tertiary').trim());
@@ -1165,13 +1156,11 @@
         sCtx.fillStyle = grad;
         sCtx.fillRect(x, y, barWidth, barH);
       }
-
-      sCtx.restore();
       requestAnimationFrame(renderSpectrum);
     }
     renderSpectrum();
 
-    // 10. Checksum Copy
+    // 9. Checksum Copy
     function copyChecksum() {
       const text = document.getElementById('shaText').textContent.trim();
       navigator.clipboard.writeText(text);
@@ -1180,20 +1169,22 @@
       setTimeout(() => btn.textContent = 'Copy Hash', 2000);
     }
 
-    // 11. Release Auto-Telemetry
+    // 10. Prioritize Active Tag v1.6.9-HDR (Prevents API downgrade to v1.6.1-HDR)
     async function updateLiveRelease() {
       try {
         const res = await fetch('https://api.github.com/repos/Specttre404/AnantaDhvani/releases');
         if (!res.ok) return;
         const releases = await res.json();
-        if (releases && releases.length > 0) {
+        if (Array.isArray(releases) && releases.length > 0) {
           const target = releases.find(r => r.tag_name === 'v1.6.9-HDR') || releases[0];
-          document.getElementById('releaseTag').textContent = `${target.tag_name} Active`;
-
-          const apk = target.assets && target.assets.find(a => a.name.endsWith('.apk'));
-          if (apk) {
-            document.getElementById('downloadButton').href = apk.browser_download_url;
-            document.getElementById('downloadLabel').textContent = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(1)} MB)`;
+          // Only update if target is equal to or newer than v1.6.9
+          if (target.tag_name && target.tag_name >= 'v1.6.9') {
+            document.getElementById('releaseTag').textContent = `${target.tag_name} Active`;
+            const apk = target.assets && target.assets.find(a => a.name.endsWith('.apk'));
+            if (apk) {
+              document.getElementById('downloadButton').href = apk.browser_download_url;
+              document.getElementById('downloadLabel').textContent = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(1)} MB)`;
+            }
           }
         }
       } catch (e) {
