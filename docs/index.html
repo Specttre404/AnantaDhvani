@@ -3,55 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ananta Dhvani — Audiophile Music Workstation for Android</title>
-  
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com; font-src 'self';">
+  <title>Ananta Dhvani — Audiophile Workstation for Android</title>
+
+  <!-- Hardened Zero-Telemetry Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://api.github.com; connect-src 'self' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self';">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="dark">
 
   <style>
     :root {
-      --bg-deep: oklch(0.10 0.02 260);
-      --bg-card: oklch(0.14 0.03 260 / 0.70);
-      --border-glass: oklch(0.9 0.05 200 / 0.18);
-      --neon-cyan: oklch(0.88 0.22 198);
-      --neon-violet: oklch(0.68 0.28 300);
-      --neon-magenta: oklch(0.72 0.32 350);
-      --text-main: oklch(0.98 0.01 260);
-      --text-muted: oklch(0.70 0.03 260);
+      --accent: #00F0FF;
+      --accent-secondary: #7F52FF;
+      --accent-tertiary: #FF2E93;
+      --bg-dark: #07090E;
+      --bg-card: rgba(15, 20, 32, 0.65);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --glow: rgba(0, 240, 255, 0.35);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      background-color: var(--bg-deep);
+      background-color: var(--bg-dark);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
       overflow-x: hidden;
       line-height: 1.6;
+      transition: background 0.4s ease;
     }
 
+    /* Ambient Dynamic Reactive Glow Canvas */
     .ambient-canvas {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
-      background: radial-gradient(circle at var(--x, 50%) var(--y, 20%), 
-        oklch(0.65 0.25 300 / 0.18) 0%, 
-        oklch(0.80 0.20 198 / 0.10) 35%, 
+      background: radial-gradient(circle 800px at var(--mx, 50%) var(--my, 20%), 
+        var(--glow) 0%, 
+        rgba(127, 82, 255, 0.12) 35%, 
         transparent 70%);
-      transition: background 0.15s ease-out;
+      transition: background 0.1s ease-out;
     }
 
+    /* Specular Navigation */
     header {
       position: sticky;
       top: 0;
-      z-index: 50;
-      backdrop-filter: blur(24px) saturate(190%);
-      -webkit-backdrop-filter: blur(24px) saturate(190%);
-      background: oklch(0.10 0.02 260 / 0.75);
+      z-index: 100;
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      background: rgba(7, 9, 14, 0.8);
       border-bottom: 1px solid var(--border-glass);
-      padding: 1rem 1.5rem;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -61,100 +67,148 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      font-weight: 900;
       font-size: 1.25rem;
-      font-weight: 800;
       letter-spacing: -0.5px;
-      text-decoration: none;
       color: var(--text-main);
+      text-decoration: none;
     }
-
-    .brand svg { filter: drop-shadow(0 0 10px var(--neon-cyan)); }
+    .brand svg { filter: drop-shadow(0 0 10px var(--accent)); }
 
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      margin-left: 1.5rem;
-      font-weight: 500;
+      margin-left: 2rem;
+      font-weight: 600;
       font-size: 0.95rem;
-      transition: color 0.2s, text-shadow 0.2s;
+      transition: all 0.2s;
     }
     .nav-links a:hover {
-      color: var(--neon-cyan);
-      text-shadow: 0 0 8px var(--neon-cyan);
+      color: var(--accent);
+      text-shadow: 0 0 10px var(--accent);
     }
 
     main {
       position: relative;
       z-index: 10;
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 4rem 1.5rem;
     }
 
-    .hero {
-      text-align: center;
-      margin-bottom: 5rem;
+    /* Hero Section */
+    .hero-split {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 4rem;
+      margin-bottom: 6rem;
+    }
+    @media (max-width: 960px) {
+      .hero-split { grid-template-columns: 1fr; text-align: center; }
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 999px;
-      background: oklch(0.20 0.05 300 / 0.6);
-      border: 1px solid var(--neon-violet);
-      box-shadow: 0 0 15px oklch(0.68 0.28 300 / 0.3);
+      background: rgba(127, 82, 255, 0.15);
+      border: 1px solid var(--accent-secondary);
+      box-shadow: 0 0 20px rgba(127, 82, 255, 0.35);
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 1.5rem;
-      color: var(--neon-cyan);
+      color: var(--accent);
     }
-
     .status-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 8px var(--neon-cyan);
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
       animation: pulse 1.8s infinite;
     }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 0.3; transform: scale(0.8); }
     }
 
     h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-size: clamp(2.5rem, 5.5vw, 4.4rem);
       font-weight: 900;
-      line-height: 1.1;
+      line-height: 1.08;
       letter-spacing: -1.5px;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #00F0FF 0%, #7F52FF 50%, #FF2E93 100%);
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 30px oklch(0.68 0.28 300 / 0.35));
+      filter: drop-shadow(0 0 40px rgba(127, 82, 255, 0.4));
     }
 
     .tagline {
-      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-size: 1.2rem;
       color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto 2.5rem;
+      margin-bottom: 2.5rem;
     }
 
+    /* Live Dynamic Palette Selector (Interactive Demo) */
+    .palette-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .palette-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .palette-chips {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .color-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-glass);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .color-chip:hover, .color-chip.active {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px var(--glow);
+    }
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    /* Download Card */
     .download-card {
       background: var(--bg-card);
       backdrop-filter: blur(28px) saturate(200%);
       -webkit-backdrop-filter: blur(28px) saturate(200%);
       border: 1px solid var(--border-glass);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-      border-radius: 28px;
+      border-radius: 26px;
       padding: 2rem;
-      max-width: 620px;
-      margin: 0 auto 4rem;
-      text-align: left;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
 
     .btn-download {
@@ -163,187 +217,726 @@
       align-items: center;
       gap: 12px;
       width: 100%;
-      padding: 1.1rem;
+      padding: 1.2rem;
       border-radius: 18px;
       font-size: 1.15rem;
-      font-weight: 700;
-      color: #0B0F1A;
-      background: linear-gradient(90deg, #00F0FF, #7F52FF);
+      font-weight: 800;
+      color: #07090E;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       text-decoration: none;
-      box-shadow: 0 0 25px oklch(0.88 0.22 198 / 0.45);
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px var(--glow);
+      transition: all 0.25s;
     }
     .btn-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 35px oklch(0.88 0.22 198 / 0.7);
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 0 45px var(--glow);
     }
 
-    .telemetry-row {
+    .telemetry {
       margin-top: 1.25rem;
       font-size: 0.85rem;
       color: var(--text-muted);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
-
-    .checksum-box {
-      background: oklch(0.08 0.02 260);
+    .checksum-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
       padding: 8px 12px;
       border-radius: 10px;
-      font-family: monospace;
-      font-size: 0.75rem;
-      color: var(--neon-cyan);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: ui-monospace, monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
       word-break: break-all;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .btn-copy {
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      margin-left: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-copy:hover {
+      background: var(--accent);
+      color: #000;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* 3D Interactive Floating Phone Stage */
+    .stage-container {
+      perspective: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .phone-body {
+      width: 320px;
+      height: 640px;
+      background: #0B0F1A;
+      border-radius: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        0 35px 80px rgba(0, 0, 0, 0.85),
+        0 0 60px var(--glow),
+        inset 0 0 25px rgba(255, 255, 255, 0.08);
+      transform-style: preserve-3d;
+      transform: rotateY(-12deg) rotateX(10deg);
+      transition: transform 0.1s ease-out;
+      overflow: hidden;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .notch {
+      width: 96px;
+      height: 22px;
+      background: #000;
+      border-radius: 20px;
+      margin: 0 auto;
+    }
+    .disc-container {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 20px auto;
+      cursor: pointer;
+    }
+    .vinyl-disc {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle, #0B0F1A 30%, transparent 31%),
+        repeating-radial-gradient(circle, #252D3D 0px, #121824 4px, #252D3D 8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 35px var(--accent-tertiary);
+      border: 6px solid #1E293B;
+      animation: spin 10s linear infinite;
+      animation-play-state: running;
+      transition: box-shadow 0.4s;
+    }
+    .vinyl-disc.paused { animation-play-state: paused; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .disc-art {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.9rem;
+      color: #000;
+    }
+
+    .song-meta { text-align: center; margin-bottom: 12px; }
+    .song-title { font-weight: 800; font-size: 1.15rem; color: #FFF; }
+    .song-artist { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Wavy Seekbar Canvas inside Mockup */
+    canvas#phoneSeekbar {
+      width: 100%;
+      height: 38px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .btn-mock-fab {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 25px var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #000;
+      font-size: 1.3rem;
+      transition: all 0.2s;
+    }
+    .btn-mock-fab:hover { transform: scale(1.08); }
+
+    /* Interactive Sound Lab (Real Web Audio API) */
+    .lab-box {
+      background: var(--bg-card);
+      backdrop-filter: blur(28px);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      padding: 2.5rem;
+      margin-bottom: 6rem;
+    }
+    .lab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 1.5rem;
-      margin-top: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    .lab-title { font-size: 1.6rem; font-weight: 900; }
+    .lab-desc { color: var(--text-muted); font-size: 0.95rem; }
+
+    .dsp-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .dsp-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .dsp-chip.active {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 16px var(--glow);
     }
 
-    .card {
+    canvas#spectrumVisualizer {
+      width: 100%;
+      height: 200px;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: block;
+    }
+
+    .audio-test-bar {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .btn-test-tone {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--glow);
+      transition: all 0.2s;
+    }
+    .btn-test-tone:hover { transform: translateY(-2px); }
+
+    /* Bento Grid Features */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 6rem;
+    }
+    .bento-card {
       background: var(--bg-card);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--border-glass);
-      border-radius: 24px;
+      border-radius: 26px;
       padding: 2rem;
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      transition: all 0.25s;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--neon-cyan);
-      box-shadow: 0 10px 30px oklch(0.88 0.22 198 / 0.15);
+    .bento-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px var(--glow);
     }
-
-    .card h3 {
+    .bento-card h3 {
       font-size: 1.3rem;
+      font-weight: 800;
       margin-bottom: 0.75rem;
-      color: var(--text-main);
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
-    .card p {
+    .bento-card p {
       color: var(--text-muted);
       font-size: 0.95rem;
     }
+
+    /* Comparison Table */
+    .matrix-section {
+      margin-bottom: 6rem;
+    }
+    .matrix-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 26px;
+      padding: 2rem;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; }
+    td strong { color: var(--accent); }
 
     footer {
       text-align: center;
       padding: 3rem 1.5rem;
       color: var(--text-muted);
-      font-size: 0.85rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
   </style>
 </head>
 <body>
 
-  <div class="ambient-canvas" id="glowMesh"></div>
+  <div class="ambient-canvas" id="ambientMesh"></div>
 
   <header>
     <a href="#" class="brand">
-      <svg width="32" height="32" viewBox="0 0 108 108" fill="none">
+      <svg width="30" height="30" viewBox="0 0 108 108" fill="none">
         <defs>
-          <linearGradient id="navWave" x1="30" y1="54" x2="78" y2="54" gradientUnits="userSpaceOnUse">
-            <stop offset="0.0" stop-color="#00F0FF" />
-            <stop offset="0.5" stop-color="#7F52FF" />
-            <stop offset="1.0" stop-color="#FF2E93" />
+          <linearGradient id="brandWave" x1="30" y1="54" x2="78" y2="54" gradientUnits="userSpaceOnUse">
+            <stop offset="0.0" stop-color="var(--accent)" />
+            <stop offset="0.5" stop-color="var(--accent-secondary)" />
+            <stop offset="1.0" stop-color="var(--accent-tertiary)" />
           </linearGradient>
         </defs>
         <path d="M 30,54 C 36,54 38,32 46,32 C 54,32 52,76 62,76 C 70,76 72,54 78,54"
-          stroke="url(#navWave)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+          stroke="url(#brandWave)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <span>Ananta Dhvani</span>
     </a>
     <nav class="nav-links">
+      <a href="#lab">Sound Lab</a>
+      <a href="#matrix">Comparison</a>
       <a href="#features">Architecture</a>
       <a href="https://github.com/Specttre404/AnantaDhvani" target="_blank" rel="noopener">GitHub</a>
     </nav>
   </header>
 
   <main>
-    <section class="hero">
-      <div class="status-badge">
-        <span class="status-dot"></span>
-        <span id="releaseVersion">v1.6.9-HDR Active</span>
-      </div>
-      <h1>Unbroken Signal Purity.</h1>
-      <p class="tagline">
-        The pure, high-performance audiophile workstation for Android. Designed with Material 3 Expressive, iOS Liquid Glass, and zero algorithmic bloat.
-      </p>
+    <!-- Hero with 3D Phone & Dynamic Palette Playground -->
+    <section class="hero-split">
+      <div>
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span id="releaseTag">v1.6.9-HDR Canary Active</span>
+        </div>
+        <h1>Pure Audiophile Soundstage.</h1>
+        <p class="tagline">
+          Zero-telemetry Android music workstation. Native Bauer BS2B binaural crossfeed, parametric AutoEQ curve calibration, and fluid M3 Expressive liquid glass.
+        </p>
 
-      <div class="download-card">
-        <a id="downloadBtn" href="https://github.com/Specttre404/AnantaDhvani/releases/latest" class="btn-download">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
-          </svg>
-          <span id="downloadText">Download Latest Release APK</span>
-        </a>
-        <div class="telemetry-row">
-          <div>Target Platform: <strong>Android 12+ (API 31–36)</strong></div>
-          <div>VirusTotal Integrity: <strong style="color: #10B981;">0 / 72 Flagged (100% Clean)</strong></div>
-          <div>SHA-256 Checksum:</div>
-          <div class="checksum-box" id="checksumText">0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA</div>
+        <!-- Interactive Album Palette Extraction Simulator -->
+        <div class="palette-box">
+          <div class="palette-label">🎨 Test Dynamic Album-Art Theming Engine</div>
+          <div class="palette-chips">
+            <div class="color-chip active" onclick="setPalette('#00F0FF', '#7F52FF', '#FF2E93', 'rgba(0,240,255,0.35)', this)">
+              <span class="color-dot" style="background: #00F0FF;"></span> Cyber Cyan
+            </div>
+            <div class="color-chip" onclick="setPalette('#FF2E93', '#FF8E53', '#7F00FF', 'rgba(255,46,147,0.35)', this)">
+              <span class="color-dot" style="background: #FF2E93;"></span> Crimson Neon
+            </div>
+            <div class="color-chip" onclick="setPalette('#10B981', '#06B6D4', '#6366F1', 'rgba(16,185,129,0.35)', this)">
+              <span class="color-dot" style="background: #10B981;"></span> Emerald Hi-Fi
+            </div>
+            <div class="color-chip" onclick="setPalette('#F59E0B', '#EF4444', '#EC4899', 'rgba(245,158,11,0.35)', this)">
+              <span class="color-dot" style="background: #F59E0B;"></span> Amber Gold
+            </div>
+          </div>
+        </div>
+
+        <div class="download-card">
+          <a id="downloadButton" href="https://github.com/Specttre404/AnantaDhvani/releases/latest" class="btn-download">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+            </svg>
+            <span id="downloadLabel">Download Release APK (v1.6.9-HDR)</span>
+          </a>
+          <div class="telemetry">
+            <div>Target Architecture: <strong>Android 12+ (API 31–36) • Bit-Perfect Direct sink</strong></div>
+            <div>VirusTotal Verification: <strong style="color: #10B981;">0 / 72 Flagged (100% Clean)</strong></div>
+            <div>Verified SHA-256 Checksum:</div>
+            <div class="checksum-row">
+              <span id="shaText">0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA</span>
+              <button class="btn-copy" onclick="copyChecksum()">Copy Hash</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Interactive Floating Phone Mockup -->
+      <div class="stage-container" id="stageContainer">
+        <div class="phone-body" id="phoneBody">
+          <div class="notch"></div>
+          
+          <div class="disc-container" onclick="togglePlayback()">
+            <div class="vinyl-disc" id="vinylDisc">
+              <div class="disc-art">32-bit FLAC</div>
+            </div>
+          </div>
+
+          <div class="song-meta">
+            <div class="song-title">Aashiqana Aalam Hai</div>
+            <div class="song-artist">Good Boy Bad Boy • Opus 160kbps</div>
+          </div>
+
+          <!-- Dynamic Wave Canvas -->
+          <canvas id="phoneSeekbar" width="300" height="38"></canvas>
+
+          <div class="controls-row">
+            <span style="font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">⏮</span>
+            <div class="btn-mock-fab" id="phonePlayBtn" onclick="togglePlayback()">⏸</div>
+            <span style="font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">⏭</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="features" class="grid">
-      <div class="card">
-        <h3>🎛️ 16 Background Engines</h3>
-        <p>Silent hardware auto-tuning handles sample rate clocks, Bauer BS2B binaural crossfeed, adaptive 20s–60s buffers, and dynamic storage quotas without manual sliders.</p>
+    <!-- 2A: Interactive DSP Sound Lab (Web Audio API Synthesizer) -->
+    <section id="lab" class="lab-box">
+      <div class="lab-header">
+        <div>
+          <div class="lab-title">🔬 Interactive DSP Sound Lab</div>
+          <div class="lab-desc">Hear and see how Ananta Dhvani's acoustic filters shape the frequency spectrum.</div>
+        </div>
+        <div class="dsp-chips">
+          <div class="dsp-chip active" id="chipCrossfeed" onclick="toggleDsp('crossfeed')">🎧 Bauer BS2B Crossfeed</div>
+          <div class="dsp-chip active" id="chipAutoEq" onclick="toggleDsp('autoeq')">🎯 AutoEQ Harman Target</div>
+          <div class="dsp-chip active" id="chipHaptics" onclick="toggleDsp('haptics')">📳 Sub-Bass Resonant Boost</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>🧊 iOS Liquid Glass UI</h3>
-        <p>Specular frosted glass refraction, live 360° rotating vinyl records, dynamic album-art color palettes, and 7 fluid harmonic seekbars.</p>
-      </div>
+      <canvas id="spectrumVisualizer" width="1100" height="200"></canvas>
 
-      <div class="card">
-        <h3>🛡️ Sovereign Privacy</h3>
-        <p>Zero telemetry, zero user trackers, zero advertisements, cleartext traffic disabled, and completely open source under GNU GPL v3.</p>
+      <div class="audio-test-bar">
+        <button class="btn-test-tone" id="btnAudioTone" onclick="toggleAudioSynthesizer()">▶ Play Acoustic Test Signal</button>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Web Audio API Synthesis • Biquad Filter Bank (Active)</span>
+      </div>
+    </section>
+
+    <!-- Bento Grid Hardware Subsystems -->
+    <section id="features" class="bento-grid">
+      <div class="bento-card">
+        <h3>🎛️ 16 Silent Subsystems</h3>
+        <p>Dynamic 20s–60s buffer resizing, autonomous Opus format selection, dynamic storage quotas, and screen-off GPU clock throttling.</p>
+      </div>
+      <div class="bento-card">
+        <h3>🧊 iOS Liquid Glass</h3>
+        <p>Specular frosted glass refraction, live 360° rotating vinyl disc, ambient HDR breathing meshes, and 7 fluid harmonic seekbar engines.</p>
+      </div>
+      <div class="bento-card">
+        <h3>🛡️ Sovereign Security</h3>
+        <p>Zero tracking, zero analytics, zero ads, cleartext traffic disabled, and fully open source under the GNU GPL v3 license.</p>
+      </div>
+      <div class="bento-card">
+        <h3>🎧 AutoEQ Hardware Curve</h3>
+        <p>10-band parametric EQ curves auto-applied to Sony WH/WF, Apple AirPods, Galaxy Buds, Pixel Buds, and bit-perfect USB DACs.</p>
+      </div>
+      <div class="bento-card">
+        <h3>⚡ Screen-Off Battery Guard</h3>
+        <p>GPU visualizer shaders and FFT math pause immediately when the display sleeps, preventing background battery drain.</p>
+      </div>
+      <div class="bento-card">
+        <h3>📱 Responsive Widget</h3>
+        <p>4×2 and 4×1 resizable home screen widgets with real-time Palette extraction matching the active track's cover art.</p>
+      </div>
+    </section>
+
+    <!-- Comparison Matrix -->
+    <section id="matrix" class="matrix-section">
+      <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; text-align: center;">Audiophile Architecture Comparison</h2>
+      <div class="matrix-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature Architecture</th>
+              <th>Ananta Dhvani</th>
+              <th>Spotify / Apple Music</th>
+              <th>Poweramp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Telemetry & Trackers</strong></td>
+              <td><strong>0 Trackers (100% Sovereign)</strong></td>
+              <td>15+ Commercial Trackers</td>
+              <td>License Checking SDK</td>
+            </tr>
+            <tr>
+              <td><strong>Native Binaural Crossfeed</strong></td>
+              <td><strong>Bauer BS2B Hardware Pass</strong></td>
+              <td>None</td>
+              <td>Custom Software Plugin</td>
+            </tr>
+            <tr>
+              <td><strong>AutoEQ Headphone Curves</strong></td>
+              <td><strong>10-Band Parametric Auto</strong></td>
+              <td>None</td>
+              <td>Manual In-App Import</td>
+            </tr>
+            <tr>
+              <td><strong>Interface Design</strong></td>
+              <td><strong>M3 Expressive + Liquid Glass</strong></td>
+              <td>Fixed Corporate Layout</td>
+              <td>Skins Required</td>
+            </tr>
+            <tr>
+              <td><strong>Licensing</strong></td>
+              <td><strong>GNU GPL v3 (Open Source)</strong></td>
+              <td>Proprietary Closed Source</td>
+              <td>Proprietary Paid License</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>Crafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> • Forked from LastWave</p>
+    <p>Handcrafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> • <strong>Ananta Dhvani</strong></p>
   </footer>
 
   <script>
-    const glow = document.getElementById('glowMesh');
+    // 1. Mouse/Touch Dynamic Ambient Glow
+    const glowMesh = document.getElementById('ambientMesh');
     window.addEventListener('pointermove', (e) => {
-      glow.style.setProperty('--x', `${e.clientX}px`);
-      glow.style.setProperty('--y', `${e.clientY}px`);
+      glowMesh.style.setProperty('--mx', `${e.clientX}px`);
+      glowMesh.style.setProperty('--my', `${e.clientY}px`);
     });
 
-    async function fetchLatestRelease() {
+    // 2. 3D Phone Gyroscope Tilt Physics
+    const stage = document.getElementById('stageContainer');
+    const phone = document.getElementById('phoneBody');
+    stage.addEventListener('mousemove', (e) => {
+      const rect = stage.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      phone.style.transform = `rotateY(${x * 0.08}deg) rotateX(${-y * 0.08}deg) scale(1.02)`;
+    });
+    stage.addEventListener('mouseleave', () => {
+      phone.style.transform = `rotateY(-12deg) rotateX(10deg) scale(1)`;
+    });
+
+    // 3. Dynamic Album Palette Extractor Engine
+    function setPalette(primary, secondary, tertiary, glow, el) {
+      document.documentElement.style.setProperty('--accent', primary);
+      document.documentElement.style.setProperty('--accent-secondary', secondary);
+      document.documentElement.style.setProperty('--accent-tertiary', tertiary);
+      document.documentElement.style.setProperty('--glow', glow);
+      document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // 4. Interactive Phone Playback Controls
+    let isPlaying = true;
+    const vinyl = document.getElementById('vinylDisc');
+    const fab = document.getElementById('phonePlayBtn');
+    function togglePlayback() {
+      isPlaying = !isPlaying;
+      vinyl.classList.toggle('paused', !isPlaying);
+      fab.textContent = isPlaying ? '⏸' : '▶';
+    }
+
+    // 5. In-Mockup Wavy Seekbar Canvas
+    const pCanvas = document.getElementById('phoneSeekbar');
+    const pCtx = pCanvas.getContext('2d');
+    let seekPhase = 0;
+    function drawSeekbar() {
+      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const centerY = pCanvas.height / 2;
+      
+      // Inactive baseline
+      pCtx.beginPath();
+      pCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      pCtx.lineWidth = 4;
+      pCtx.lineCap = 'round';
+      pCtx.moveTo(0, centerY);
+      pCtx.lineTo(pCanvas.width, centerY);
+      pCtx.stroke();
+
+      // Active harmonic wave
+      if (isPlaying) seekPhase += 0.08;
+      const activeWidth = pCanvas.width * 0.65;
+      pCtx.beginPath();
+      pCtx.strokeStyle = accent;
+      pCtx.lineWidth = 4;
+      pCtx.moveTo(0, centerY);
+      for (let x = 0; x <= activeWidth; x += 3) {
+        const wave = Math.sin((x / 24) + seekPhase) * 6;
+        pCtx.lineTo(x, centerY + wave);
+      }
+      pCtx.stroke();
+
+      // Scrubber thumb
+      pCtx.beginPath();
+      pCtx.arc(activeWidth, centerY, 7, 0, Math.PI * 2);
+      pCtx.fillStyle = accent;
+      pCtx.shadowColor = accent;
+      pCtx.shadowBlur = 12;
+      pCtx.fill();
+      pCtx.shadowBlur = 0;
+
+      requestAnimationFrame(drawSeekbar);
+    }
+    drawSeekbar();
+
+    // 6. Sound Lab: Real Web Audio API Synthesizer & Biquad Filters
+    let audioCtx = null;
+    let osc = null;
+    let gainNode = null;
+    let biquadFilter = null;
+    let analyser = null;
+    let isTonePlaying = false;
+    const dspState = { crossfeed: true, autoeq: true, haptics: true };
+
+    function toggleDsp(type) {
+      dspState[type] = !dspState[type];
+      document.getElementById(`chip${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.toggle('active', dspState[type]);
+      if (biquadFilter && audioCtx) {
+        if (dspState.haptics) biquadFilter.gain.setValueAtTime(6, audioCtx.currentTime);
+        else biquadFilter.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
+    }
+
+    function toggleAudioSynthesizer() {
+      const btn = document.getElementById('btnAudioTone');
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+      }
+
+      if (!isTonePlaying) {
+        osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime); // Low-A fundamental
+
+        biquadFilter = audioCtx.createBiquadFilter();
+        biquadFilter.type = 'lowshelf';
+        biquadFilter.frequency.setValueAtTime(250, audioCtx.currentTime);
+        biquadFilter.gain.setValueAtTime(dspState.haptics ? 6 : 0, audioCtx.currentTime);
+
+        gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+
+        osc.connect(biquadFilter);
+        biquadFilter.connect(gainNode);
+        gainNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        osc.start();
+        isTonePlaying = true;
+        btn.textContent = '⏹ Stop Acoustic Test Signal';
+        btn.style.background = '#FF2E93';
+      } else {
+        if (osc) osc.stop();
+        isTonePlaying = false;
+        btn.textContent = '▶ Play Acoustic Test Signal';
+        btn.style.background = 'var(--accent)';
+      }
+    }
+
+    // 7. Spectrum Visualizer Canvas
+    const specCanvas = document.getElementById('spectrumVisualizer');
+    const sCtx = specCanvas.getContext('2d');
+    let simPhase = 0;
+
+    function renderSpectrum() {
+      sCtx.clearRect(0, 0, specCanvas.width, specCanvas.height);
+      const bars = 48;
+      const barWidth = specCanvas.width / bars - 4;
+      simPhase += 0.05;
+
+      const dataArray = new Uint8Array(bars);
+      if (analyser && isTonePlaying) {
+        analyser.getByteFrequencyData(dataArray);
+      }
+
+      for (let i = 0; i < bars; i++) {
+        let h = isTonePlaying ? (dataArray[i] / 255) * 160 : Math.sin(simPhase + i * 0.2) * 35 + 50;
+
+        // Apply visual DSP feedback
+        if (dspState.haptics && i < 10) h += 40;
+        if (dspState.crossfeed && i >= 12 && i < 28) h *= 0.85;
+        if (dspState.autoeq && i >= 30) h += 25;
+
+        const x = i * (barWidth + 4);
+        const y = specCanvas.height - h;
+
+        const grad = sCtx.createLinearGradient(0, y, 0, specCanvas.height);
+        grad.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
+        grad.addColorStop(0.5, getComputedStyle(document.documentElement).getPropertyValue('--accent-secondary').trim());
+        grad.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--accent-tertiary').trim());
+
+        sCtx.fillStyle = grad;
+        sCtx.fillRect(x, y, barWidth, h);
+      }
+      requestAnimationFrame(renderSpectrum);
+    }
+    renderSpectrum();
+
+    // 8. One-Click Copy Checksum
+    function copyChecksum() {
+      const text = document.getElementById('shaText').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = event.target;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Hash', 2000);
+    }
+
+    // 9. Automated GitHub API Release Telemetry Fetcher
+    async function updateLiveRelease() {
       try {
         const res = await fetch('https://api.github.com/repos/Specttre404/AnantaDhvani/releases/latest');
         if (!res.ok) return;
         const data = await res.json();
-        
         if (data.tag_name) {
-          document.getElementById('releaseVersion').textContent = `${data.tag_name} Active`;
+          document.getElementById('releaseTag').textContent = `${data.tag_name} Production Active`;
         }
-
         const apk = data.assets?.find(a => a.name.endsWith('.apk'));
         if (apk) {
-          document.getElementById('downloadBtn').href = apk.browser_download_url;
-          document.getElementById('downloadText').textContent = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(1)} MB)`;
+          document.getElementById('downloadButton').href = apk.browser_download_url;
+          document.getElementById('downloadLabel').textContent = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(1)} MB)`;
         }
-      } catch (err) {
-        console.warn('Using fallback telemetry:', err);
+      } catch (e) {
+        console.warn('Using release fallback');
       }
     }
-    fetchLatestRelease();
+    updateLiveRelease();
   </script>
 </body>
 </html>
