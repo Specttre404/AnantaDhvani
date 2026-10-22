@@ -1,5 +1,5 @@
 # Ananta Dhvani Release Binary SHA-256 Checksums
 # Format: <sha256>  <filename>
 
-# v1.6.6-HDR Production Release (Target: Android 12+ API 31-36)
-C672BD1B32EA5A265062EC4833A05076EC801744D862C6E15AFC117226B9D920  app-release.apk
+# v1.6.9-HDR Production Release (Target: Android 12+ API 31-36)
+0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA  app-release.apk
