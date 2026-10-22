@@ -1,3 +1,31 @@
+# 🌊 Ananta Dhvani (अनंत ध्वनि)
+### Pure Audiophile Music Workstation for Android • Bit-Perfect Direct Engine
+
+<p align="center">
+  <a href="https://specttre404.github.io/AnantaDhvani/">
+    <img src="https://img.shields.io/badge/🌐_Launch_Official_Website-specttre404.github.io%2FAnantaDhvani-00F0FF?style=for-the-badge&logoColor=0B0F1A" alt="Official Website" />
+  </a>
+  <a href="https://github.com/Specttre404/AnantaDhvani/releases/tag/v1.6.9-HDR">
+    <img src="https://img.shields.io/badge/Release-v1.6.9--HDR-7F52FF?style=for-the-badge" alt="Latest Release" />
+  </a>
+  <a href="https://github.com/Specttre404/AnantaDhvani/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-GNU_GPLv3-FF2E93?style=for-the-badge" alt="License" />
+  </a>
+</p>
+
+---
+
+### 🌐 Official Interactive Web Showcase
+Experience the live web app with interactive audio demonstrations and hardware telemetry:  
+👉 **[https://specttre404.github.io/AnantaDhvani/](https://specttre404.github.io/AnantaDhvani/)**
+
+* 📱 **3D Google Pixel 11 Pro XL Virtual Device**: Cursor-responsive gyroscope tilt physics with working controls and real-time harmonic seekbars.
+* 🔬 **Interactive DSP Sound Lab**: In-browser Web Audio API synthesizer demonstrating Bauer BS2B crossfeed and AutoEQ frequency curves.
+* 🧊 **Material 3 Expressive & iOS Liquid Glass**: Dynamic album art palette extraction with fluid spring animations.
+* 🛡️ **Verified Release Binary (v1.6.9-HDR)**: SHA-256: `0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA`
+
+---
+
 <div align="center">
 
 <br/>
@@ -218,3 +246,4 @@ cd AnantaDhvani
 # Assemble production release APK
 ./gradlew app:assembleRelease
 ```
+
