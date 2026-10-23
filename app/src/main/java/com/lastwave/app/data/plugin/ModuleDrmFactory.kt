@@ -62,18 +62,20 @@ class ModuleDrmFactory @Inject constructor(
         override fun executeProvisionRequest(
             uuid: UUID,
             request: ExoMediaDrm.ProvisionRequest,
-        ): ByteArray = postBytes(
-            url = request.defaultUrl,
-            headers = descriptor.headers,
-            body = request.data,
+        ): MediaDrmCallback.Response = MediaDrmCallback.Response(
+            postBytes(
+                url = request.defaultUrl,
+                headers = descriptor.headers,
+                body = request.data,
+            )
         )
 
-        override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrm.KeyRequest): ByteArray {
+        override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrm.KeyRequest): MediaDrmCallback.Response {
             val drm = descriptor.drm ?: error("No DRM descriptor")
             val url = request.licenseServerUrl?.takeIf { it.isNotBlank() } ?: drm.licenseUrl
             require(url.isNotBlank()) { "DRM licenseUrl missing" }
             val h = handle
-            return if (h != null && drm.envelope == "module") {
+            val responseBytes = if (h != null && drm.envelope == "module") {
                 // Module authority: build envelope -> POST -> parse (blocking
                 // CDM thread; engine lock lives on IO threads, no deadlock).
                 val challengeB64 = Base64.encodeToString(request.data, Base64.NO_WRAP)
@@ -92,6 +94,7 @@ class ModuleDrmFactory @Inject constructor(
             } else {
                 postBytes(url, descriptor.headers, request.data)
             }
+            return MediaDrmCallback.Response(responseBytes)
         }
 
         private fun postBytes(url: String, headers: Map<String, String>, body: ByteArray): ByteArray {

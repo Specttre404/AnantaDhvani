@@ -63,6 +63,8 @@ class CapturingAudioSink(
         return framesWritten * 1_000_000L / rate
     }
 
+    override fun getAudioTrackBufferSizeUs(): Long = 0L
+
     override fun configure(format: Format, specifiedBufferSizeMs: Int, outputChannels: IntArray?) {
         if (!isPcm(format)) {
             throw AudioSink.ConfigurationException("Capturing sink needs PCM16/FLOAT", format)

@@ -23,7 +23,7 @@ pluginManagement {
         // Kotlin & Compose Compiler Nightlies / EAPs
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         // AndroidX / Jetpack Snapshots
-        maven("https://androidx.dev/snapshots/builds")
+        maven { url = uri("https://androidx.dev/snapshots/latest/artifacts/repository") }
     }
 }
 
@@ -33,7 +33,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://jitpack.io")
-        maven("https://androidx.dev/snapshots/builds")
+        maven { url = uri("https://androidx.dev/snapshots/latest/artifacts/repository") }
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
     }

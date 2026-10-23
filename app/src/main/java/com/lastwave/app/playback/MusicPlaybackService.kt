@@ -13,6 +13,7 @@ import android.net.wifi.WifiManager
 import android.os.PowerManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.drawable.Icon
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
@@ -185,17 +186,13 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
         playbackWifiLock = wifiManager?.createWifiLock(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) WifiManager.WIFI_MODE_FULL_LOW_LATENCY
-            else WifiManager.WIFI_MODE_FULL_HIGH_PERF,
+            else @Suppress("DEPRECATION") WifiManager.WIFI_MODE_FULL_HIGH_PERF,
             "LastWave:PlaybackWifiLock",
         )?.apply { setReferenceCounted(false) }
 
         createNotificationChannel()
         runCatching {
             val session = MediaSessionCompat(this, "LastWavePlayer").apply {
-                setFlags(
-                    MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS,
-                )
                 setCallback(object : MediaSessionCompat.Callback() {
                     override fun onPlay() = musicPlayer.resume()
                     override fun onPause() = musicPlayer.pause()
@@ -1004,10 +1001,10 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
                 .setColor(notificationPalette.primary)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setStyle(mediaStyle)
-                .addAction(Notification.Action.Builder(R.drawable.ic_widget_shuffle, if (state.shuffleEnabled) "Shuffle on" else "Shuffle off", serviceAction(ACTION_SHUFFLE, 5)).build())
-                .addAction(Notification.Action.Builder(if (state.isPlaying) R.drawable.ic_widget_pause else R.drawable.ic_widget_play, "Play or pause", serviceAction(ACTION_TOGGLE, 2)).build())
-                .addAction(Notification.Action.Builder(repeatIcon, repeatLabel, serviceAction(ACTION_REPEAT, 6)).build())
-                .addAction(Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel, "Stop", serviceAction(ACTION_STOP, 4)).build())
+                .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, R.drawable.ic_widget_shuffle), if (state.shuffleEnabled) "Shuffle on" else "Shuffle off", serviceAction(ACTION_SHUFFLE, 5)).build())
+                .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, if (state.isPlaying) R.drawable.ic_widget_pause else R.drawable.ic_widget_play), "Play or pause", serviceAction(ACTION_TOGGLE, 2)).build())
+                .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, repeatIcon), repeatLabel, serviceAction(ACTION_REPEAT, 6)).build())
+                .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, android.R.drawable.ic_menu_close_clear_cancel), "Stop", serviceAction(ACTION_STOP, 4)).build())
                 .apply {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
@@ -1068,19 +1065,22 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
             .setCustomContentView(compact)
             .setCustomBigContentView(expanded)
             .setCustomHeadsUpContentView(compact)
-            .addAction(Notification.Action.Builder(R.drawable.ic_widget_shuffle, "Shuffle", serviceAction(ACTION_SHUFFLE, 5)).build())
-            .addAction(Notification.Action.Builder(if (state.isPlaying) R.drawable.ic_widget_pause else R.drawable.ic_widget_play, "Play or pause", serviceAction(ACTION_TOGGLE, 2)).build())
+            .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, R.drawable.ic_widget_shuffle), "Shuffle", serviceAction(ACTION_SHUFFLE, 5)).build())
+            .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, if (state.isPlaying) R.drawable.ic_widget_pause else R.drawable.ic_widget_play), "Play or pause", serviceAction(ACTION_TOGGLE, 2)).build())
             .addAction(
                 Notification.Action.Builder(
-                    when (state.repeatMode) {
-                        androidx.media3.common.Player.REPEAT_MODE_ONE -> R.drawable.ic_widget_repeat_one
-                        else -> R.drawable.ic_widget_repeat
-                    },
+                    Icon.createWithResource(
+                        this@MusicPlaybackService,
+                        when (state.repeatMode) {
+                            androidx.media3.common.Player.REPEAT_MODE_ONE -> R.drawable.ic_widget_repeat_one
+                            else -> R.drawable.ic_widget_repeat
+                        },
+                    ),
                     "Repeat",
                     serviceAction(ACTION_REPEAT, 6),
                 ).build(),
             )
-            .addAction(Notification.Action.Builder(android.R.drawable.ic_menu_close_clear_cancel, "Stop", serviceAction(ACTION_STOP, 4)).build())
+            .addAction(Notification.Action.Builder(Icon.createWithResource(this@MusicPlaybackService, android.R.drawable.ic_menu_close_clear_cancel), "Stop", serviceAction(ACTION_STOP, 4)).build())
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)

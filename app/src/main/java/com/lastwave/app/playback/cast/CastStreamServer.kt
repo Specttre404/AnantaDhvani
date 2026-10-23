@@ -23,7 +23,11 @@ internal class CastStreamServer(private val context: Context, private val addres
     private val wakeLock = context.getSystemService(PowerManager::class.java)
         .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LastWave:CastStream")
     private val wifiLock = context.getSystemService(WifiManager::class.java)
-        .createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "LastWave:CastStream")
+        .createWifiLock(
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) WifiManager.WIFI_MODE_FULL_LOW_LATENCY
+            else @Suppress("DEPRECATION") WifiManager.WIFI_MODE_FULL_HIGH_PERF,
+            "LastWave:CastStream",
+        )
     private data class Stream(val path: String, val source: MusicPlayer.ResolvedStream)
     @Volatile private var stream: Stream? = null
 
@@ -113,13 +117,22 @@ internal class CastStreamServer(private val context: Context, private val addres
     companion object {
         fun create(context: Context): CastStreamServer {
             val manager = context.getSystemService(ConnectivityManager::class.java)
-            val address = manager.allNetworks.asSequence().filter { network ->
+            val activeNetwork = manager.activeNetwork
+            val address = (activeNetwork?.let { network ->
+                val caps = manager.getNetworkCapabilities(network)
+                if (caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
+                    caps?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true) {
+                    manager.getLinkProperties(network)?.linkAddresses.orEmpty().asSequence()
+                        .map { it.address }.filterIsInstance<Inet4Address>().firstOrNull { !it.isLoopbackAddress }
+                        ?.hostAddress
+                } else null
+            } ?: @Suppress("DEPRECATION") manager.allNetworks.asSequence().filter { network ->
                 val caps = manager.getNetworkCapabilities(network)
                 caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
                     caps?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
             }.flatMap { manager.getLinkProperties(it)?.linkAddresses.orEmpty().asSequence() }
                 .map { it.address }.filterIsInstance<Inet4Address>().firstOrNull { !it.isLoopbackAddress }
-                ?.hostAddress ?: error("Connect your phone and Chromecast to the same Wi-Fi network")
+                ?.hostAddress) ?: error("Connect your phone and Chromecast to the same Wi-Fi network")
             val server = CastStreamServer(context, address)
             try {
                 server.start(SOCKET_READ_TIMEOUT, true)

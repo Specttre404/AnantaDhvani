@@ -277,9 +277,10 @@ dependencies {
 
     // Native in-app audio playback, background service, system media
     // controls, Bluetooth/headset controls and a MediaController-backed UI.
-    implementation("androidx.media3:media3-exoplayer-hls:1.6.0-alpha02")
+    val media3Version = "1.12.0-alpha01"
+    implementation("androidx.media3:media3-exoplayer-hls:$media3Version")
     // Segmented provider-module path: DASH chunk source + CDM decryption.
-    implementation("androidx.media3:media3-exoplayer-dash:1.6.0-alpha02")
+    implementation("androidx.media3:media3-exoplayer-dash:$media3Version")
     // MediaBrowserServiceCompat/MediaSessionCompat bridge used by Android
     // Auto to browse the LastWave library and control the same player.
     implementation("androidx.media:media:1.7.0")
@@ -330,12 +331,16 @@ kotlin {
 }
 
 configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jetbrains.kotlin") {
-            useVersion(libs.versions.kotlin.get())
-        }
-        if (requested.group == "io.github.dokar3" && requested.name.startsWith("quickjs-kt")) {
-            useVersion("1.0.12")
+    resolutionStrategy {
+        cacheChangingModulesFor(0, "seconds")
+        cacheDynamicVersionsFor(0, "seconds")
+        eachDependency {
+            if (requested.group == "org.jetbrains.kotlin") {
+                useVersion(libs.versions.kotlin.get())
+            }
+            if (requested.group == "io.github.dokar3" && requested.name.startsWith("quickjs-kt")) {
+                useVersion("1.0.12")
+            }
         }
     }
 }

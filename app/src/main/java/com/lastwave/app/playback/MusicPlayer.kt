@@ -34,7 +34,6 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.audio.AudioCapabilities
 import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.drm.DrmSessionManager
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
@@ -828,7 +827,6 @@ class MusicPlayer @Inject constructor(
                 val fallbackSink = DefaultAudioSink.Builder(context)
                     .setEnableFloatOutput(false)
                     .setEnableAudioTrackPlaybackParams(false)
-                    .setAudioCapabilities(AudioCapabilities.getCapabilities(context))
                     .build()
                 val engine = runCatching(engineProvider).getOrNull()
                 if (engine?.isAvailable != true) {
@@ -839,7 +837,6 @@ class MusicPlayer @Inject constructor(
                     DefaultAudioSink.Builder(context)
                         .setEnableFloatOutput(true)
                         .setEnableAudioTrackPlaybackParams(false)
-                        .setAudioCapabilities(AudioCapabilities.getCapabilities(context))
                         .build()
                 } catch (error: Exception) {
                     android.util.Log.w("MusicPlayer", "Enhanced audio sink unavailable; using PCM16", error)

@@ -72,27 +72,17 @@ class LocalMediaWebServer @Inject constructor(
     }
 
     fun getLocalIpAddress(): String {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
-        val ipInt = wifiManager?.connectionInfo?.ipAddress ?: 0
-        if (ipInt != 0) {
-            return String.format(
-                "%d.%d.%d.%d",
-                ipInt and 0xff,
-                ipInt shr 8 and 0xff,
-                ipInt shr 16 and 0xff,
-                ipInt shr 24 and 0xff
-            )
-        }
         try {
-            val interfaces = NetworkInterface.getNetworkInterfaces()
+            val interfaces = NetworkInterface.getNetworkInterfaces() ?: return "127.0.0.1"
             while (interfaces.hasMoreElements()) {
                 val intf = interfaces.nextElement()
+                if (!intf.isUp || intf.isLoopback) continue
                 val addrs = intf.inetAddresses
                 while (addrs.hasMoreElements()) {
                     val addr = addrs.nextElement()
                     if (!addr.isLoopbackAddress && addr is InetAddress) {
                         val sAddr = addr.hostAddress
-                        if (sAddr != null && !sAddr.contains(":")) {
+                        if (!sAddr.isNullOrBlank() && !sAddr.contains(":")) {
                             return sAddr
                         }
                     }

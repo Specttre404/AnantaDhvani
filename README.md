@@ -22,7 +22,7 @@ Experience the live web app with interactive audio demonstrations and hardware t
 * 📱 **3D Google Pixel 11 Pro XL Virtual Device**: Cursor-responsive gyroscope tilt physics with working controls and real-time harmonic seekbars.
 * 🔬 **Interactive DSP Sound Lab**: In-browser Web Audio API synthesizer demonstrating Bauer BS2B crossfeed and AutoEQ frequency curves.
 * 🧊 **Material 3 Expressive & iOS Liquid Glass**: Dynamic album art palette extraction with fluid spring animations.
-* 🛡️ **Verified Release Binary (v1.7.0-HDR)**: SHA-256: `0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA`
+* 🛡️ **Verified Release Binary (v1.7.0-HDR)**: SHA-256: `F0EE58B7969F6C439FA0A26B0CAC02EF96AF9F9D62FB3307025CBA4FC52CD937`
 
 ---
 
@@ -104,7 +104,7 @@ When a media player attempts to multiplex conversational talk shows and songs wi
 ┌───────────────────────────────────────────────────────────────────────────────────────┐
 │                        ANANTA DHVANI RUNTIME ARCHITECTURE                             │
 └───────────────────────────────────────────────────────────────────────────────────────┘
-Core Media Engine      ──▶ Google Media3 / ExoPlayer Core (1.6.0-alpha02)
+Core Media Engine      ──▶ Google Media3 / ExoPlayer Core (1.12.0-alpha01)
                            Custom OkHttp Data Source, High-Bitrate Opus/AAC Streaming
 Audio Sinking Pipeline ──▶ Android AAudio / AudioTrack Sink via AudioManager Routing
 Hardware Auto-Tuner    ──▶ AutoHardwareAudioTuner.kt & AudioDeviceCallback Listener
@@ -115,6 +115,16 @@ UI & Motion Engine     ──▶ Material 3 Expressive (1.4.0-alpha05), Compose 
                            (1.8.0-alpha07), iOS Liquid Glass Specular Shaders
 Linguistics & Musician ──▶ Furigana Ruby Typography, Synchronized Lyrics,
                            BitChord Interactive Musical Chords
+
+### 🧰 Core Tech Stack & Tooling
+
+| Component | Technology / Library | Version |
+| :--- | :--- | :--- |
+| **Compiler** | R8 Shrinker & Optimizer | `9.6.0-alpha02` (Full Mode) |
+| **Media Engine** | Google Media3 / ExoPlayer | `1.12.0-alpha01` |
+| **Platform Target** | Android SDK | SDK 37 Canary |
+| **UI Toolkit** | Jetpack Compose Expressive | Compose Material 3 `1.4.0-alpha05` |
+| **Language** | Kotlin & C++26 Native | Kotlin `2.4.10` / NDK 28 |
 ```
 
 * **Zero-Jargon Background Automation:** All audio engineering settings have been removed from user-facing screens. The engine configures playback parameters autonomously in the background based on real-time device telemetry.

@@ -103,6 +103,9 @@ class NativeProcessingAudioSink(
     override fun getCurrentPositionUs(sourceEnded: Boolean): Long =
         activeDelegate.getCurrentPositionUs(sourceEnded)
 
+    override fun getAudioTrackBufferSizeUs(): Long =
+        activeDelegate.getAudioTrackBufferSizeUs()
+
     override fun configure(format: Format, specifiedBufferSize: Int, outputChannels: IntArray?) {
         configuredFormat = format
         configuredBufferSize = specifiedBufferSize
