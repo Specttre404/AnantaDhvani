@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ananta Dhvani — Official Audiophile Workstation for Android</title>
+  <title>Ananta Dhvani â€” Official Audiophile Workstation for Android</title>
 
   <!-- Hardened Zero-Telemetry Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://api.github.com; connect-src 'self' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self';">
@@ -700,7 +700,7 @@
         <a href="https://github.com/Specttre404/AnantaDhvani" target="_blank" rel="noopener">GitHub</a>
       </nav>
       <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
-        <span id="themeIcon">☀️</span>
+        <span id="themeIcon">â˜€ï¸</span>
       </button>
     </div>
   </header>
@@ -718,7 +718,7 @@
         </p>
 
         <div class="palette-box">
-          <div class="palette-label">🎨 Dynamic Album-Art Palette Extraction</div>
+          <div class="palette-label">ðŸŽ¨ Dynamic Album-Art Palette Extraction</div>
           <div class="palette-chips">
             <div class="color-chip active" onclick="setPalette('#00F0FF', '#7F52FF', '#FF2E93', 'rgba(0,240,255,0.35)', this)">
               <span class="color-dot" style="background: #00F0FF;"></span> Cyber Cyan
@@ -743,11 +743,11 @@
             <span id="downloadLabel">Download Release APK (v1.7.0-HDR)</span>
           </a>
           <div class="telemetry">
-            <div>Target Architecture: <strong>Android 12+ (API 31–36) • Bit-Perfect Direct sink</strong></div>
+            <div>Target Architecture: <strong>Android 12+ (API 31â€“36) â€¢ Bit-Perfect Direct sink</strong></div>
             <div>VirusTotal Verification: <strong style="color: #10B981;">0 / 72 Flagged (100% Clean)</strong></div>
             <div>Verified Distribution SHA-256 Checksum:</div>
             <div class="checksum-container">
-              <div class="checksum-hash" id="shaText">B7F2750F2FF1E1DAC482B0BBA1F8E7901D66DFED5F8BD74116713781939C3D6D</div>
+              <div class="checksum-hash" id="shaText">98703F5677481BDF366232A0C50DEAE7044E5773E6B3415B710C587F932E5F23</div>
               <button class="btn-copy" onclick="copyChecksum()">Copy Hash</button>
             </div>
           </div>
@@ -760,7 +760,7 @@
             <div class="pixel-camera-punch"></div>
             <div class="pixel-status-bar">
               <span>12:45</span>
-              <span>5G • 100%</span>
+              <span>5G â€¢ 100%</span>
             </div>
           </div>
 
@@ -772,16 +772,16 @@
 
           <div class="song-meta">
             <div class="song-title" id="mockTitle">Aashiqana Aalam Hai</div>
-            <div class="song-artist" id="mockArtist">Good Boy Bad Boy • Opus 160kbps</div>
+            <div class="song-artist" id="mockArtist">Good Boy Bad Boy â€¢ Opus 160kbps</div>
           </div>
 
           <!-- Fixed canvas sizing ensures seekbar never disappears in desktop site mode -->
           <canvas id="phoneSeekbar" width="588" height="80"></canvas>
 
           <div class="controls-row">
-            <span class="btn-mock-nav" onclick="prevTrack()">⏮</span>
-            <div class="btn-mock-fab" id="phonePlayBtn" onclick="togglePlayback()">⏸</div>
-            <span class="btn-mock-nav" onclick="nextTrack()">⏭</span>
+            <span class="btn-mock-nav" onclick="prevTrack()">â®</span>
+            <div class="btn-mock-fab" id="phonePlayBtn" onclick="togglePlayback()">â¸</div>
+            <span class="btn-mock-nav" onclick="nextTrack()">â­</span>
           </div>
 
           <div class="pixel-nav-bar"></div>
@@ -793,49 +793,49 @@
     <section id="lab" class="lab-box">
       <div class="lab-header">
         <div>
-          <div class="lab-title">🔬 Interactive DSP Sound Lab</div>
+          <div class="lab-title">ðŸ”¬ Interactive DSP Sound Lab</div>
           <div class="lab-desc">Hear and see how Ananta Dhvani's acoustic filters shape the frequency spectrum.</div>
         </div>
         <div class="dsp-chips">
-          <div class="dsp-chip active" id="chipCrossfeed" onclick="toggleDsp('crossfeed')">🎧 Bauer BS2B Crossfeed</div>
-          <div class="dsp-chip active" id="chipAutoEq" onclick="toggleDsp('autoeq')">🎯 AutoEQ Harman Target</div>
-          <div class="dsp-chip active" id="chipHaptics" onclick="toggleDsp('haptics')">📳 Sub-Bass Resonant Boost</div>
+          <div class="dsp-chip active" id="chipCrossfeed" onclick="toggleDsp('crossfeed')">ðŸŽ§ Bauer BS2B Crossfeed</div>
+          <div class="dsp-chip active" id="chipAutoEq" onclick="toggleDsp('autoeq')">ðŸŽ¯ AutoEQ Harman Target</div>
+          <div class="dsp-chip active" id="chipHaptics" onclick="toggleDsp('haptics')">ðŸ“³ Sub-Bass Resonant Boost</div>
         </div>
       </div>
 
       <canvas id="spectrumVisualizer" width="1600" height="380"></canvas>
 
       <div class="audio-test-bar">
-        <button class="btn-test-tone" id="btnAudioTone" onclick="toggleAudioSynthesizer()">▶ Play Acoustic Test Signal</button>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Web Audio API Synthesis • Harmonic Sweep Active</span>
+        <button class="btn-test-tone" id="btnAudioTone" onclick="toggleAudioSynthesizer()">â–¶ Play Acoustic Test Signal</button>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Web Audio API Synthesis â€¢ Harmonic Sweep Active</span>
       </div>
     </section>
 
     <!-- 16 Subsystems -->
     <section id="subsystems" class="bento-grid">
       <div class="bento-card">
-        <h3>🎛️ 16 Silent Subsystems</h3>
-        <p>Dynamic 20s–60s buffer resizing, autonomous Opus format selection, dynamic storage quotas, and screen-off GPU clock throttling.</p>
+        <h3>ðŸŽ›ï¸ 16 Silent Subsystems</h3>
+        <p>Dynamic 20sâ€“60s buffer resizing, autonomous Opus format selection, dynamic storage quotas, and screen-off GPU clock throttling.</p>
       </div>
       <div class="bento-card">
-        <h3>🧊 iOS Liquid Glass UI</h3>
-        <p>Specular frosted glass refraction, live 360° rotating vinyl disc, ambient HDR breathing meshes, and 7 fluid harmonic seekbars.</p>
+        <h3>ðŸ§Š iOS Liquid Glass UI</h3>
+        <p>Specular frosted glass refraction, live 360Â° rotating vinyl disc, ambient HDR breathing meshes, and 7 fluid harmonic seekbars.</p>
       </div>
       <div class="bento-card">
-        <h3>🛡️ Sovereign Security</h3>
+        <h3>ðŸ›¡ï¸ Sovereign Security</h3>
         <p>Zero tracking, zero analytics, zero ads, cleartext traffic disabled, and fully open source under the GNU GPL v3 license.</p>
       </div>
       <div class="bento-card">
-        <h3>🎧 AutoEQ Hardware Curve</h3>
+        <h3>ðŸŽ§ AutoEQ Hardware Curve</h3>
         <p>10-band parametric EQ curves auto-applied to Sony WH/WF, Apple AirPods, Galaxy Buds, Pixel Buds, and bit-perfect USB DACs.</p>
       </div>
       <div class="bento-card">
-        <h3>⚡ Screen-Off Battery Guard</h3>
+        <h3>âš¡ Screen-Off Battery Guard</h3>
         <p>GPU visualizer shaders and FFT math pause immediately when the display sleeps, preventing background battery drain.</p>
       </div>
       <div class="bento-card">
-        <h3>📱 Responsive Home Widget</h3>
-        <p>4×2 and 4×1 resizable home screen widgets with real-time Palette extraction matching the active track's cover art.</p>
+        <h3>ðŸ“± Responsive Home Widget</h3>
+        <p>4Ã—2 and 4Ã—1 resizable home screen widgets with real-time Palette extraction matching the active track's cover art.</p>
       </div>
     </section>
 
@@ -843,7 +843,7 @@
     <section id="matrix" class="matrix-section">
       <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 1rem; text-align: center;">Audiophile Architecture Comparison</h2>
       <div class="matrix-card">
-        <div class="matrix-scroll-hint">👈 Swipe table horizontally to inspect all specs 👉</div>
+        <div class="matrix-scroll-hint">ðŸ‘ˆ Swipe table horizontally to inspect all specs ðŸ‘‰</div>
         <table>
           <thead>
             <tr>
@@ -892,18 +892,18 @@
     <!-- Legal & Credits -->
     <section id="credits" class="legal-card">
       <div>
-        <div class="legal-title">⚖️ Legal Disclaimer & Fair Use</div>
+        <div class="legal-title">âš–ï¸ Legal Disclaimer & Fair Use</div>
         <p class="legal-body">
           Ananta Dhvani is an independent, non-commercial, open-source audiophile workstation created solely for educational and personal listening purposes under the GNU General Public License v3.0 (GNU GPL v3). Ananta Dhvani does not host, store, monetize, or distribute copyrighted media files. All streaming and scrobbling operations are performed directly client-side via public endpoints. All product names, logos, and brands (e.g., Android, Google Pixel, Sony, Apple) are property of their respective trademark holders.
         </p>
       </div>
 
       <div>
-        <div class="legal-title">🤝 Credits & Acknowledgements</div>
+        <div class="legal-title">ðŸ¤ Credits & Acknowledgements</div>
         <div class="credits-grid">
           <div class="credit-item">
             <strong>Ishan (@Specttre404)</strong>
-            <span>Lead Creator & Architect • Ananta Dhvani Fork</span>
+            <span>Lead Creator & Architect â€¢ Ananta Dhvani Fork</span>
           </div>
           <div class="credit-item">
             <strong>Google Gemini</strong>
@@ -931,7 +931,7 @@
   </main>
 
   <footer>
-    <p>Handcrafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> • <strong>Ananta Dhvani</strong> • Licensed under GNU GPL v3</p>
+    <p>Handcrafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> â€¢ <strong>Ananta Dhvani</strong> â€¢ Licensed under GNU GPL v3</p>
   </footer>
 
   <script>
@@ -947,12 +947,12 @@
       const html = document.documentElement;
       const target = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', target);
-      document.getElementById('themeIcon').textContent = target === 'dark' ? '☀️' : '🌙';
+      document.getElementById('themeIcon').textContent = target === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
       localStorage.setItem('ananta_theme', target);
     }
     const savedTheme = localStorage.getItem('ananta_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
 
     // 3. Isolated Touch & Mouse Tilt (No Android selection magnifier)
     const stage = document.getElementById('stageContainer');
@@ -992,9 +992,9 @@
 
     // 5. Track Carousel
     const tracks = [
-      { title: "Aashiqana Aalam Hai", artist: "Good Boy Bad Boy • Opus 160kbps", format: "32-bit FLAC", primary: "#00F0FF", secondary: "#7F52FF", tertiary: "#FF2E93" },
-      { title: "Starboy", artist: "The Weeknd • Daft Punk • Lossless", format: "24-bit Hi-Res", primary: "#FF2E93", secondary: "#FF8E53", tertiary: "#7F00FF" },
-      { title: "Midnight City", artist: "M83 • Direct Master Lossless", format: "DSD 256", primary: "#10B981", secondary: "#06B6D4", tertiary: "#6366F1" }
+      { title: "Aashiqana Aalam Hai", artist: "Good Boy Bad Boy â€¢ Opus 160kbps", format: "32-bit FLAC", primary: "#00F0FF", secondary: "#7F52FF", tertiary: "#FF2E93" },
+      { title: "Starboy", artist: "The Weeknd â€¢ Daft Punk â€¢ Lossless", format: "24-bit Hi-Res", primary: "#FF2E93", secondary: "#FF8E53", tertiary: "#7F00FF" },
+      { title: "Midnight City", artist: "M83 â€¢ Direct Master Lossless", format: "DSD 256", primary: "#10B981", secondary: "#06B6D4", tertiary: "#6366F1" }
     ];
     let trackIndex = 0;
     let isPlaying = true;
@@ -1017,7 +1017,7 @@
     function togglePlayback() {
       isPlaying = !isPlaying;
       vinyl.classList.toggle('paused', !isPlaying);
-      fab.textContent = isPlaying ? '⏸' : '▶';
+      fab.textContent = isPlaying ? 'â¸' : 'â–¶';
     }
 
     // 6. In-Mockup Wavy Seekbar Canvas (Rock-solid fixed coordinate system)
@@ -1109,7 +1109,7 @@
         oscRoot.start();
         oscFifth.start();
         isTonePlaying = true;
-        btn.textContent = '⏹ Stop Acoustic Test Signal';
+        btn.textContent = 'â¹ Stop Acoustic Test Signal';
         btn.style.background = '#FF2E93';
       } else {
         if (masterGain && audioCtx) {
@@ -1120,7 +1120,7 @@
           }, 200);
         }
         isTonePlaying = false;
-        btn.textContent = '▶ Play Acoustic Test Signal';
+        btn.textContent = 'â–¶ Play Acoustic Test Signal';
         btn.style.background = 'var(--accent)';
       }
     }
@@ -1165,7 +1165,7 @@
       const text = document.getElementById('shaText').textContent.trim();
       navigator.clipboard.writeText(text);
       const btn = event.target;
-      btn.textContent = '✓ Copied';
+      btn.textContent = 'âœ“ Copied';
       setTimeout(() => btn.textContent = 'Copy Hash', 2000);
     }
 
@@ -1195,6 +1195,7 @@
   </script>
 </body>
 </html>
+
 
 
 

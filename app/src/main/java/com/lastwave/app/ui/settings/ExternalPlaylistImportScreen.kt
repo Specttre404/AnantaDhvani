@@ -32,7 +32,7 @@ import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -197,7 +197,7 @@ fun ExternalPlaylistImportScreen(
                                     Spacer(Modifier.width(8.dp))
                                     Text("Reading Playlist...")
                                 } else {
-                                    Icon(Icons.Filled.QueueMusic, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.QueueMusic, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(Modifier.width(8.dp))
                                     Text("Preview", fontWeight = FontWeight.Bold)
                                 }
@@ -423,3 +423,4 @@ private fun ExternalTrackRowCard(
         }
     }
 }
+

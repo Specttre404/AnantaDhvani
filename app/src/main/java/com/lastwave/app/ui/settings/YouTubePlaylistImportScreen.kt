@@ -46,7 +46,7 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
@@ -199,7 +199,7 @@ fun YouTubePlaylistImportScreen(
                         val selected = state.selectedTab == tab
                         val icon = when (tab) {
                             ImportTab.LIBRARY -> Icons.Filled.LibraryMusic
-                            ImportTab.SEARCH -> Icons.Filled.QueueMusic
+                            ImportTab.SEARCH -> androidx.compose.material.icons.Icons.AutoMirrored.Filled.QueueMusic
                             ImportTab.LINK -> Icons.Filled.Link
                             ImportTab.CSV -> Icons.Filled.Description
                         }
@@ -884,3 +884,4 @@ private fun queryFileName(context: Context, uri: Uri): String? {
     }
     return name
 }
+

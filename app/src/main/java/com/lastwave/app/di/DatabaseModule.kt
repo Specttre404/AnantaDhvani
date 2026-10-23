@@ -267,8 +267,8 @@ object DatabaseModule {
             // PlaylistRepository mirrors playlists to public JSON before
             // future schema changes can rebuild Room, then restores that
             // mirror if the database opens empty. Artwork is cache.
-            .fallbackToDestructiveMigration()
-            .fallbackToDestructiveMigrationOnDowngrade()
+            .fallbackToDestructiveMigration(dropAllTables = true)
+            .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
             .addMigrations(
                 migration4To5,
                 migration5To6,
@@ -305,3 +305,4 @@ object DatabaseModule {
     fun provideSongPlayStatsDao(database: AppDatabase): com.lastwave.app.data.local.db.SongPlayStatsDao =
         database.songPlayStatsDao()
 }
+

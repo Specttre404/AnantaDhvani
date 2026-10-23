@@ -37,7 +37,7 @@ import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PushPin
@@ -143,7 +143,7 @@ fun FriendProfileScreen(
                         onClick = viewModel::togglePinned,
                     )
                     HeaderActionIcon(
-                        icon = Icons.Filled.OpenInNew,
+                        icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew,
                         contentDescription = "Open Last.fm profile",
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.last.fm/user/$username"))
@@ -1021,3 +1021,4 @@ private fun formatRelativeTime(millis: Long?): String {
         }
     }
 }
+

@@ -63,12 +63,6 @@ fun EdgeToEdgeDialogWindow() {
         }
         window?.let { w ->
             WindowCompat.setDecorFitsSystemWindows(w, false)
-            w.navigationBarColor = android.graphics.Color.TRANSPARENT
-            w.statusBarColor = android.graphics.Color.TRANSPARENT
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                w.isNavigationBarContrastEnforced = false
-                w.isStatusBarContrastEnforced = false
-            }
             if (isDialog) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     w.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
@@ -83,3 +77,4 @@ fun EdgeToEdgeDialogWindow() {
         onDispose {}
     }
 }
+

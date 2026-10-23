@@ -38,7 +38,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -263,7 +263,7 @@ fun PlaylistScreen(
                                 Text("Smart Auto-Playlists", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                     val smarts = listOf(
-                                        listOf(-101L, "Top 50 Most Played", "Most played tracks", Icons.Filled.TrendingUp),
+                                        listOf(-101L, "Top 50 Most Played", "Most played tracks", androidx.compose.material.icons.Icons.AutoMirrored.Filled.TrendingUp),
                                         listOf(-102L, "Recently Added", "Last 30 days", Icons.Filled.History),
                                         listOf(-103L, "Forgotten Favorites", "Unplayed in >60 days", Icons.Filled.AutoAwesome),
                                         listOf(-104L, "Hi-Res Lossless Only", "24-bit / 96kHz FLAC", Icons.Filled.HighQuality),
@@ -853,3 +853,4 @@ private fun FormatOptionRow(title: String, description: String, selected: Boolea
 
 private fun formatDate(millis: Long): String =
     SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(millis))
+

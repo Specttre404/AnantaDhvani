@@ -42,22 +42,8 @@ fun LastWaveTheme(
         SideEffect {
             val window = (view.context as? Activity)?.window ?: return@SideEffect
             runCatching {
-                window.statusBarColor = android.graphics.Color.TRANSPARENT
-                window.navigationBarColor = android.graphics.Color.TRANSPARENT
                 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDark
                 WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !isDark
-                // Setting navigationBarColor to TRANSPARENT above is not enough on
-                // its own: Android 10+ automatically draws its own translucent
-                // black scrim over a transparent nav bar ("contrast enforcement")
-                // to keep the gesture pill visible against arbitrary content —
-                // THAT scrim is the visible black strip. Disabling enforcement
-                // here is what actually removes it; without this line the app
-                // background never reaches the true bottom of the display no
-                // matter what padding or Surface backgrounds are added elsewhere.
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    window.isStatusBarContrastEnforced = false
-                    window.isNavigationBarContrastEnforced = false
-                }
             }
         }
     }
@@ -91,3 +77,4 @@ fun LastWaveTheme(
         }
     }
 }
+

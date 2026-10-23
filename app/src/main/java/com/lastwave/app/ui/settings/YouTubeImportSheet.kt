@@ -28,7 +28,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -168,7 +168,7 @@ fun YouTubeImportSheet(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        Icons.Filled.QueueMusic,
+                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.QueueMusic,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(20.dp),
@@ -365,3 +365,4 @@ fun YouTubeImportSheet(
         }
     }
 }
+

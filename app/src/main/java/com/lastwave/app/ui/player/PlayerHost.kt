@@ -119,8 +119,8 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.PlaylistAdd
-import androidx.compose.material.icons.filled.QueueMusic
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Shuffle
@@ -1064,7 +1064,7 @@ private fun AddToPlaylistDialog(
                     modifier = Modifier.size(52.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Filled.PlaylistAdd, contentDescription = null, modifier = Modifier.size(27.dp))
+                        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.PlaylistAdd, contentDescription = null, modifier = Modifier.size(27.dp))
                     }
                 }
                 Column(Modifier.weight(1f).padding(start = 14.dp)) {
@@ -1238,7 +1238,7 @@ private fun AddToPlaylistDialog(
                             color = MaterialTheme.colorScheme.onPrimary,
                         )
                     } else {
-                        Icon(Icons.Filled.PlaylistAdd, contentDescription = null, modifier = Modifier.size(19.dp))
+                        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.PlaylistAdd, contentDescription = null, modifier = Modifier.size(19.dp))
                     }
                     Spacer(Modifier.width(8.dp))
                     Text(
@@ -4244,3 +4244,4 @@ private fun LinguisticLyricsStudioSheet(
         }
     }
 }
+
