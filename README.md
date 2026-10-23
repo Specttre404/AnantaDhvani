@@ -5,8 +5,8 @@
   <a href="https://specttre404.github.io/AnantaDhvani/">
     <img src="https://img.shields.io/badge/🌐_Launch_Official_Website-specttre404.github.io%2FAnantaDhvani-00F0FF?style=for-the-badge&logoColor=0B0F1A" alt="Official Website" />
   </a>
-  <a href="https://github.com/Specttre404/AnantaDhvani/releases/tag/v1.6.9-HDR">
-    <img src="https://img.shields.io/badge/Release-v1.6.9--HDR-7F52FF?style=for-the-badge" alt="Latest Release" />
+  <a href="https://github.com/Specttre404/AnantaDhvani/releases/tag/v1.7.0-HDR">
+    <img src="https://img.shields.io/badge/Release-v1.7.0--HDR-7F52FF?style=for-the-badge" alt="Latest Release" />
   </a>
   <a href="https://github.com/Specttre404/AnantaDhvani/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-GNU_GPLv3-FF2E93?style=for-the-badge" alt="License" />
@@ -22,7 +22,7 @@ Experience the live web app with interactive audio demonstrations and hardware t
 * 📱 **3D Google Pixel 11 Pro XL Virtual Device**: Cursor-responsive gyroscope tilt physics with working controls and real-time harmonic seekbars.
 * 🔬 **Interactive DSP Sound Lab**: In-browser Web Audio API synthesizer demonstrating Bauer BS2B crossfeed and AutoEQ frequency curves.
 * 🧊 **Material 3 Expressive & iOS Liquid Glass**: Dynamic album art palette extraction with fluid spring animations.
-* 🛡️ **Verified Release Binary (v1.6.9-HDR)**: SHA-256: `0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA`
+* 🛡️ **Verified Release Binary (v1.7.0-HDR)**: SHA-256: `0010F4A0BE35EB283C2B03DA68FB4A7A85FCBC41F8A608786DA8CF37DCBBA7FA`
 
 ---
 
@@ -39,7 +39,7 @@ Experience the live web app with interactive audio demonstrations and hardware t
 <!-- VIBGYOR Palette: Violet -> Indigo -> Blue -> Green -> Yellow -> Orange -> Red (Icons Removed) -->
 <p align="center">
   <a href="https://github.com/Specttre404/AnantaDhvani/releases/latest">
-    <img src="https://img.shields.io/badge/Latest_Release-v1.6.4--HDR_Preview-7F00FF?style=for-the-badge" alt="Latest Release" />
+    <img src="https://img.shields.io/badge/Latest_Release-v1.7.0--HDR_Preview-7F00FF?style=for-the-badge" alt="Latest Release" />
   </a>
   <img src="https://img.shields.io/badge/Lifecycle-Testing_Phase_(Active_Evaluation)-4B0082?style=for-the-badge" alt="Testing Phase" />
   <a href="https://github.com/Specttre404/AnantaDhvani/blob/main/LICENSE">
@@ -166,7 +166,7 @@ These are exceptional, high-utility open-source Android projects that I personal
 
 ---
 
-## 📋 Changelog Highlights (Post-v1.6.0 Releases)
+## 📋 Changelog Highlights (Post-v1.7.0 Releases)
 
 ### Version 1.6.4-HDR (Current Release)
 * **Dynamic Widget Theme Extraction**: Integrated AndroidX Palette in `MusicWidgetProvider.kt` to extract vibrant accent colors from active album art, dynamically tinting transport controls and playback controls.
@@ -246,4 +246,5 @@ cd AnantaDhvani
 # Assemble production release APK
 ./gradlew app:assembleRelease
 ```
+
 

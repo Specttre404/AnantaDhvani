@@ -465,6 +465,7 @@ fun SettingsScreen(
                     // Last.fm is optional here — never a gate. Connected:
                     // global scrobbles + stats sync. Disconnected: Stats and
                     // recommendations run local-first from Room.
+                    SquidifyCard()
                     LastFmIntegrationCard(
                         isConnected = isLastFmConnected,
                         username = session.username,
@@ -5851,6 +5852,46 @@ private fun LyricsAnimationSheet(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@androidx.compose.runtime.Composable
+fun SquidifyCard(
+    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.material3.OutlinedCard(
+        onClick = {
+            val intent = android.content.Intent(context, com.lastwave.app.SquidifyActivity::class.java)
+            context.startActivity(intent)
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = androidx.compose.ui.Modifier.padding(16.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            androidx.compose.material3.Text(
+                text = "🦑",
+                style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = androidx.compose.ui.Modifier.width(16.dp))
+            androidx.compose.foundation.layout.Column {
+                androidx.compose.material3.Text(
+                    text = "Squidify Audio Hub",
+                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+                androidx.compose.material3.Text(
+                    text = "Open web streaming & lossless track downloader",
+                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

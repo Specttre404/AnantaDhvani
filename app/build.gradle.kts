@@ -55,8 +55,8 @@ android {
         applicationId = "com.specttre404.lastwavex"
         minSdk = 31
         targetSdk = 35
-        versionCode = 19
-        versionName = "1.6.0"
+        versionCode = 20
+        versionName = "1.7.0-HDR"
 
         val secretMask = listOf(0x5A, 0x3F, 0x7E, 0x1B, 0x92, 0x4C, 0xA1, 0x6D)
         fun obfuscateSecret(plainText: String): String {
@@ -343,4 +343,5 @@ configurations.all {
 tasks.withType<Test> {
     maxHeapSize = "2048m"
 }
+
 
