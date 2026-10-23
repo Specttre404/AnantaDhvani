@@ -6,7 +6,7 @@ pluginManagement {
             maven { url = uri("https://storage.googleapis.com/r8-releases/raw") }
         }
         dependencies {
-            classpath("com.android.tools:r8:9.4.14")
+            classpath("com.android.tools:r8:9.4.24")
         }
     }
     repositories {
@@ -41,3 +41,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "LastWave"
 include(":app")
+
