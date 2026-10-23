@@ -10,6 +10,7 @@ import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebResourceRequest
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -27,7 +28,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
         settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            databaseEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
             cacheMode = WebSettings.LOAD_DEFAULT
@@ -87,3 +87,5 @@ override fun onDestroy() {
     super.onDestroy()
 }
 }
+
+
