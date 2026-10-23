@@ -46,18 +46,25 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Check
 import com.lastwave.app.util.BatteryOptimizationHelper
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDownload
@@ -69,7 +76,6 @@ import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.BubbleChart
@@ -82,7 +88,6 @@ import com.lastwave.app.data.local.LyricsAnimation
 import com.lastwave.app.data.local.LyricsUiVersion
 import com.lastwave.app.data.local.AppIconTheme
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Refresh
@@ -93,18 +98,13 @@ import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.material.icons.filled.Headset
-import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Vibration
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.QueueMusic
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -121,7 +121,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.material3.Surface
@@ -404,11 +404,11 @@ fun SettingsScreen(
         ) {
         ExpressiveHeader(title = stringResource(R.string.settings), onBack = onBack)
 
-        val categoryTitles = listOf("Everyday", "Audio & Engine", "Personalization", "Diagnostics")
+        val categoryTitles = remember { listOf("Everyday", "Audio & Engine", "Personalization", "Diagnostics") }
         val pagerState = rememberPagerState(pageCount = { categoryTitles.size })
         val scope = rememberCoroutineScope()
 
-        ScrollableTabRow(
+        PrimaryScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
             edgePadding = 16.dp,
             containerColor = Color.Transparent,
@@ -561,7 +561,7 @@ fun SettingsScreen(
                                     "$selectedCount of ${allPlaylists.size} playlists selected"
                                 }
                                 SettingsActionCard(
-                                    icon = Icons.Filled.FormatListBulleted,
+                                    icon = Icons.AutoMirrored.Filled.FormatListBulleted,
                                     iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
                                     iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
                                     title = stringResource(R.string.settings_select_playlists),
@@ -571,7 +571,7 @@ fun SettingsScreen(
                                 )
                             } else {
                                 SettingsActionCard(
-                                    icon = Icons.Filled.QueueMusic,
+                                    icon = Icons.AutoMirrored.Filled.QueueMusic,
                                     iconContainer = MaterialTheme.colorScheme.tertiaryContainer,
                                     iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
                                     title = "Import from YouTube Music",
@@ -598,7 +598,7 @@ fun SettingsScreen(
                                 )
                             }
                             4 -> SettingsActionCard(
-                                icon = Icons.Filled.QueueMusic,
+                                icon = Icons.AutoMirrored.Filled.QueueMusic,
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = stringResource(R.string.settings_make_local),
@@ -1038,7 +1038,7 @@ fun SettingsScreen(
                                 )
                             } else {
                                 SettingsToggleCard(
-                                    icon = Icons.Filled.VolumeUp,
+                                    icon = Icons.AutoMirrored.Filled.VolumeUp,
                                     iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                     iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     title = stringResource(R.string.settings_loudness_normalization),
@@ -1054,7 +1054,7 @@ fun SettingsScreen(
                             }
                             5 -> if (misc.crossfadeEnabled) {
                                 SettingsToggleCard(
-                                    icon = Icons.Filled.VolumeUp,
+                                    icon = Icons.AutoMirrored.Filled.VolumeUp,
                                     iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                     iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     title = stringResource(R.string.settings_loudness_normalization),
@@ -1239,7 +1239,7 @@ fun SettingsScreen(
                     SettingsGroup(rowCount = 2) { index, position ->
                         when (index) {
                             0 -> SettingsActionCard(
-                                icon = Icons.Filled.QueueMusic,
+                                icon = Icons.AutoMirrored.Filled.QueueMusic,
                                 iconContainer = MaterialTheme.colorScheme.primaryContainer,
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = "Import from Spotify / Apple Music",
@@ -1772,7 +1772,7 @@ fun SettingsScreen(
                         .heightIn(max = 420.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(filteredProfiles) { (headphoneName, targetCurve) ->
+                    items(filteredProfiles, key = { it.first }) { (headphoneName, targetCurve) ->
                         Surface(
                             shape = RoundedCornerShape(14.dp),
                             color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -2829,7 +2829,7 @@ private fun YouTubeAccountRow(
                     contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 ),
             ) {
-                Icon(Icons.Filled.Logout, contentDescription = "Disconnect")
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Disconnect")
             }
         }
     }
@@ -3208,7 +3208,7 @@ private fun SilenceTrimmingCard(
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.VolumeOff, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Icon(Icons.AutoMirrored.Filled.VolumeOff, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(10.dp))
                 Column {
                     Text("Silence Trimming Parameters", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -5401,7 +5401,7 @@ private fun YouTubeLibraryVisibilitySheet(
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(
-                                        Icons.Filled.QueueMusic,
+                                        Icons.AutoMirrored.Filled.QueueMusic,
                                         contentDescription = null,
                                         tint = if (isShown) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -5543,7 +5543,7 @@ private fun SyncPlaylistsSheet(
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(
-                                        Icons.Filled.QueueMusic,
+                                        Icons.AutoMirrored.Filled.QueueMusic,
                                         contentDescription = null,
                                         tint = if (isChecked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(22.dp),
