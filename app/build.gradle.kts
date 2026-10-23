@@ -345,3 +345,12 @@ tasks.withType<Test> {
 }
 
 
+
+
+// --- Auto-Fetch Latest Snapshots On Every Build ---
+configurations.all {
+resolutionStrategy {
+    cacheChangingModulesFor(0, "seconds")
+    cacheDynamicVersionsFor(0, "seconds")
+}
+}
