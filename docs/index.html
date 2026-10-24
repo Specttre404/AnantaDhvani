@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ananta Dhvani â€” Official Audiophile Workstation for Android</title>
+  <title>Ananta Dhvani — Official Audiophile Workstation for Android</title>
 
   <!-- Hardened Zero-Telemetry Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://api.github.com; connect-src 'self' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self';">
@@ -12,14 +12,14 @@
 
   <style>
     /* ==========================================================================
-       1. Android 17 M3 Expressive & iOS Liquid Glass Dynamic Tokens
+       Android 17 M3 Expressive & iOS Liquid Glass Dynamic Tokens
        ========================================================================== */
     :root {
       --accent: #00F0FF;
       --accent-secondary: #7F52FF;
       --accent-tertiary: #FF2E93;
       --bg-void: #06080D;
-      --bg-card: rgba(15, 20, 32, 0.76);
+      --bg-card: rgba(15, 20, 32, 0.78);
       --bg-card-solid: #0F1420;
       --border-glass: rgba(255, 255, 255, 0.14);
       --border-specular: rgba(255, 255, 255, 0.28);
@@ -28,13 +28,8 @@
       --glow: rgba(0, 240, 255, 0.35);
       --header-bg: rgba(6, 8, 13, 0.88);
       --code-bg: rgba(0, 0, 0, 0.65);
-      --chip-bg: rgba(255, 255, 255, 0.06);
-      --chip-active-bg: rgba(0, 240, 255, 0.16);
-      --chip-active-text: #00F0FF;
       --badge-bg: rgba(127, 82, 255, 0.18);
       --badge-text: #00F0FF;
-      --phone-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(0, 240, 255, 0.45) 100%);
-      --phone-bezel: #0C101A;
       --m3-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       --liquid-glass-shadow: 
         0 20px 50px rgba(0, 0, 0, 0.55),
@@ -56,14 +51,9 @@
       --glow: rgba(2, 132, 199, 0.25);
       --header-bg: rgba(248, 250, 252, 0.94);
       --code-bg: rgba(241, 245, 249, 0.98);
-      --chip-bg: rgba(15, 23, 42, 0.06);
-      --chip-active-bg: rgba(2, 132, 199, 0.14);
-      --chip-active-text: #0369A1;
       --badge-bg: rgba(79, 70, 229, 0.12);
       --badge-text: #0369A1;
-      --phone-rim: linear-gradient(135deg, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.08) 50%, rgba(2, 132, 199, 0.35) 100%);
-      --phone-bezel: #1E293B;
-      --liquid-glass-shadow: 
+      --liquid-glass-shadow:
         0 20px 45px rgba(15, 23, 42, 0.08),
         inset 0 1px 2px rgba(255, 255, 255, 0.95),
         inset 0 -1px 1px rgba(15, 23, 42, 0.08);
@@ -93,7 +83,6 @@
       transition: background 0.12s ease-out;
     }
 
-    /* Fixed Responsive Header (No collision on desktop site mode) */
     header {
       position: sticky;
       top: 0;
@@ -112,31 +101,26 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-weight: 900;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       letter-spacing: -0.5px;
       color: var(--text-main);
       text-decoration: none;
-      flex-shrink: 0;
     }
-    .brand svg { filter: drop-shadow(0 0 10px var(--accent)); transition: filter 0.3s; }
+    .brand svg { filter: drop-shadow(0 0 10px var(--accent)); }
 
-    .nav-actions { display: flex; align-items: center; gap: clamp(0.75rem, 2vw, 1.5rem); }
-    .nav-links { display: flex; align-items: center; gap: clamp(0.75rem, 1.5vw, 1.25rem); }
+    .nav-actions { display: flex; align-items: center; gap: 1.25rem; }
+    .nav-links { display: flex; align-items: center; gap: 1.25rem; }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.88rem;
-      transition: color 0.2s, text-shadow 0.2s;
-      white-space: nowrap;
+      font-size: 0.9rem;
+      transition: color 0.2s;
     }
-    .nav-links a:hover {
-      color: var(--accent);
-      text-shadow: 0 0 10px var(--accent);
-    }
-    @media (max-width: 900px) { .nav-links { display: none; } }
+    .nav-links a:hover { color: var(--accent); }
+    @media (max-width: 800px) { .nav-links { display: none; } }
 
     .theme-toggle-btn {
       background: var(--bg-card);
@@ -152,12 +136,10 @@
       justify-content: center;
       font-size: 1.15rem;
       transition: all 0.3s var(--m3-spring);
-      flex-shrink: 0;
     }
     .theme-toggle-btn:hover {
       transform: scale(1.1) rotate(15deg);
       border-color: var(--accent);
-      box-shadow: 0 0 20px var(--glow);
     }
 
     main {
@@ -165,18 +147,19 @@
       z-index: 10;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 3rem 1.25rem;
+      padding: 3rem 1.5rem;
     }
 
-    .hero-split {
+    /* Hero Section */
+    .hero-container {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1.2fr 0.8fr;
       align-items: center;
       gap: 3.5rem;
-      margin-bottom: 5.5rem;
+      margin-bottom: 4rem;
     }
-    @media (max-width: 960px) {
-      .hero-split { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; }
+    @media (max-width: 900px) {
+      .hero-container { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; }
     }
 
     .status-badge {
@@ -207,7 +190,7 @@
     }
 
     h1 {
-      font-size: clamp(2.3rem, 5vw, 4.2rem);
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
       font-weight: 900;
       line-height: 1.08;
       letter-spacing: -1.5px;
@@ -219,108 +202,121 @@
     }
 
     .tagline {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       color: var(--text-muted);
       margin-bottom: 2rem;
+      line-height: 1.7;
     }
 
-    .palette-box {
-      background: var(--bg-card);
-      backdrop-filter: blur(28px) saturate(200%);
-      border: 1px solid var(--border-glass);
-      border-radius: 24px;
-      padding: 1.2rem;
-      margin-bottom: 1.75rem;
-      box-shadow: var(--liquid-glass-shadow);
-      text-align: left;
+    /* Official Adaptive Launcher Icon Stage */
+    .icon-showcase {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
     }
-    .palette-label {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
-    .palette-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-    .color-chip {
+
+    .adaptive-icon-card {
+      width: 260px;
+      height: 260px;
+      border-radius: 58px;
+      background: linear-gradient(135deg, #0A0D18 0%, #0E1221 50%, #12172A 100%);
+      border: 1px solid var(--border-specular);
+      box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.75),
+        0 0 60px var(--glow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: var(--chip-bg);
-      border: 1px solid var(--border-glass);
-      color: var(--text-main);
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 700;
-      transition: all 0.25s var(--m3-spring);
+      justify-content: center;
+      overflow: hidden;
+      transition: transform 0.4s var(--m3-spring);
     }
-    .color-chip:hover, .color-chip.active {
-      border-color: var(--accent);
-      background: var(--chip-active-bg);
-      color: var(--chip-active-text);
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 0 16px var(--glow);
+    .adaptive-icon-card:hover {
+      transform: scale(1.05) rotate(2deg);
     }
-    .color-dot { width: 12px; height: 12px; border-radius: 50%; }
 
+    .ring-glow-1 {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0, 240, 255, 0.35);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+      animation: breath 4s ease-in-out infinite alternate;
+    }
+    .ring-glow-2 {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 2px solid rgba(127, 82, 255, 0.45);
+      box-shadow: 0 0 20px rgba(127, 82, 255, 0.3);
+      animation: breath 3s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes breath {
+      0% { transform: scale(0.95); opacity: 0.6; }
+      100% { transform: scale(1.06); opacity: 1; }
+    }
+
+    .icon-vector-svg {
+      width: 140px;
+      height: 140px;
+      z-index: 2;
+      filter: drop-shadow(0 0 20px var(--accent));
+    }
+
+    /* Download Card */
     .download-card {
       background: var(--bg-card);
-      backdrop-filter: blur(32px) saturate(210%);
+      backdrop-filter: blur(28px) saturate(200%);
       border: 1px solid var(--border-glass);
       border-radius: 28px;
       padding: 1.75rem;
       box-shadow: var(--liquid-glass-shadow);
-      text-align: left;
+      margin-bottom: 3.5rem;
     }
+
     .btn-download {
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       gap: 12px;
       width: 100%;
-      padding: 1.2rem;
+      padding: 1.25rem;
       border-radius: 20px;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 800;
       color: #06080D;
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       text-decoration: none;
-      box-shadow: 0 0 30px var(--glow);
+      box-shadow: 0 0 35px var(--glow);
       transition: all 0.25s var(--m3-spring);
     }
     .btn-download:hover {
       transform: translateY(-3px) scale(1.015);
-      box-shadow: 0 0 45px var(--glow);
+      box-shadow: 0 0 50px var(--glow);
     }
 
-    .telemetry {
+    .checksum-box {
       margin-top: 1.25rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .checksum-container {
       background: var(--code-bg);
       border: 1px solid var(--border-glass);
-      border-radius: 14px;
-      padding: 10px 14px;
+      border-radius: 16px;
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
     .checksum-hash {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.76rem;
-      line-height: 1.45;
+      font-size: 0.8rem;
       color: var(--accent);
       word-break: break-all;
     }
+
     .btn-copy {
       align-self: flex-end;
       background: var(--bg-card);
@@ -329,339 +325,135 @@
       padding: 6px 14px;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 700;
       transition: all 0.2s var(--m3-spring);
     }
     .btn-copy:hover {
       background: var(--accent);
       color: #000;
-      transform: scale(1.05);
     }
 
-    /* 3D Google Pixel 11 Pro XL Stage (Touch & Magnifier Bubble Guard) */
-    .stage-container {
-      perspective: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      touch-action: pan-y;
-    }
-    .pixel-11-pro-xl {
-      width: 326px;
-      height: 672px;
-      background: var(--phone-bezel);
-      border-radius: 48px;
-      border: 5px solid transparent;
-      background-clip: padding-box;
-      position: relative;
-      box-shadow: 
-        0 30px 85px rgba(0, 0, 0, 0.65),
-        0 0 55px var(--glow),
-        inset 0 0 20px rgba(255, 255, 255, 0.14);
-      transform-style: preserve-3d;
-      transform: rotateY(-8deg) rotateX(6deg);
-      transition: transform 0.12s ease-out, box-shadow 0.3s;
-      overflow: hidden;
-      padding: 16px 16px 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .pixel-11-pro-xl::before {
-      content: '';
-      position: absolute;
-      inset: -5px;
-      border-radius: 48px;
-      background: var(--phone-rim);
-      z-index: -1;
-    }
-
-    .pixel-camera-punch {
-      width: 14px;
-      height: 14px;
-      background: #000;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.5);
-    }
-    .pixel-status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #CBD5E1;
-      padding: 0 8px;
-      margin-top: -6px;
-    }
-
-    .disc-container {
-      position: relative;
-      width: 216px;
-      height: 216px;
-      margin: 16px auto;
-      cursor: pointer;
-    }
-    .vinyl-disc {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: 
-        radial-gradient(circle, #0B0F1A 30%, transparent 31%),
-        repeating-radial-gradient(circle, #252D3D 0px, #121824 4px, #252D3D 8px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.85), 0 0 35px var(--glow);
-      border: 6px solid #1E293B;
-      animation: spin 10s linear infinite;
-      animation-play-state: running;
-      transition: box-shadow 0.4s;
-    }
-    .vinyl-disc.paused { animation-play-state: paused; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .disc-art {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 0.78rem;
-      color: #000;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
-    }
-
-    .song-meta { text-align: center; margin-bottom: 6px; }
-    .song-title { font-weight: 800; font-size: 1.15rem; color: #FFF; }
-    .song-artist { font-size: 0.85rem; color: #94A3B8; }
-
-    /* Fixed Seekbar Canvas: Explicit physical pixel dimensions prevent vanishing */
-    canvas#phoneSeekbar {
-      width: 294px;
-      height: 40px;
-      display: block;
-      margin: 0 auto 6px;
-    }
-
-    .controls-row {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .btn-mock-nav {
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #94A3B8;
-      transition: all 0.2s;
-    }
-    .btn-mock-nav:hover { color: #FFF; transform: scale(1.15); }
-
-    .btn-mock-fab {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 25px var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: #000;
-      font-size: 1.3rem;
-      transition: all 0.2s var(--m3-spring);
-    }
-    .btn-mock-fab:hover { transform: scale(1.1); }
-
-    .pixel-nav-bar {
-      width: 96px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.45);
-      border-radius: 99px;
-      margin: 8px auto 2px;
-    }
-
-    /* Sound Lab */
-    .lab-box {
-      background: var(--bg-card);
-      backdrop-filter: blur(32px) saturate(210%);
-      border: 1px solid var(--border-glass);
-      border-radius: 32px;
-      padding: 2.25rem;
-      margin-bottom: 5.5rem;
+    /* Testing Notice Banner */
+    .notice-card {
+      background: linear-gradient(135deg, rgba(127, 82, 255, 0.15) 0%, rgba(0, 240, 255, 0.1) 100%);
+      border: 1px solid var(--accent-secondary);
+      border-radius: 24px;
+      padding: 1.75rem;
+      margin-bottom: 3.5rem;
       box-shadow: var(--liquid-glass-shadow);
     }
-    .lab-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .lab-title { font-size: 1.6rem; font-weight: 900; }
-    .lab-desc { color: var(--text-muted); font-size: 0.95rem; }
-
-    .dsp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-    .dsp-chip {
-      background: var(--chip-bg);
-      border: 1px solid var(--border-glass);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-size: 0.88rem;
-      font-weight: 700;
-      transition: all 0.25s var(--m3-spring);
-      user-select: none;
-    }
-    .dsp-chip.active {
-      background: var(--chip-active-bg);
-      border-color: var(--accent);
-      color: var(--chip-active-text);
-      box-shadow: 0 0 18px var(--glow);
+    .notice-title {
+      font-size: 1.3rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
     }
 
-    canvas#spectrumVisualizer {
-      width: 100%;
-      height: 190px;
-      background: var(--code-bg);
-      border-radius: 20px;
-      border: 1px solid var(--border-glass);
-      display: block;
-    }
-
-    .audio-test-bar {
-      margin-top: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .btn-test-tone {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      padding: 10px 22px;
-      border-radius: 14px;
-      font-weight: 800;
-      font-size: 0.9rem;
-      cursor: pointer;
-      box-shadow: 0 0 20px var(--glow);
-      transition: all 0.25s var(--m3-spring);
-    }
-    .btn-test-tone:hover { transform: translateY(-2px) scale(1.03); }
-
-    /* Bento Grid Subsystems */
-    .bento-grid {
+    /* Content Cards Grid */
+    .section-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 5.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3.5rem;
     }
-    .bento-card {
+
+    .glass-card {
       background: var(--bg-card);
       backdrop-filter: blur(28px) saturate(190%);
       border: 1px solid var(--border-glass);
       border-radius: 28px;
-      padding: 1.75rem;
-      transition: all 0.3s var(--m3-spring);
-      box-shadow: var(--liquid-glass-shadow);
-    }
-    .bento-card:hover {
-      transform: translateY(-6px);
-      border-color: var(--accent);
-      box-shadow: 0 15px 35px var(--glow);
-    }
-    .bento-card h3 {
-      font-size: 1.25rem;
-      font-weight: 800;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .bento-card p { color: var(--text-muted); font-size: 0.95rem; }
-
-    /* Comparison Matrix (Fixes Overlapping Column Collision) */
-    .matrix-section { margin-bottom: 5.5rem; }
-    .matrix-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-glass);
-      border-radius: 28px;
-      padding: 1.5rem;
-      overflow-x: auto;
-      box-shadow: var(--liquid-glass-shadow);
-      -webkit-overflow-scrolling: touch;
-    }
-    .matrix-scroll-hint {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      display: none;
-    }
-    @media (max-width: 768px) { .matrix-scroll-hint { display: block; } }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.92rem;
-      min-width: 680px;
-    }
-    th, td {
-      padding: 1.1rem 1.2rem;
-      border-bottom: 1px solid var(--border-glass);
-      white-space: nowrap;
-    }
-    th:first-child, td:first-child {
-      white-space: normal;
-      min-width: 180px;
-      font-weight: 800;
-    }
-    th { color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; }
-    td strong { color: var(--accent); font-weight: 800; }
-
-    /* Legal & Credits */
-    .legal-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-glass);
-      border-radius: 28px;
       padding: 2rem;
-      margin-bottom: 5rem;
       box-shadow: var(--liquid-glass-shadow);
+      transition: all 0.3s var(--m3-spring);
+    }
+    .glass-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .glass-card h2 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+
+    .manifesto-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .manifesto-list li {
+      position: relative;
+      padding-left: 24px;
+      color: var(--text-muted);
+    }
+    .manifesto-list li::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* Roadmap Card */
+    .roadmap-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 50px;
+      background: rgba(255, 46, 147, 0.2);
+      color: var(--accent-tertiary);
+      border: 1px solid var(--accent-tertiary);
+      font-size: 0.8rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    /* Changelog Timeline */
+    .timeline {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      margin-top: 1rem;
     }
-    .legal-title { font-size: 1.35rem; font-weight: 900; }
-    .legal-body { font-size: 0.92rem; color: var(--text-muted); line-height: 1.7; }
-    .credits-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-      margin-top: 0.5rem;
+    .timeline-item {
+      border-left: 2px solid var(--accent);
+      padding-left: 1.25rem;
+      position: relative;
     }
-    .credit-item {
-      background: rgba(0, 0, 0, 0.08);
-      border: 1px solid var(--border-glass);
-      padding: 1rem 1.25rem;
-      border-radius: 18px;
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
     }
-    .credit-item strong { color: var(--text-main); font-size: 0.95rem; display: block; margin-bottom: 4px; }
-    .credit-item span { color: var(--text-muted); font-size: 0.85rem; }
+    .version-tag {
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 1.05rem;
+    }
+
+    /* Pantheon Table */
+    .pantheon-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    .pantheon-table th, .pantheon-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-glass);
+      text-align: left;
+    }
+    .pantheon-table th {
+      color: var(--text-muted);
+      font-weight: 800;
+    }
 
     footer {
       text-align: center;
@@ -678,7 +470,7 @@
 
   <header>
     <a href="#" class="brand">
-      <svg width="30" height="30" viewBox="0 0 108 108" fill="none">
+      <svg width="32" height="32" viewBox="0 0 108 108" fill="none">
         <defs>
           <linearGradient id="brandWave" x1="30" y1="54" x2="78" y2="54" gradientUnits="userSpaceOnUse">
             <stop offset="0.0" stop-color="var(--accent)" />
@@ -693,20 +485,21 @@
     </a>
     <div class="nav-actions">
       <nav class="nav-links">
-        <a href="#lab">Sound Lab</a>
-        <a href="#subsystems">16 Subsystems</a>
-        <a href="#matrix">Comparison</a>
-        <a href="#credits">Acknowledgements</a>
+        <a href="#manifesto">Manifesto</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#changelog">Changelog</a>
+        <a href="#pantheon">Pantheon</a>
         <a href="https://github.com/Specttre404/AnantaDhvani" target="_blank" rel="noopener">GitHub</a>
       </nav>
       <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode">
-        <span id="themeIcon">â˜€ï¸</span>
+        <span id="themeIcon">☀️</span>
       </button>
     </div>
   </header>
 
   <main>
-    <section class="hero-split">
+    <!-- Hero Section -->
+    <section class="hero-container">
       <div>
         <div class="status-badge">
           <span class="status-dot"></span>
@@ -714,26 +507,8 @@
         </div>
         <h1>Pure Audiophile Soundstage.</h1>
         <p class="tagline">
-          The sovereign, high-fidelity music workstation for Android. Native Bauer BS2B binaural crossfeed, parametric AutoEQ target curve engine, and M3 Expressive liquid glass.
+          The sovereign, high-fidelity music workstation for Android. Native Bauer BS2B binaural crossfeed, parametric AutoEQ target curves, Material 3 Expressive, and iOS Liquid Glass.
         </p>
-
-        <div class="palette-box">
-          <div class="palette-label">ðŸŽ¨ Dynamic Album-Art Palette Extraction</div>
-          <div class="palette-chips">
-            <div class="color-chip active" onclick="setPalette('#00F0FF', '#7F52FF', '#FF2E93', 'rgba(0,240,255,0.35)', this)">
-              <span class="color-dot" style="background: #00F0FF;"></span> Cyber Cyan
-            </div>
-            <div class="color-chip" onclick="setPalette('#FF2E93', '#FF8E53', '#7F00FF', 'rgba(255,46,147,0.35)', this)">
-              <span class="color-dot" style="background: #FF2E93;"></span> Crimson Neon
-            </div>
-            <div class="color-chip" onclick="setPalette('#10B981', '#06B6D4', '#6366F1', 'rgba(16,185,129,0.35)', this)">
-              <span class="color-dot" style="background: #10B981;"></span> Emerald Hi-Fi
-            </div>
-            <div class="color-chip" onclick="setPalette('#F59E0B', '#EF4444', '#EC4899', 'rgba(245,158,11,0.35)', this)">
-              <span class="color-dot" style="background: #F59E0B;"></span> Amber Gold
-            </div>
-          </div>
-        </div>
 
         <div class="download-card">
           <a id="downloadButton" href="https://github.com/Specttre404/AnantaDhvani/releases/tag/v1.7.0-HDR" class="btn-download">
@@ -742,463 +517,180 @@
             </svg>
             <span id="downloadLabel">Download Release APK (v1.7.0-HDR)</span>
           </a>
-          <div class="telemetry">
-            <div>Target Architecture: <strong>R8 9.6.0-Alpha02 | Media3 1.12.0-Alpha01 | SDK 37 Canary</strong></div>
-            <div>VirusTotal Verification: <strong style="color: #10B981;">0 / 72 Flagged (100% Clean)</strong></div>
-            <div>Verified Distribution SHA-256 Checksum:</div>
-            <div class="checksum-container">
-              <div class="checksum-hash" id="shaText">3C7984AAF060FEE6098D5EE262715EF709E7D2AD674E0BCA5976283164BBBE89</div>
-              <button class="btn-copy" onclick="copyChecksum()">Copy Hash</button>
-            </div>
+          <div class="checksum-box">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Verified Distribution SHA-256 Checksum:</div>
+            <div class="checksum-hash" id="shaText">3C7984AAF060FEE6098D5EE262715EF709E7D2AD674E0BCA5976283164BBBE89</div>
+            <button class="btn-copy" onclick="copyChecksum()">Copy Hash</button>
           </div>
         </div>
       </div>
 
-      <div class="stage-container" id="stageContainer">
-        <div class="pixel-11-pro-xl" id="phoneBody">
-          <div>
-            <div class="pixel-camera-punch"></div>
-            <div class="pixel-status-bar">
-              <span>12:45</span>
-              <span>5G â€¢ 100%</span>
-            </div>
-          </div>
-
-          <div class="disc-container" onclick="togglePlayback()">
-            <div class="vinyl-disc" id="vinylDisc">
-              <div class="disc-art" id="discLabel">32-bit FLAC</div>
-            </div>
-          </div>
-
-          <div class="song-meta">
-            <div class="song-title" id="mockTitle">Aashiqana Aalam Hai</div>
-            <div class="song-artist" id="mockArtist">Good Boy Bad Boy â€¢ Opus 160kbps</div>
-          </div>
-
-          <!-- Fixed canvas sizing ensures seekbar never disappears in desktop site mode -->
-          <canvas id="phoneSeekbar" width="588" height="80"></canvas>
-
-          <div class="controls-row">
-            <span class="btn-mock-nav" onclick="prevTrack()">â®</span>
-            <div class="btn-mock-fab" id="phonePlayBtn" onclick="togglePlayback()">â¸</div>
-            <span class="btn-mock-nav" onclick="nextTrack()">â­</span>
-          </div>
-
-          <div class="pixel-nav-bar"></div>
+      <!-- Official Adaptive Launcher Icon Stage -->
+      <div class="icon-showcase">
+        <div class="adaptive-icon-card">
+          <div class="ring-glow-1"></div>
+          <div class="ring-glow-2"></div>
+          <svg class="icon-vector-svg" viewBox="0 0 108 108" fill="none">
+            <defs>
+              <linearGradient id="heroWave" x1="30" y1="54" x2="78" y2="54" gradientUnits="userSpaceOnUse">
+                <stop offset="0.0" stop-color="#00F0FF" />
+                <stop offset="0.5" stop-color="#7F52FF" />
+                <stop offset="1.0" stop-color="#FF2E93" />
+              </linearGradient>
+            </defs>
+            <!-- Ambient Glow Wave -->
+            <path d="M 30,54 C 36,54 38,32 46,32 C 54,32 52,76 62,76 C 70,76 72,54 78,54"
+              stroke="url(#heroWave)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" />
+            <!-- Harmonic Wave -->
+            <path d="M 30,54 C 36,54 38,32 46,32 C 54,32 52,76 62,76 C 70,76 72,54 78,54"
+              stroke="url(#heroWave)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </div>
       </div>
     </section>
 
-    <!-- Sound Lab -->
-    <section id="lab" class="lab-box">
-      <div class="lab-header">
-        <div>
-          <div class="lab-title">ðŸ”¬ Interactive DSP Sound Lab</div>
-          <div class="lab-desc">Hear and see how Ananta Dhvani's acoustic filters shape the frequency spectrum.</div>
-        </div>
-        <div class="dsp-chips">
-          <div class="dsp-chip active" id="chipCrossfeed" onclick="toggleDsp('crossfeed')">ðŸŽ§ Bauer BS2B Crossfeed</div>
-          <div class="dsp-chip active" id="chipAutoEq" onclick="toggleDsp('autoeq')">ðŸŽ¯ AutoEQ Harman Target</div>
-          <div class="dsp-chip active" id="chipHaptics" onclick="toggleDsp('haptics')">ðŸ“³ Sub-Bass Resonant Boost</div>
-        </div>
-      </div>
-
-      <canvas id="spectrumVisualizer" width="1600" height="380"></canvas>
-
-      <div class="audio-test-bar">
-        <button class="btn-test-tone" id="btnAudioTone" onclick="toggleAudioSynthesizer()">â–¶ Play Acoustic Test Signal</button>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Web Audio API Synthesis â€¢ Harmonic Sweep Active</span>
-      </div>
+    <!-- Testing Phase Notice -->
+    <section class="notice-card">
+      <div class="notice-title">⚠️ Active Testing & Hardening Phase</div>
+      <p style="color: var(--text-muted); line-height: 1.7;">
+        <strong>Ananta Dhvani</strong> is created and directed by <strong>Ishan (@Specttre404)</strong> with <strong>Google Gemini (Gemini 4 Argon)</strong> as the primary engineering intelligence. The workstation is under continuous testing and hardening to ensure bit-perfect audio delivery, memory safety, and fluid 60fps Liquid Glass rendering across physical Android devices.
+      </p>
     </section>
 
-    <!-- 16 Subsystems -->
-    <section id="subsystems" class="bento-grid">
-      <div class="bento-card">
-        <h3>ðŸŽ›ï¸ 16 Silent Subsystems</h3>
-        <p>Dynamic 20sâ€“60s buffer resizing, autonomous Opus format selection, dynamic storage quotas, and screen-off GPU clock throttling.</p>
-      </div>
-      <div class="bento-card">
-        <h3>ðŸ§Š iOS Liquid Glass UI</h3>
-        <p>Specular frosted glass refraction, live 360Â° rotating vinyl disc, ambient HDR breathing meshes, and 7 fluid harmonic seekbars.</p>
-      </div>
-      <div class="bento-card">
-        <h3>ðŸ›¡ï¸ Sovereign Security</h3>
-        <p>Zero tracking, zero analytics, zero ads, cleartext traffic disabled, and fully open source under the GNU GPL v3 license.</p>
-      </div>
-      <div class="bento-card">
-        <h3>ðŸŽ§ AutoEQ Hardware Curve</h3>
-        <p>10-band parametric EQ curves auto-applied to Sony WH/WF, Apple AirPods, Galaxy Buds, Pixel Buds, and bit-perfect USB DACs.</p>
-      </div>
-      <div class="bento-card">
-        <h3>âš¡ Screen-Off Battery Guard</h3>
-        <p>GPU visualizer shaders and FFT math pause immediately when the display sleeps, preventing background battery drain.</p>
-      </div>
-      <div class="bento-card">
-        <h3>ðŸ“± Responsive Home Widget</h3>
-        <p>4Ã—2 and 4Ã—1 resizable home screen widgets with real-time Palette extraction matching the active track's cover art.</p>
-      </div>
-    </section>
-
-    <!-- Comparison Matrix (Scrollable Table Without Overlapping Text) -->
-    <section id="matrix" class="matrix-section">
-      <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 1rem; text-align: center;">Audiophile Architecture Comparison</h2>
-      <div class="matrix-card">
-        <div class="matrix-scroll-hint">ðŸ‘ˆ Swipe table horizontally to inspect all specs ðŸ‘‰</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Feature Architecture</th>
-              <th>Ananta Dhvani</th>
-              <th>Spotify / Apple Music</th>
-              <th>Poweramp</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Telemetry & Trackers</strong></td>
-              <td><strong>0 Trackers (100% Sovereign)</strong></td>
-              <td>15+ Commercial Trackers</td>
-              <td>License Checking SDK</td>
-            </tr>
-            <tr>
-              <td><strong>Native Binaural Crossfeed</strong></td>
-              <td><strong>Bauer BS2B Hardware Pass</strong></td>
-              <td>None</td>
-              <td>Custom Software Plugin</td>
-            </tr>
-            <tr>
-              <td><strong>AutoEQ Headphone Curves</strong></td>
-              <td><strong>10-Band Parametric Auto</strong></td>
-              <td>None</td>
-              <td>Manual In-App Import</td>
-            </tr>
-            <tr>
-              <td><strong>Interface Design</strong></td>
-              <td><strong>M3 Expressive + Liquid Glass</strong></td>
-              <td>Fixed Corporate Layout</td>
-              <td>Skins Required</td>
-            </tr>
-            <tr>
-              <td><strong>Licensing</strong></td>
-              <td><strong>GNU GPL v3 (Open Source)</strong></td>
-              <td>Proprietary Closed Source</td>
-              <td>Proprietary Paid License</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Legal & Credits -->
-    <section id="credits" class="legal-card">
-      <div>
-        <div class="legal-title">âš–ï¸ Legal Disclaimer & Fair Use</div>
-        <p class="legal-body">
-          Ananta Dhvani is an independent, non-commercial, open-source audiophile workstation created solely for educational and personal listening purposes under the GNU General Public License v3.0 (GNU GPL v3). Ananta Dhvani does not host, store, monetize, or distribute copyrighted media files. All streaming and scrobbling operations are performed directly client-side via public endpoints. All product names, logos, and brands (e.g., Android, Google Pixel, Sony, Apple) are property of their respective trademark holders.
+    <!-- Vision, Philosophy & Anti-Podcast Manifesto -->
+    <section id="manifesto" class="section-grid">
+      <div class="glass-card">
+        <h2>🏛️ Vision & Philosophy</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Music is an acoustic continuum to be experienced without algorithmic distortion. Ananta Dhvani preserves the full dynamic headroom and original room acoustics intended by artists and sound engineers.
         </p>
       </div>
 
-      <div>
-        <div class="legal-title">ðŸ¤ Credits & Acknowledgements</div>
-        <div class="credits-grid">
-          <div class="credit-item">
-            <strong>Ishan (@Specttre404)</strong>
-            <span>Lead Creator & Architect â€¢ Ananta Dhvani Fork</span>
-          </div>
-          <div class="credit-item">
-            <strong>Google Gemini</strong>
-            <span>AI Architecture & Pair Programming Collaborator</span>
-          </div>
-          <div class="credit-item">
-            <strong>LastWave / LastWaveX</strong>
-            <span>Upstream Android Foundation & Scrobbler Stack</span>
-          </div>
-          <div class="credit-item">
-            <strong>AutoEQ by Jaakkopasanen</strong>
-            <span>Parametric Headphone Measurement & Harman Curves</span>
-          </div>
-          <div class="credit-item">
-            <strong>Boris Mikhaylov</strong>
-            <span>Bauer Stereophonic-to-Binaural (BS2B) DSP Algorithm</span>
-          </div>
-          <div class="credit-item">
-            <strong>Google Android Team</strong>
-            <span>Material 3 Expressive Design System & Jetpack Compose</span>
-          </div>
+      <div class="glass-card">
+        <h2>⚡ Anti-Podcast Manifesto</h2>
+        <ul class="manifesto-list">
+          <li><strong>Zero Podcast Bloat:</strong> Strictly no talk shows, audiobooks, or commercial feeds.</li>
+          <li><strong>Silent Auto-Tuning:</strong> Background hardware optimization without low-level clutter.</li>
+          <li><strong>Sovereign Privacy:</strong> Zero trackers, zero analytics, zero ad SDKs, cleartext HTTP forbidden.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Active Roadmap Section -->
+    <section id="roadmap" class="glass-card" style="margin-bottom: 3.5rem;">
+      <span class="roadmap-badge">IN ACTIVE DEVELOPMENT</span>
+      <h2>🚀 Upcoming Feature Roadmap</h2>
+      <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.7;">
+        <strong>Anime OST, Opening (OP) & Ending (ED) Catalog Integration:</strong> Native indexing, synchronized Japanese Furigana (Ruby) lyrics, and high-bitrate acoustic streaming for anime music soundtracks.
+      </p>
+    </section>
+
+    <!-- Version Changelog Timeline (v1.6.1-HDR to v1.7.0-HDR) -->
+    <section id="changelog" class="glass-card" style="margin-bottom: 3.5rem;">
+      <h2>📜 Version Changelog Timeline</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="version-tag">v1.7.0-HDR (Current Release)</div>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Redesigned adaptive launcher icon with specular glow; deep-integrated native Squidify Audio Hub screen; added rotating musical thoughts banner; unified dual-engine theming (M3 & Liquid Glass); completely scrapped app widgets and bottom mini-player.
+          </p>
         </div>
+        <div class="timeline-item">
+          <div class="version-tag">v1.6.9-HDR</div>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Enhanced AutoEQ database profile matching for USB DACs; stabilized ExoPlayer buffer tuning and background audio offload.
+          </p>
+        </div>
+        <div class="timeline-item">
+          <div class="version-tag">v1.6.4-HDR</div>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Integrated AndroidX Palette dynamic color extraction; added sound recognition sheet; hardened security governance.
+          </p>
+        </div>
+        <div class="timeline-item">
+          <div class="version-tag">v1.6.1-HDR</div>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Initial HDR release foundation with native C++ Bauer BS2B binaural crossfeed and iOS Liquid Glass specular shaders.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pantheon & Acknowledgements -->
+    <section id="pantheon" class="glass-card" style="margin-bottom: 3.5rem;">
+      <h2>🏆 Acknowledgements & Inspiration Pantheon</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1rem;">
+        Foremost credit to the original <strong><a href="https://github.com/dkanada/lastwave" target="_blank" style="color: var(--accent); text-decoration: none;">LastWave (dkanada/lastwave)</a></strong> foundation and our 21-repo architectural inspiration pantheon:
+      </p>
+
+      <div style="overflow-x: auto;">
+        <table class="pantheon-table">
+          <thead>
+            <tr>
+              <th>Repository / Project</th>
+              <th>Creator / Team</th>
+              <th>Inspiration Domain</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>ArchiveTune</strong></td><td>rukamori</td><td>Analog console aesthetic & purism</td></tr>
+            <tr><td><strong>Nightly</strong></td><td>rukamori</td><td>Fluid edge-to-edge scaffolding</td></tr>
+            <tr><td><strong>Metrolist</strong></td><td>MetrolistGroup</td><td>Panoramic hubs & seekbar precision</td></tr>
+            <tr><td><strong>vivi-music</strong></td><td>vivizzz007</td><td>M3 Expressive spring dynamics</td></tr>
+            <tr><td><strong>BitChord</strong></td><td>kushagrasinghx</td><td>Fretboard & piano chord lyrics</td></tr>
+            <tr><td><strong>Obsidian-Music</strong></td><td>Varun7009</td><td>OLED black surface minimalism</td></tr>
+            <tr><td><strong>Convx</strong></td><td>cosmictaserdev-creator</td><td>FIR convolution IR filtering</td></tr>
+            <tr><td><strong>orb</strong></td><td>theusalbuquerque</td><td>3D particle sphere visualizer</td></tr>
+            <tr><td><strong>OreoTunes</strong></td><td>kurixutian</td><td>Dynamic color extraction layout</td></tr>
+            <tr><td><strong>YumaPlayer</strong></td><td>MuwMx</td><td>Japanese Furigana Ruby lyrics</td></tr>
+            <tr><td><strong>PixelPlayer</strong></td><td>PixelPlayerHQ</td><td>M3 Expressive design tokens</td></tr>
+            <tr><td><strong>namida</strong></td><td>namidaco</td><td>Sub-bass tactile haptics (20–80Hz)</td></tr>
+            <tr><td><strong>BeatWave</strong></td><td>vortexapps67</td><td>Camelot Wheel harmonic mixing</td></tr>
+            <tr><td><strong>MusicBeat</strong></td><td>SamuelAdmand</td><td>Real-time BPM & phrase detection</td></tr>
+            <tr><td><strong>VantaMusic</strong></td><td>drewk312</td><td>WSOLA pitch-independent stretch</td></tr>
+            <tr><td><strong>Lelonio/Square</strong></td><td>Lelonio</td><td>iOS Liquid Glass specular blur</td></tr>
+            <tr><td><strong>Cider</strong></td><td>Cider Collective</td><td>Desktop panoramic architecture</td></tr>
+            <tr><td><strong>Nuvia-Musics</strong></td><td>aadhil06dev</td><td>Real-time acoustic spectrum waveform</td></tr>
+            <tr><td><strong>Prism</strong></td><td>Yigder</td><td>Iridescent chromatic visualizers</td></tr>
+            <tr><td><strong>Octave</strong></td><td>Octave Team</td><td>Bit-perfect DAC stream routing</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>Handcrafted by <strong>Ishan</strong> with <strong>Google Gemini</strong> â€¢ <strong>Ananta Dhvani</strong> â€¢ Licensed under GNU GPL v3</p>
+    <p>Created by <strong>Ishan (@Specttre404)</strong> with <strong>Google Gemini 4 Argon</strong> • <strong>Ananta Dhvani</strong> • Licensed under GNU GPL v3</p>
   </footer>
 
   <script>
-    // 1. Ambient Glow Tracker
+    // Ambient Glow Tracker
     const glowMesh = document.getElementById('ambientMesh');
     window.addEventListener('pointermove', (e) => {
       glowMesh.style.setProperty('--mx', `${e.clientX}px`);
       glowMesh.style.setProperty('--my', `${e.clientY}px`);
     });
 
-    // 2. Light / Dark Theme Switcher
+    // Theme Switcher
     function toggleTheme() {
       const html = document.documentElement;
       const target = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', target);
-      document.getElementById('themeIcon').textContent = target === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
+      document.getElementById('themeIcon').textContent = target === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('ananta_theme', target);
     }
     const savedTheme = localStorage.getItem('ananta_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
+    document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-    // 3. Isolated Touch & Mouse Tilt (No Android selection magnifier)
-    const stage = document.getElementById('stageContainer');
-    const phone = document.getElementById('phoneBody');
-    let isInteracting = false;
-    let initialX = 0, initialY = 0;
-
-    stage.addEventListener('pointerdown', (e) => {
-      isInteracting = true;
-      initialX = e.clientX;
-      initialY = e.clientY;
-      stage.setPointerCapture(e.pointerId);
-    });
-    stage.addEventListener('pointermove', (e) => {
-      if (!isInteracting) return;
-      const deltaX = Math.max(-18, Math.min(18, (e.clientX - initialX) * 0.12));
-      const deltaY = Math.max(-14, Math.min(14, (e.clientY - initialY) * -0.12));
-      phone.style.transform = `rotateY(${deltaX}deg) rotateX(${deltaY}deg) scale(1.02)`;
-    });
-    const releaseTilt = () => {
-      if (!isInteracting) return;
-      isInteracting = false;
-      phone.style.transform = `rotateY(-8deg) rotateX(6deg) scale(1)`;
-    };
-    stage.addEventListener('pointerup', releaseTilt);
-    stage.addEventListener('pointercancel', releaseTilt);
-
-    // 4. Palette Engine
-    function setPalette(primary, secondary, tertiary, glow, el) {
-      document.documentElement.style.setProperty('--accent', primary);
-      document.documentElement.style.setProperty('--accent-secondary', secondary);
-      document.documentElement.style.setProperty('--accent-tertiary', tertiary);
-      document.documentElement.style.setProperty('--glow', glow);
-      document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    // 5. Track Carousel
-    const tracks = [
-      { title: "Aashiqana Aalam Hai", artist: "Good Boy Bad Boy â€¢ Opus 160kbps", format: "32-bit FLAC", primary: "#00F0FF", secondary: "#7F52FF", tertiary: "#FF2E93" },
-      { title: "Starboy", artist: "The Weeknd â€¢ Daft Punk â€¢ Lossless", format: "24-bit Hi-Res", primary: "#FF2E93", secondary: "#FF8E53", tertiary: "#7F00FF" },
-      { title: "Midnight City", artist: "M83 â€¢ Direct Master Lossless", format: "DSD 256", primary: "#10B981", secondary: "#06B6D4", tertiary: "#6366F1" }
-    ];
-    let trackIndex = 0;
-    let isPlaying = true;
-
-    function updateTrackView() {
-      const t = tracks[trackIndex];
-      document.getElementById('mockTitle').textContent = t.title;
-      document.getElementById('mockArtist').textContent = t.artist;
-      document.getElementById('discLabel').textContent = t.format;
-      document.documentElement.style.setProperty('--accent', t.primary);
-      document.documentElement.style.setProperty('--accent-secondary', t.secondary);
-      document.documentElement.style.setProperty('--accent-tertiary', t.tertiary);
-      document.documentElement.style.setProperty('--glow', `${t.primary}55`);
-    }
-    function nextTrack() { trackIndex = (trackIndex + 1) % tracks.length; updateTrackView(); }
-    function prevTrack() { trackIndex = (trackIndex - 1 + tracks.length) % tracks.length; updateTrackView(); }
-
-    const vinyl = document.getElementById('vinylDisc');
-    const fab = document.getElementById('phonePlayBtn');
-    function togglePlayback() {
-      isPlaying = !isPlaying;
-      vinyl.classList.toggle('paused', !isPlaying);
-      fab.textContent = isPlaying ? 'â¸' : 'â–¶';
-    }
-
-    // 6. In-Mockup Wavy Seekbar Canvas (Rock-solid fixed coordinate system)
-    const pCanvas = document.getElementById('phoneSeekbar');
-    const pCtx = pCanvas.getContext('2d');
-    let seekPhase = 0;
-
-    function renderSeekbar() {
-      pCtx.save();
-      pCtx.scale(2, 2); // 2x Retina scale onto 588x80 physical buffer
-      pCtx.clearRect(0, 0, 294, 40);
-
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      const centerY = 20;
-
-      // Inactive track
-      pCtx.beginPath();
-      pCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      pCtx.lineWidth = 4;
-      pCtx.lineCap = 'round';
-      pCtx.moveTo(4, centerY);
-      pCtx.lineTo(290, centerY);
-      pCtx.stroke();
-
-      // Active harmonic wave
-      if (isPlaying) seekPhase += 0.08;
-      const activeWidth = 190; // 65% scrub
-      pCtx.beginPath();
-      pCtx.strokeStyle = accent;
-      pCtx.lineWidth = 4;
-      pCtx.lineCap = 'round';
-      pCtx.moveTo(4, centerY);
-      for (let x = 4; x <= activeWidth; x += 3) {
-        const wave = Math.sin((x / 20) + seekPhase) * 5.5;
-        pCtx.lineTo(x, centerY + wave);
-      }
-      pCtx.stroke();
-
-      // Scrubber Thumb
-      pCtx.beginPath();
-      pCtx.arc(activeWidth, centerY, 6.5, 0, Math.PI * 2);
-      pCtx.fillStyle = accent;
-      pCtx.shadowColor = accent;
-      pCtx.shadowBlur = 12;
-      pCtx.fill();
-
-      pCtx.restore();
-      requestAnimationFrame(renderSeekbar);
-    }
-    renderSeekbar();
-
-    // 7. Harmonized Sound Lab Synthesizer
-    let audioCtx = null;
-    let oscRoot = null, oscFifth = null;
-    let masterGain = null, lowFilter = null;
-    let isTonePlaying = false;
-    const dspState = { crossfeed: true, autoeq: true, haptics: true };
-
-    function toggleDsp(type) {
-      dspState[type] = !dspState[type];
-      document.getElementById(`chip${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.toggle('active', dspState[type]);
-    }
-
-    function toggleAudioSynthesizer() {
-      const btn = document.getElementById('btnAudioTone');
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-      if (!isTonePlaying) {
-        oscRoot = audioCtx.createOscillator();
-        oscFifth = audioCtx.createOscillator();
-        oscRoot.type = 'sine';
-        oscFifth.type = 'sine';
-        oscRoot.frequency.setValueAtTime(220, audioCtx.currentTime);
-        oscFifth.frequency.setValueAtTime(330, audioCtx.currentTime);
-
-        lowFilter = audioCtx.createBiquadFilter();
-        lowFilter.type = 'lowpass';
-        lowFilter.frequency.setValueAtTime(800, audioCtx.currentTime);
-
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-        masterGain.gain.exponentialRampToValueAtTime(0.04, audioCtx.currentTime + 0.3);
-
-        oscRoot.connect(lowFilter);
-        oscFifth.connect(lowFilter);
-        lowFilter.connect(masterGain);
-        masterGain.connect(audioCtx.destination);
-
-        oscRoot.start();
-        oscFifth.start();
-        isTonePlaying = true;
-        btn.textContent = 'â¹ Stop Acoustic Test Signal';
-        btn.style.background = '#FF2E93';
-      } else {
-        if (masterGain && audioCtx) {
-          masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
-          setTimeout(() => {
-            if (oscRoot) oscRoot.stop();
-            if (oscFifth) oscFifth.stop();
-          }, 200);
-        }
-        isTonePlaying = false;
-        btn.textContent = 'â–¶ Play Acoustic Test Signal';
-        btn.style.background = 'var(--accent)';
-      }
-    }
-
-    // 8. Sound Lab Canvas Spectrum Analyzer
-    const specCanvas = document.getElementById('spectrumVisualizer');
-    const sCtx = specCanvas.getContext('2d');
-    let specPhase = 0;
-
-    function renderSpectrum() {
-      sCtx.clearRect(0, 0, specCanvas.width, specCanvas.height);
-      const bars = 48;
-      const barWidth = (specCanvas.width / bars) - 6;
-      specPhase += isTonePlaying ? 0.08 : 0.04;
-
-      for (let i = 0; i < bars; i++) {
-        let h = Math.sin(specPhase + i * 0.22) * 70 + 110;
-        if (isTonePlaying) h += Math.sin(specPhase * 1.5 + i * 0.1) * 50 + 60;
-
-        if (dspState.haptics && i < 10) h += 80;
-        if (dspState.crossfeed && i >= 12 && i < 28) h *= 0.85;
-        if (dspState.autoeq && i >= 30) h += 50;
-
-        const x = i * (barWidth + 6);
-        const barH = Math.min(h, specCanvas.height - 24);
-        const y = specCanvas.height - barH;
-
-        const grad = sCtx.createLinearGradient(0, y, 0, specCanvas.height);
-        grad.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
-        grad.addColorStop(0.5, getComputedStyle(document.documentElement).getPropertyValue('--accent-secondary').trim());
-        grad.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--accent-tertiary').trim());
-
-        sCtx.fillStyle = grad;
-        sCtx.fillRect(x, y, barWidth, barH);
-      }
-      requestAnimationFrame(renderSpectrum);
-    }
-    renderSpectrum();
-
-    // 9. Checksum Copy
+    // Copy Checksum
     function copyChecksum() {
       const text = document.getElementById('shaText').textContent.trim();
       navigator.clipboard.writeText(text);
       const btn = event.target;
-      btn.textContent = 'âœ“ Copied';
+      btn.textContent = '✓ Copied';
       setTimeout(() => btn.textContent = 'Copy Hash', 2000);
     }
-
-    // 10. Prioritize Active Tag v1.7.0-HDR (Prevents API downgrade to v1.7.0-HDR)
-    async function updateLiveRelease() {
-      try {
-        const res = await fetch('https://api.github.com/repos/Specttre404/AnantaDhvani/releases');
-        if (!res.ok) return;
-        const releases = await res.json();
-        if (Array.isArray(releases) && releases.length > 0) {
-          const target = releases.find(r => r.tag_name === 'v1.7.0-HDR') || releases[0];
-          // Only update if target is equal to or newer than v1.6.9
-          if (target.tag_name && target.tag_name >= 'v1.6.9') {
-            document.getElementById('releaseTag').textContent = `${target.tag_name} Active`;
-            const apk = target.assets && target.assets.find(a => a.name.endsWith('.apk'));
-            if (apk) {
-              document.getElementById('downloadButton').href = apk.browser_download_url;
-              document.getElementById('downloadLabel').textContent = `Download ${apk.name} (${(apk.size / (1024 * 1024)).toFixed(1)} MB)`;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Using release fallback');
-      }
-    }
-    updateLiveRelease();
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
