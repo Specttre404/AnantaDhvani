@@ -60,6 +60,9 @@ import com.lastwave.app.ui.common.safeDrawingBottomPadding
 import com.lastwave.app.ui.common.safeHorizontalContentPadding
 import com.lastwave.app.ui.common.adaptiveContentWidth
 import com.lastwave.app.ui.player.LocalMiniPlayerScrollClearance
+import com.lastwave.app.ui.theme.LocalLiquidGlass
+import com.lastwave.app.ui.theme.liquidGlassChrome
+import com.lastwave.app.ui.theme.liquidGlassContainerColor
 
 /**
  * Faithful port of genres.js (§5): bar-chart genre list with a period
@@ -192,7 +195,7 @@ private fun GenreBarRow(
 ) {
     val animated by animateFloatAsState(targetValue = percent.coerceIn(0.03f, 1f), animationSpec = tween(600), label = "genreBar")
     val gradient = getGenreGradient(name)
-    val isLiquidGlass = com.lastwave.app.ui.theme.LocalLiquidGlass.current
+    val isLiquidGlass = LocalLiquidGlass.current
 
     if (isLiquidGlass) {
         com.lastwave.app.ui.common.LiquidGlassCard(
@@ -269,7 +272,16 @@ private fun GenreDetailSheet(
         if (shouldLoadMore && !state.detailLoading && state.detailHasMore && !state.isDiscoverMode) onLoadMore()
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+    val liquidGlass = LocalLiquidGlass.current
+    val sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = sheetShape,
+        containerColor = if (liquidGlass) liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerLow) else MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.liquidGlassChrome(sheetShape, liquidGlass),
+    ) {
         Column(
             Modifier
                 .fillMaxSize()

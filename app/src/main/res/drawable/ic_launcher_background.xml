@@ -5,7 +5,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Rich Multi-Stop Background Gradient -->
+    <!-- Vibrant Multi-Stop Linear Gradient Background -->
     <path
         android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
@@ -15,43 +15,43 @@
                 android:startY="0"
                 android:endX="108"
                 android:endY="108">
-                <item android:offset="0.0" android:color="#0A0D18" />
-                <item android:offset="0.5" android:color="#0E1221" />
-                <item android:offset="1.0" android:color="#12172A" />
+                <item android:offset="0.0" android:color="#00E5FF" />
+                <item android:offset="0.5" android:color="#7F52FF" />
+                <item android:offset="1.0" android:color="#FF2E93" />
             </gradient>
         </aapt:attr>
     </path>
-    <!-- Cyan Specular Radial Glow Ring -->
+    <!-- Outer Ambient Ring: #5000F0FF bloom -->
     <path
-        android:pathData="M 54,18 A 36,36 0 1,0 54,90 A 36,36 0 1,0 54,18 Z"
-        android:strokeWidth="1.5"
+        android:pathData="M 54,14 A 40,40 0 1,0 54,94 A 40,40 0 1,0 54,14 Z"
+        android:strokeWidth="3.5"
         android:fillColor="#00000000">
         <aapt:attr name="android:strokeColor">
             <gradient
                 android:type="radial"
                 android:centerX="54"
                 android:centerY="54"
-                android:gradientRadius="42">
-                <item android:offset="0.0" android:color="#4000F0FF" />
-                <item android:offset="0.7" android:color="#1A00F0FF" />
+                android:gradientRadius="44">
+                <item android:offset="0.0" android:color="#5000F0FF" />
+                <item android:offset="0.7" android:color="#3000F0FF" />
                 <item android:offset="1.0" android:color="#0000F0FF" />
             </gradient>
         </aapt:attr>
     </path>
-    <!-- Purple Specular Radial Glow Ring -->
+    <!-- Inner Ring: #80FFFFFF with soft radial blur -->
     <path
-        android:pathData="M 54,26 A 28,28 0 1,0 54,82 A 28,28 0 1,0 54,26 Z"
-        android:strokeWidth="2.0"
+        android:pathData="M 54,22 A 32,32 0 1,0 54,86 A 32,32 0 1,0 54,22 Z"
+        android:strokeWidth="2.5"
         android:fillColor="#00000000">
         <aapt:attr name="android:strokeColor">
             <gradient
                 android:type="radial"
                 android:centerX="54"
                 android:centerY="54"
-                android:gradientRadius="32">
-                <item android:offset="0.0" android:color="#507F52FF" />
-                <item android:offset="0.8" android:color="#207F52FF" />
-                <item android:offset="1.0" android:color="#007F52FF" />
+                android:gradientRadius="34">
+                <item android:offset="0.0" android:color="#80FFFFFF" />
+                <item android:offset="0.6" android:color="#40FFFFFF" />
+                <item android:offset="1.0" android:color="#00FFFFFF" />
             </gradient>
         </aapt:attr>
     </path>

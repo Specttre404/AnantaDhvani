@@ -3604,10 +3604,12 @@ private fun AudioOffloadCard(
     enabled: Boolean,
     onToggle: (Boolean) -> Unit,
 ) {
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().liquidGlassChrome(shape, liquidGlass),
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
@@ -3716,10 +3718,12 @@ private fun DecoupledSpeedPitchCard(
     var speed by remember { mutableFloatStateOf(1.0f) }
     var pitchSemitones by remember { mutableFloatStateOf(0.0f) }
 
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight().liquidGlassChrome(shape, liquidGlass),
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Decoupled Speed & Pitch", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -3753,10 +3757,12 @@ private fun UsbDirectOutputCard(
     enabled: Boolean,
     onToggle: (Boolean) -> Unit,
 ) {
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight().liquidGlassChrome(shape, liquidGlass),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),

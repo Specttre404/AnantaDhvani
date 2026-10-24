@@ -320,10 +320,10 @@ fun HomeScreen(
                                 )
                             }
 
-                            // Settings (Completely isolated hit boundary)
+                            // Settings (Completely isolated 44.dp hit boundary)
                             Box(
                                 modifier = Modifier
-                                    .size(40.dp)
+                                    .size(44.dp)
                                     .clip(CircleShape)
                                     .clickable(onClick = onOpenSettings),
                                 contentAlignment = Alignment.Center,
@@ -580,9 +580,12 @@ fun HomeScreen(
 
     if (showAudioRecognitionSheet) {
         val musicPlayer = com.lastwave.app.ui.player.LocalMusicPlayer.current
-        com.lastwave.app.ui.common.AudioRecognitionSheet(
+        com.lastwave.app.ui.common.UnifiedAudioAssistantSheet(
             recognitionManager = viewModel.audioRecognitionManager,
             onDismiss = { showAudioRecognitionSheet = false },
+            onVoiceSearchResult = { _ ->
+                onOpenSearch()
+            },
             onPlayRecognizedTrack = { song ->
                 showAudioRecognitionSheet = false
                 musicPlayer.play(

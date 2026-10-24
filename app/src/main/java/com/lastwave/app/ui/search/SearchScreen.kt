@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Mic
 import android.Manifest
@@ -147,6 +148,7 @@ fun SearchScreen(
     val musicPlayer = com.lastwave.app.ui.player.LocalMusicPlayer.current
     val playbackState by musicPlayer.chromeState.collectAsStateWithLifecycle()
     var menuTarget by remember { mutableStateOf<TrackMenuTarget?>(null) }
+    var showAssistantSheet by remember { mutableStateOf(false) }
     val addToPlaylist = com.lastwave.app.ui.player.LocalAddToPlaylist.current
     val focusManager = LocalFocusManager.current
     val liquidGlass = LocalLiquidGlass.current
@@ -263,6 +265,20 @@ fun SearchScreen(
                             }
                         },
                     )
+                    Spacer(Modifier.width(8.dp))
+                    IconButton(
+                        onClick = { showAssistantSheet = true },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.GraphicEq,
+                            contentDescription = "Audio Assistant",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(10.dp))

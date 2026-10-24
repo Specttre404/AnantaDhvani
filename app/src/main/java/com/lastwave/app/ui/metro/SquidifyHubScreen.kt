@@ -17,8 +17,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,15 +36,19 @@ fun SquidifyHubScreen(
     val context = LocalContext.current
     val webView = remember {
         WebView(context).apply {
+            setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
+                databaseEnabled = true
+                setSupportZoom(false)
                 loadWithOverviewMode = true
                 useWideViewPort = true
                 allowFileAccess = false
                 allowContentAccess = false
                 cacheMode = WebSettings.LOAD_DEFAULT
                 mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                offscreenPreRaster = true
             }
 
             webViewClient = object : WebViewClient() {
