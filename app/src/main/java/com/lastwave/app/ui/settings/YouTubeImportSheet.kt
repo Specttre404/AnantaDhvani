@@ -72,6 +72,9 @@ import com.lastwave.app.ui.common.ArtworkImage
 import com.lastwave.app.ui.common.adaptiveContentWidth
 import com.lastwave.app.ui.common.safeDrawingBottomPadding
 import com.lastwave.app.ui.theme.ArtworkShape
+import com.lastwave.app.ui.theme.LocalLiquidGlass
+import com.lastwave.app.ui.theme.liquidGlassChrome
+import com.lastwave.app.ui.theme.liquidGlassContainerColor
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,11 +137,15 @@ fun YouTubeImportSheet(
         }
     }
 
+    val liquidGlass = LocalLiquidGlass.current
+    val sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = sheetShape,
+        containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerLow),
+        modifier = Modifier.liquidGlassChrome(sheetShape, liquidGlass),
         dragHandle = {
             Surface(
                 shape = RoundedCornerShape(50),

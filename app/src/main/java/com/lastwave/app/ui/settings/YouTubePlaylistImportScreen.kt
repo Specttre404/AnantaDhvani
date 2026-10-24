@@ -108,6 +108,9 @@ import com.lastwave.app.ui.common.adaptiveContentWidth
 import com.lastwave.app.ui.player.LocalMiniPlayerScrollClearance
 import com.lastwave.app.ui.shell.FloatingNavDefaults
 import com.lastwave.app.ui.theme.ArtworkShape
+import com.lastwave.app.ui.theme.LocalLiquidGlass
+import com.lastwave.app.ui.theme.liquidGlassChrome
+import com.lastwave.app.ui.theme.liquidGlassContainerColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -694,14 +697,18 @@ private fun YouTubePlaylistCard(
     onToggleSelect: () -> Unit,
     onPreview: () -> Unit,
 ) {
+    val shape = groupShape(position)
+    val liquidGlass = LocalLiquidGlass.current
+    val baseColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceContainerHigh
     Card(
-        shape = groupShape(position),
+        shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceContainerHigh,
+            containerColor = liquidGlassContainerColor(baseColor),
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .liquidGlassChrome(shape, liquidGlass)
             .clickable(onClick = onToggleSelect),
     ) {
         Row(

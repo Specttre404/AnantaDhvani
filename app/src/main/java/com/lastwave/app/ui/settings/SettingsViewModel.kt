@@ -98,7 +98,6 @@ class SettingsViewModel @Inject constructor(
     private val downloadedTrackDao: com.lastwave.app.data.local.db.DownloadedTrackDao,
     private val songPlayStatsRepository: com.lastwave.app.data.repository.SongPlayStatsRepository,
     private val appLocaleManager: com.lastwave.app.util.AppLocaleManager,
-    private val appIconManager: com.lastwave.app.util.AppIconManager,
     private val autoEqRepository: com.lastwave.app.data.eq.AutoEqRepository,
     private val webDavSyncManager: com.lastwave.app.data.backup.WebDavSyncManager,
     val playlistImportManager: com.lastwave.app.data.playlist.PlaylistImportManager,
@@ -517,10 +516,7 @@ class SettingsViewModel @Inject constructor(
         appLocaleManager.applyLanguage(language)
     }
 
-    fun setAppIconTheme(icon: com.lastwave.app.data.local.AppIconTheme) = launchSettingsAction("switch app icon") {
-        settingsPreferences.setAppIconTheme(icon)
-        appIconManager.switchIcon(icon)
-    }
+
 
     fun setBufferTuning(minBufferMs: Int, maxBufferMs: Int, bufferForPlaybackMs: Int, bufferForPlaybackAfterRebufferMs: Int) = launchSettingsAction("update buffer tuning") {
         settingsPreferences.setBufferTuning(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferMs)

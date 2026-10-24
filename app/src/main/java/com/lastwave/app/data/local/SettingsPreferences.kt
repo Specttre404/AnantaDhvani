@@ -233,8 +233,6 @@ data class MiscSettings(
     val notchAutoDismissSec: Int = 4,
     /** Local disk cache quota in MB (default 2048 MB, -1 for unlimited). */
     val cacheQuotaMb: Long = 2048L,
-    /** Active launcher app icon theme. */
-    val appIconTheme: AppIconTheme = AppIconTheme.DARK,
     /** ExoPlayer LoadControl buffer preferences (in milliseconds). */
     val minBufferMs: Int = 15_000,
     val maxBufferMs: Int = 50_000,
@@ -405,7 +403,6 @@ class SettingsPreferences @Inject constructor(
         val NOTCH_TOP_MARGIN_DP = intPreferencesKey("lw_notch_top_margin_dp")
         val NOTCH_CAPSULE_WIDTH_DP = intPreferencesKey("lw_notch_capsule_width_dp")
         val NOTCH_AUTO_DISMISS_SEC = intPreferencesKey("lw_notch_auto_dismiss_sec")
-        val APP_ICON_THEME = stringPreferencesKey("lw_app_icon_theme")
         val CACHE_QUOTA_MB = longPreferencesKey("lw_cache_quota_mb")
         val MIN_BUFFER_MS = intPreferencesKey("lw_min_buffer_ms")
         val MAX_BUFFER_MS = intPreferencesKey("lw_max_buffer_ms")
@@ -493,7 +490,6 @@ class SettingsPreferences @Inject constructor(
                 notchTopMarginDp = (p.readSafely(Keys.NOTCH_TOP_MARGIN_DP) ?: 4).coerceIn(0, 24),
                 notchCapsuleWidthDp = (p.readSafely(Keys.NOTCH_CAPSULE_WIDTH_DP) ?: 220).coerceIn(180, 320),
                 notchAutoDismissSec = (p.readSafely(Keys.NOTCH_AUTO_DISMISS_SEC) ?: 4).coerceIn(2, 6),
-                appIconTheme = AppIconTheme.fromId(p.readSafely(Keys.APP_ICON_THEME)),
                 cacheQuotaMb = p.readSafely(Keys.CACHE_QUOTA_MB) ?: 2048L,
                 minBufferMs = (p.readSafely(Keys.MIN_BUFFER_MS) ?: 15_000).coerceIn(5_000, 60_000),
                 maxBufferMs = (p.readSafely(Keys.MAX_BUFFER_MS) ?: 50_000).coerceIn(15_000, 120_000),
@@ -675,9 +671,7 @@ class SettingsPreferences @Inject constructor(
         dataStore.edit { it[Keys.PLAYER_STYLE] = style.id }
     }
 
-    suspend fun setAppIconTheme(icon: AppIconTheme) {
-        dataStore.edit { it[Keys.APP_ICON_THEME] = icon.id }
-    }
+
 
     suspend fun setBufferTuning(minBufferMs: Int, maxBufferMs: Int, bufferForPlaybackMs: Int, bufferForPlaybackAfterRebufferMs: Int) {
         dataStore.edit {

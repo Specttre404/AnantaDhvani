@@ -1,9 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Ambient Bloom Glow Layer -->
+    <path
+        android:pathData="M 30,54 C 36,54 38,32 46,32 C 54,32 52,76 62,76 C 70,76 72,54 78,54"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="linear"
+                android:startX="30"
+                android:startY="54"
+                android:endX="78"
+                android:endY="54">
+                <item android:offset="0.0" android:color="#3300F0FF" />
+                <item android:offset="0.5" android:color="#337F52FF" />
+                <item android:offset="1.0" android:color="#33FF2E93" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Tri-Color Harmonic Soundwave Vector -->
     <path
         android:pathData="M 30,54 C 36,54 38,32 46,32 C 54,32 52,76 62,76 C 70,76 72,54 78,54"
         android:strokeWidth="6.5"

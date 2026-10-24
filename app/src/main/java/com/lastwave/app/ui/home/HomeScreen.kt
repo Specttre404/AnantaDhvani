@@ -152,6 +152,90 @@ private val BadgePillShape = RoundedCornerShape(50)
  * There's no separate "Now Playing card" — that was an earlier, simplified
  * substitute; the real app renders it as the first row of the same list.
  */
+@Composable
+private fun ThoughtOfSessionBanner(
+    modifier: Modifier = Modifier,
+) {
+    var dismissed by remember { mutableStateOf(false) }
+    if (dismissed) return
+
+    val thought = remember { com.lastwave.app.data.model.MusicalThoughtProvider.getDailyThought() }
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = RoundedCornerShape(22.dp)
+
+    Card(
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)),
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .liquidGlassChrome(shape, liquidGlass),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("🎵", style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        "THOUGHT OF THE SESSION",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text("•", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        thought.category,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "\"${thought.quote}\"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "— ${thought.author}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            IconButton(
+                onClick = { dismissed = true },
+                modifier = Modifier.size(28.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "Dismiss thought",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -289,6 +373,7 @@ fun HomeScreen(
                     .adaptiveContentWidth(maxWidth = 860.dp)
                     .safeHorizontalContentPadding(),
             ) {
+            ThoughtOfSessionBanner()
             HeaderRow(
                 displayUsername = when {
                     uiState.isViewingFriend -> uiState.viewingUsername

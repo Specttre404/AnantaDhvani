@@ -547,7 +547,9 @@ fun PlayerHost(
     }
     val trackKey = state.current?.let { it.videoId ?: "${it.artist}|${it.title}" }
     LaunchedEffect(trackKey) {
-        if (trackKey == null) {
+        if (trackKey != null) {
+            expanded = true
+        } else {
             expanded = false
             currentTab = FullPlayerTab.NOW_PLAYING
         }
@@ -577,28 +579,14 @@ fun PlayerHost(
             }
         }
     }
-    val miniPlayerVisible = state.current != null && !expanded
 
     CompositionLocalProvider(
         LocalMusicPlayer provides viewModel.player,
         LocalAddToPlaylist provides requestAddToPlaylist,
-        LocalMiniPlayerScrollClearance provides if (state.current != null) 88.dp else 0.dp,
+        LocalMiniPlayerScrollClearance provides 0.dp,
     ) {
         Box(Modifier.fillMaxSize()) {
             content()
-            if (miniPlayerVisible) {
-                ExpressiveMiniPlayer(
-                    playbackState = state,
-                    onExpand = { expanded = true },
-                    onPlayPause = viewModel.player::togglePlayPause,
-                    onNext = viewModel.player::next,
-                    onPrevious = viewModel.player::previous,
-                    enableVinylRotation = true,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = if (hasBottomNavigation) 80.dp else 8.dp),
-                )
-            }
             AnimatedVisibility(
                 visible = expanded && state.current != null,
                 enter = slideInVertically(

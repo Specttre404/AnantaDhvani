@@ -260,58 +260,6 @@ fun SearchScreen(
                                         )
                                     }
                                 }
-                                var showAudioRecognitionSheet by remember { mutableStateOf(false) }
-
-                                val voiceSearchLauncher = rememberLauncherForActivityResult(
-                                    contract = ActivityResultContracts.StartActivityForResult(),
-                                ) { result ->
-                                    if (result.resultCode == android.app.Activity.RESULT_OK) {
-                                        val spokenText = result.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
-                                        if (!spokenText.isNullOrBlank()) {
-                                            viewModel.executeSearch(spokenText)
-                                        }
-                                    }
-                                }
-
-                                IconButton(
-                                    onClick = {
-                                        val intent = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                            putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                                            putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Speak track, artist, or album name...")
-                                        }
-                                        runCatching { voiceSearchLauncher.launch(intent) }
-                                    },
-                                    modifier = Modifier.size(28.dp),
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Mic,
-                                        contentDescription = "Voice Search",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                }
-
-                                IconButton(
-                                    onClick = { showAudioRecognitionSheet = true },
-                                    modifier = Modifier.size(28.dp),
-                                ) {
-                                    Icon(
-                                        Icons.Filled.GraphicEq,
-                                        contentDescription = "Identify song by audio",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                }
-
-                                if (showAudioRecognitionSheet) {
-                                    com.lastwave.app.ui.common.AudioRecognitionSheet(
-                                        recognitionManager = viewModel.audioRecognitionManager,
-                                        onDismiss = { showAudioRecognitionSheet = false },
-                                        onPlayRecognizedTrack = { song ->
-                                            viewModel.executeSearch(song.query)
-                                        },
-                                    )
-                                }
                             }
                         },
                     )

@@ -95,9 +95,9 @@
             android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- Internal intent filters (Launcher is handled by activity-aliases) -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.APP_MUSIC" />
             </intent-filter>
@@ -149,33 +149,7 @@
 
         </activity>
 
-        <!-- Default: Material 3 Expressive Dark Theme Icon -->
-        <activity-alias
-            android:name=".MainActivityDark"
-            android:enabled="true"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
 
-        <!-- Option: Material 3 Expressive Light Theme Icon -->
-        <activity-alias
-            android:name=".MainActivityLight"
-            android:enabled="false"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher_light"
-            android:roundIcon="@mipmap/ic_launcher_light"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
 
         <!-- LastWave local scrobbler listener service -->
         <service
@@ -223,20 +197,7 @@
             </intent-filter>
         </receiver>
 
-        <!-- Expressive Home Screen Widget Receiver -->
-        <receiver
-            android:name=".widget.MusicWidgetProvider"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.lastwave.app.widget.ACTION_PLAY_PAUSE" />
-                <action android:name="com.lastwave.app.widget.ACTION_NEXT" />
-                <action android:name="com.lastwave.app.widget.ACTION_PREVIOUS" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/music_widget_info" />
-        </receiver>
+
 
         <!-- Retained for the Playlist module's M3U export (SAF/legacy write) -->
         <provider
@@ -280,11 +241,7 @@
             </intent-filter>
         </service>
 
-            <activity
-            android:name=".SquidifyActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
     </application>
 </manifest>
 

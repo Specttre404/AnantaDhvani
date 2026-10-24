@@ -402,6 +402,7 @@ fun LastWaveNavHost(
                     onOpenYouTubeImport = { navController.navigate(Screen.YouTubeImport.route) },
                     onOpenYouTubeLogin = { navController.navigate(Screen.YouTubeLogin.route) },
                     onOpenExternalImport = { navController.navigate(Screen.ExternalPlaylistImport.route) },
+                    onOpenSquidifyHub = { navController.navigate(Screen.SquidifyHub.route) },
                 )
             }
         }

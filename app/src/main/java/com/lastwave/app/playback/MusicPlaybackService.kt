@@ -865,13 +865,6 @@ class MusicPlaybackService : MediaBrowserServiceCompat() {
         val success = runCatching {
             getSystemService(NotificationManager::class.java)
                 ?.notify(NOTIFICATION_ID, buildNotification(state, artworkBitmap))
-            com.lastwave.app.widget.MusicWidgetProvider.updateAllWidgets(
-                this,
-                track.title,
-                track.artist,
-                state.isPlaying,
-                artworkBitmap,
-            )
             true
         }.onFailure { error ->
             // Some OEMs throw from notify() for transient binder failures;

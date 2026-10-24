@@ -192,7 +192,40 @@ private fun GenreBarRow(
 ) {
     val animated by animateFloatAsState(targetValue = percent.coerceIn(0.03f, 1f), animationSpec = tween(600), label = "genreBar")
     val gradient = getGenreGradient(name)
-    Column(modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    val isLiquidGlass = com.lastwave.app.ui.theme.LocalLiquidGlass.current
+
+    if (isLiquidGlass) {
+        com.lastwave.app.ui.common.LiquidGlassCard(
+            onClick = onClick,
+            modifier = modifier.fillMaxWidth(),
+        ) {
+            GenreBarContent(name = name, percent = percent, animated = animated, gradient = gradient)
+        }
+    } else {
+        com.lastwave.app.ui.common.ExpressiveGroup(
+            rowCount = 1,
+            modifier = modifier.fillMaxWidth(),
+        ) { _, _ ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onClick)
+                    .padding(16.dp),
+            ) {
+                GenreBarContent(name = name, percent = percent, animated = animated, gradient = gradient)
+            }
+        }
+    }
+}
+
+@Composable
+private fun GenreBarContent(
+    name: String,
+    percent: Float,
+    animated: Float,
+    gradient: Brush,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(name.replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
             Text("${(percent * 100).toInt()}%", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)

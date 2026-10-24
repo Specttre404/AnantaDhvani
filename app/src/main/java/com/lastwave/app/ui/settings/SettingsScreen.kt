@@ -86,7 +86,7 @@ import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Waves
 import com.lastwave.app.data.local.LyricsAnimation
 import com.lastwave.app.data.local.LyricsUiVersion
-import com.lastwave.app.data.local.AppIconTheme
+
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RestartAlt
@@ -286,6 +286,7 @@ fun SettingsScreen(
     onOpenYouTubeImport: () -> Unit = {},
     onOpenYouTubeLogin: () -> Unit = {},
     onOpenExternalImport: () -> Unit = {},
+    onOpenSquidifyHub: () -> Unit = {},
     playerViewModel: com.lastwave.app.ui.player.PlayerViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -818,10 +819,6 @@ fun SettingsScreen(
                             )
                         }
                     }
-                    AppIconSelectorCard(
-                        currentTheme = misc.appIconTheme,
-                        onSelectIcon = viewModel::setAppIconTheme,
-                    )
                     SystemIntegrationLockscreenCard(
                         expressiveNotificationEnabled = misc.expressiveNotificationEnabled,
                         screenOffBatterySaver = misc.screenOffBatterySaver,
@@ -1544,56 +1541,75 @@ fun SettingsScreen(
 
     // -- App language picker (Settings -> Language) --
     if (showLanguageDialog) {
+        val liquidGlass = LocalLiquidGlass.current
+        val dialogShape = RoundedCornerShape(28.dp)
         AlertDialog(
             onDismissRequest = { showLanguageDialog = false },
-            title = { Text(stringResource(R.string.settings_language_dialog_title)) },
+            modifier = Modifier.liquidGlassChrome(dialogShape, liquidGlass),
+            shape = dialogShape,
+            containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh),
+            title = { Text(stringResource(R.string.settings_language_dialog_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     AppLanguage.SELECTABLE.forEach { language ->
                         val selected = language == currentLanguage
-                        Row(
+                        val itemShape = RoundedCornerShape(16.dp)
+                        val itemColor = if (liquidGlass) {
+                            if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else Color.Transparent
+                        } else {
+                            if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainer
+                        }
+                        Surface(
+                            onClick = {
+                                viewModel.setAppLanguage(language)
+                                showLanguageDialog = false
+                            },
+                            shape = itemShape,
+                            color = itemColor,
+                            border = if (selected) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(14.dp))
-                                .clickable {
-                                    viewModel.setAppLanguage(language)
-                                    showLanguageDialog = false
-                                }
-                                .padding(horizontal = 8.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                                .liquidGlassChrome(itemShape, liquidGlass && selected),
                         ) {
-                            RadioButton(
-                                selected = selected,
-                                onClick = {
-                                    viewModel.setAppLanguage(language)
-                                    showLanguageDialog = false
-                                },
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    language.nativeDisplayName(),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                RadioButton(
+                                    selected = selected,
+                                    onClick = {
+                                        viewModel.setAppLanguage(language)
+                                        showLanguageDialog = false
+                                    },
                                 )
-                                if (language == AppLanguage.SYSTEM) {
+                                Spacer(Modifier.width(10.dp))
+                                Column(Modifier.weight(1f)) {
                                     Text(
-                                        stringResource(R.string.settings_language_system_sub),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        language.nativeDisplayName(),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                                    )
+                                    if (language == AppLanguage.SYSTEM) {
+                                        Text(
+                                            stringResource(R.string.settings_language_system_sub),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                }
+                                if (selected) {
+                                    Icon(
+                                        Icons.Filled.Check,
+                                        contentDescription = stringResource(R.string.common_selected),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp),
                                     )
                                 }
-                            }
-                            if (selected) {
-                                Icon(
-                                    Icons.Filled.Check,
-                                    contentDescription = stringResource(R.string.common_selected),
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(18.dp),
-                                )
                             }
                         }
                     }
@@ -3047,10 +3063,12 @@ private fun StreamBufferTuningCard(
     playbackBufferMs: Int,
     onBufferChange: (min: Int, max: Int, start: Int, rebuffer: Int) -> Unit,
 ) {
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().liquidGlassChrome(shape, liquidGlass),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -3082,10 +3100,12 @@ private fun StreamCodecCard(
     currentCodec: com.lastwave.app.data.local.PreferredAudioCodec,
     onSelectCodec: (com.lastwave.app.data.local.PreferredAudioCodec) -> Unit,
 ) {
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().liquidGlassChrome(shape, liquidGlass),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -3115,10 +3135,12 @@ private fun CacheQuotaCard(
     currentQuotaMb: Long,
     onSelectQuotaMb: (Long) -> Unit,
 ) {
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().liquidGlassChrome(shape, liquidGlass),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -3201,10 +3223,12 @@ private fun SilenceTrimmingCard(
     minDurationMs: Long,
     onChange: (thresholdDb: Float, minDurationMs: Long) -> Unit,
 ) {
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = CardOuterShape
     Card(
-        shape = CardOuterShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh)),
+        modifier = Modifier.fillMaxWidth().liquidGlassChrome(shape, liquidGlass),
     ) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -4089,55 +4113,7 @@ private fun AutoEqCard(
     }
 }
 
-@Composable
-private fun AppIconSelectorCard(
-    currentTheme: AppIconTheme,
-    onSelectIcon: (AppIconTheme) -> Unit,
-) {
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Icon(Icons.Filled.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Column {
-                    Text("App Launcher Icon", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Choose Material 3 Expressive launcher icon theme", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Surface(
-                    onClick = { onSelectIcon(AppIconTheme.DARK) },
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFF0B0F1A),
-                    border = BorderStroke(if (currentTheme == AppIconTheme.DARK) 2.dp else 1.dp, if (currentTheme == AppIconTheme.DARK) MaterialTheme.colorScheme.primary else Color(0x33FFFFFF)),
-                    modifier = Modifier.weight(1f).height(90.dp),
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        Icon(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(42.dp))
-                        Spacer(Modifier.height(4.dp))
-                        Text("Expressive Dark", style = MaterialTheme.typography.labelSmall, color = Color.White, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-                Surface(
-                    onClick = { onSelectIcon(AppIconTheme.LIGHT) },
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFF8FAFC),
-                    border = BorderStroke(if (currentTheme == AppIconTheme.LIGHT) 2.dp else 1.dp, if (currentTheme == AppIconTheme.LIGHT) MaterialTheme.colorScheme.primary else Color(0x33000000)),
-                    modifier = Modifier.weight(1f).height(90.dp),
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        Icon(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(42.dp))
-                        Spacer(Modifier.height(4.dp))
-                        Text("Expressive Light", style = MaterialTheme.typography.labelSmall, color = Color(0xFF0F172A), fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun AccentPresetGrid(
@@ -5857,40 +5833,43 @@ private fun LyricsAnimationSheet(
     }
 }
 
-@androidx.compose.runtime.Composable
+@Composable
 fun SquidifyCard(
-    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
+    onOpenSquidifyHub: () -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    androidx.compose.material3.OutlinedCard(
-        onClick = {
-            val intent = android.content.Intent(context, com.lastwave.app.SquidifyActivity::class.java)
-            context.startActivity(intent)
-        },
+    val liquidGlass = LocalLiquidGlass.current
+    val shape = RoundedCornerShape(18.dp)
+    Card(
+        onClick = onOpenSquidifyHub,
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh),
+        ),
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .liquidGlassChrome(shape, liquidGlass),
     ) {
-        androidx.compose.foundation.layout.Row(
-            modifier = androidx.compose.ui.Modifier.padding(16.dp),
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "🦑",
-                style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
-            androidx.compose.foundation.layout.Spacer(modifier = androidx.compose.ui.Modifier.width(16.dp))
-            androidx.compose.foundation.layout.Column {
-                androidx.compose.material3.Text(
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
                     text = "Squidify Audio Hub",
-                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                 )
-                androidx.compose.material3.Text(
+                Text(
                     text = "Open web streaming & lossless track downloader",
-                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
