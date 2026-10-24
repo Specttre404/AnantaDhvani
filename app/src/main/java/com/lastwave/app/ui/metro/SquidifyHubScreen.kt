@@ -40,7 +40,6 @@ fun SquidifyHubScreen(
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
-                databaseEnabled = true
                 setSupportZoom(false)
                 loadWithOverviewMode = true
                 useWideViewPort = true

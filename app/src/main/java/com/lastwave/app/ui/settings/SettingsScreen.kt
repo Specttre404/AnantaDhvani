@@ -711,7 +711,7 @@ fun SettingsScreen(
                     SettingsGroup(rowCount = 9) { index, position ->
                         when (index) {
                             0 -> ThemeModeSelectorCard(
-                                currentThemeMode = theme?.themeMode ?: ThemeMode.SYSTEM,
+                                currentThemeMode = theme.themeMode,
                                 onSelectThemeMode = viewModel::setThemeMode,
                                 position = position,
                             )
@@ -721,8 +721,8 @@ fun SettingsScreen(
                                 iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
                                 title = stringResource(R.string.settings_amoled),
                                 subtitle = stringResource(R.string.settings_amoled_sub),
-                                checked = theme?.amoled ?: false,
-                                enabled = theme?.themeMode != ThemeMode.LIGHT,
+                                checked = theme.amoled,
+                                enabled = theme.themeMode != ThemeMode.LIGHT,
                                 onCheckedChange = viewModel::setAmoled,
                                 position = position,
                             )
@@ -732,7 +732,7 @@ fun SettingsScreen(
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = stringResource(R.string.settings_dynamic_color),
                                 subtitle = stringResource(R.string.settings_dynamic_color_sub),
-                                checked = theme?.mode == AccentMode.DYNAMIC,
+                                checked = theme.mode == AccentMode.DYNAMIC,
                                 onCheckedChange = { enabled ->
                                     viewModel.setAccentMode(if (enabled) AccentMode.DYNAMIC else AccentMode.MANUAL)
                                 },
@@ -810,8 +810,8 @@ fun SettingsScreen(
                     ) {
                         Column(Modifier.padding(20.dp)) {
                             AccentPresetGrid(
-                                currentMode = theme?.mode ?: AccentMode.MANUAL,
-                                selectedHex = theme?.accentColorHex,
+                                currentMode = theme.mode,
+                                selectedHex = theme.accentColorHex,
                                 onPickDynamic = { viewModel.setAccentMode(AccentMode.DYNAMIC) },
                                 onPickPreset = { hex -> viewModel.setManualAccent(Color(android.graphics.Color.parseColor(hex))) },
                                 onPickMono = { viewModel.setAccentMode(AccentMode.MONOCHROME) },
@@ -841,7 +841,7 @@ fun SettingsScreen(
                                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 title = stringResource(R.string.settings_liquid_glass),
                                 subtitle = stringResource(R.string.settings_liquid_glass_sub),
-                                checked = theme?.liquidGlass ?: false,
+                                checked = theme.liquidGlass,
                                 onCheckedChange = viewModel::setLiquidGlass,
                                 position = position,
                             )

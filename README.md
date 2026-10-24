@@ -22,7 +22,7 @@ Experience the live web app with interactive audio demonstrations and hardware t
 * 📱 **3D Google Pixel 11 Pro XL Virtual Device**: Cursor-responsive gyroscope tilt physics with working controls and real-time harmonic seekbars.
 * 🔬 **Interactive DSP Sound Lab**: In-browser Web Audio API synthesizer demonstrating Bauer BS2B crossfeed and AutoEQ frequency curves.
 * 🧊 **Material 3 Expressive & iOS Liquid Glass**: Dynamic album art palette extraction with fluid spring animations.
-* 🛡️ **Verified Release Binary (v1.7.0-HDR)**: SHA-256: `991ED3BF470B74371ED68F7A7A71A7263CF5B857739416D612E912F4560E02BD`
+* 🛡️ **Verified Release Binary (v1.7.0-HDR)**: SHA-256: `442AE26B5C31C5031EE57C898B395D97DE975E6D4CDBF73240EA0E415E70B431`
 
 ---
 
