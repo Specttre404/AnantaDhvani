@@ -53,8 +53,8 @@ android {
 
     defaultConfig {
         applicationId = "com.specttre404.lastwavex"
-        minSdk = 31
-        targetSdk = 35
+        minSdk = 29
+        targetSdk = 37
         versionCode = 20
         versionName = "1.7.0-HDR"
 
@@ -110,6 +110,8 @@ android {
                 cppFlags += listOf("-Wl,-z,max-page-size=16384", "-std=c++26", "-O3", "-flto")
             }
         }
+        proguardFiles()
+        signingConfig = signingConfigs.getByName("release")
     }
 
     signingConfigs {
@@ -171,8 +173,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         // Required by org.jellyfin.media3:media3-ffmpeg-decoder AAR metadata.
         isCoreLibraryDesugaringEnabled = true
     }
@@ -207,6 +209,9 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+    compileSdkMinor = 0
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "28.2.13676358"
 }
 
 dependencies {
@@ -218,7 +223,7 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.foundation)
 
-    implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
+    implementation("com.google.android.gms:play-services-cast-framework:23.0.0")
     implementation("org.nanohttpd:nanohttpd:2.3.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -283,23 +288,23 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-dash:$media3Version")
     // MediaBrowserServiceCompat/MediaSessionCompat bridge used by Android
     // Auto to browse the LastWave library and control the same player.
-    implementation("androidx.media:media:1.7.0")
+    implementation("androidx.media:media:1.8.0")
 
     // Provider-module QuickJS runtime (pinned to the cached 1.0.12 line).
-    implementation("io.github.dokar3:quickjs-kt-android:1.0.12")
+    implementation("io.github.dokar3:quickjs-kt-android:1.0.15")
 
     // GPLv3 Media3-matched FFmpeg software decoder (distribution must comply).
     // The renderer factory prefers FFmpeg for every codec it supports so all
     // devices decode through one deterministic, OEM-bug-free path; platform
     // decoders remain as automatic fallbacks.
-    implementation("org.jellyfin.media3:media3-ffmpeg-decoder:1.2.1+1")
+    implementation("org.jellyfin.media3:media3-ffmpeg-decoder:1.9.0+1")
 
     // Core library desugaring required by the FFmpeg decoder AAR metadata.
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     // Low-latency native output. Version 1.10 remains API-compatible with the
     // requested Oboe 1.8+ baseline and exposes its CMake target through Prefab.
-    implementation("com.google.oboe:oboe:1.10.0")
+    implementation("com.google.oboe:oboe:1.11.0")
 
     // Metadata/search remains local InnerTube/NewPipe functionality; playback
     // resolves through InnerTubeX first and retains NewPipe as a fallback.
@@ -309,14 +314,14 @@ dependencies {
     // current release is built with a newer Kotlin metadata version than the
     // app. Runtime-only keeps the app compiler on its existing Kotlin line.
     runtimeOnly(libs.innertubex)
-    runtimeOnly("io.ktor:ktor-client-cio:3.5.2")
+    runtimeOnly("io.ktor:ktor-client-cio:3.6.0")
 
     // Unit Testing dependencies
     testImplementation("junit:junit:4.13.2")
-    testImplementation("com.google.truth:truth:1.4.2")
-    testImplementation("org.robolectric:robolectric:4.12.2")
-    testImplementation("io.mockk:mockk:1.13.10")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("com.google.truth:truth:1.4.5")
+    testImplementation("org.robolectric:robolectric:4.17")
+    testImplementation("io.mockk:mockk:1.14.11")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
 }
 
 kotlin {
