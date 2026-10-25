@@ -1,86 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ananta Dhvani — Architecture & System Showcase</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ananta Dhvani — Cutting-Edge Audiophile Workstation</title>
+  <meta name="description" content="Ananta Dhvani (v1.7.0): Android 17, Apple iOS Liquid Glass, Bit-Perfect DAC passthrough, and Squidify Audio Hub." />
   <style>
-    body { margin: 0; background: #0B0F19; color: #F8FAFC; font-family: system-ui, -apple-system, sans-serif; }
-    @keyframes hdrGlow {
-      0% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.25); }
-      50% { box-shadow: 0 0 28px rgba(255, 46, 147, 0.35); }
-      100% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.25); }
+    :root {
+      --bg: #0B0F19;
+      --surface: rgba(15, 23, 42, 0.75);
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --hdr-cyan: #00E5FF;
+      --hdr-magenta: #FF2E93;
+      --hdr-indigo: #7F52FF;
+      --hdr-emerald: #06D6A0;
+      --hdr-amber: #FFB703;
+      --hdr-pink: #FF0055;
+      --hdr-purple: #9D4EDD;
+      --hdr-lime: #38EF7D;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
     }
-    .tag { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; text-decoration: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .container { max-width: 1140px; margin: 0 auto; padding: 48px 24px; }
+    .hero { text-align: center; padding: 32px 0 24px; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      color: var(--hdr-cyan);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--hdr-cyan) 0%, var(--hdr-indigo) 50%, var(--hdr-magenta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 760px;
+      margin: 0 auto 32px;
+    }
+    .notice-card {
+      background: radial-gradient(circle at top left, rgba(255, 46, 147, 0.12), rgba(127, 82, 255, 0.08) 60%, rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(255, 46, 147, 0.35);
+      border-radius: 24px;
+      padding: 28px 32px;
+      margin-bottom: 48px;
+      box-shadow: 0 0 30px rgba(255, 46, 147, 0.15);
+    }
+    .notice-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--hdr-magenta);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .notice-body { color: #E2E8F0; font-size: 1rem; line-height: 1.7; }
+    .notice-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .notice-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    section { margin-bottom: 56px; }
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #FFFFFF;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      padding: 24px 26px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .card h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card ul { list-style: none; }
+    .card li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 10px;
+      color: #CBD5E1;
+      font-size: 0.95rem;
+    }
+    .card li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--hdr-cyan);
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 32px 0;
+    }
+    .tag {
+      padding: 10px 20px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease;
+    }
     .tag:hover { transform: translateY(-3px) scale(1.02); }
+    footer {
+      border-top: 1px solid var(--surface-border);
+      padding: 40px 0 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .disclaimer-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 18px 24px;
+      border-radius: 14px;
+      margin-top: 24px;
+      text-align: left;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
-  <section style="padding: 64px 24px; text-align: center; max-width: 1140px; margin: 0 auto;">
-    <h1 style="font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, #00E5FF, #7F52FF, #FF2E93); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-      Ananta Dhvani Core Architecture
-    </h1>
-    <p style="color: #94A3B8; font-size: 1.15rem; margin-bottom: 40px;">
-      Targeting <strong>Android 17</strong> with a Dual-Engine Visual Pipeline: <strong>Apple iOS Liquid Glass</strong> & <strong>Material 3 Expressive</strong>.
-    </p>
+  <div class="container">
+    <header class="hero">
+      <div class="hero-badge">⚡ Production Build v1.7.0</div>
+      <h1>Ananta Dhvani (अनन्त-ध्वनि)</h1>
+      <p>The bleeding-edge, dual-engine audiophile music streaming workstation for Android.</p>
+      <div class="tag-cloud">
+        <div class="tag" style="background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.5); box-shadow: 0 0 16px rgba(0, 229, 255, 0.25);">
+          <span>⚡</span><strong style="color: #00E5FF;">android-17</strong>
+        </div>
+        <div class="tag" style="background: rgba(127, 82, 255, 0.15); border: 1px solid rgba(127, 82, 255, 0.5); box-shadow: 0 0 18px rgba(127, 82, 255, 0.3);">
+          <span>🪟</span><strong style="color: #B899FF;">ios-liquid-glass</strong>
+        </div>
+        <div class="tag" style="background: rgba(255, 46, 147, 0.12); border: 1px solid rgba(255, 46, 147, 0.5); box-shadow: 0 0 16px rgba(255, 46, 147, 0.25);">
+          <span>🎨</span><strong style="color: #FF2E93;">material3-expressive</strong>
+        </div>
+        <div class="tag" style="background: rgba(6, 214, 160, 0.12); border: 1px solid rgba(6, 214, 160, 0.5); box-shadow: 0 0 16px rgba(6, 214, 160, 0.25);">
+          <span>🎵</span><strong style="color: #06D6A0;">bit-perfect-audio</strong>
+        </div>
+        <div class="tag" style="background: rgba(255, 0, 85, 0.12); border: 1px solid rgba(255, 0, 85, 0.5); box-shadow: 0 0 16px rgba(255, 0, 85, 0.25);">
+          <span>🦑</span><strong style="color: #FF2E7E;">squidify-audio-hub</strong>
+        </div>
+        <div class="tag" style="background: rgba(157, 78, 221, 0.12); border: 1px solid rgba(157, 78, 221, 0.5); box-shadow: 0 0 16px rgba(157, 78, 221, 0.25);">
+          <span>🎛️</span><strong style="color: #C77DFF;">libsoxr-dsp</strong>
+        </div>
+        <div class="tag" style="background: rgba(255, 183, 3, 0.12); border: 1px solid rgba(255, 183, 3, 0.5); box-shadow: 0 0 16px rgba(255, 183, 3, 0.25);">
+          <span>🔊</span><strong style="color: #FFB703;">media3-exoplayer</strong>
+        </div>
+      </div>
+    </header>
 
-    <!-- Spec Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 40px; text-align: left;">
-      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
-        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Runtime Target</span>
-        <div style="font-size: 1.25rem; font-weight: 800; color: #00E5FF; margin-top: 4px;">Android 17 Preview</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">Min SDK 29 (16 KB Page-Aligned)</div>
+    <div class="notice-card">
+      <div class="notice-header">
+        <span>📢</span> Important Notice: Project Status & Hiatus
       </div>
-      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
-        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Audio Pipeline</span>
-        <div style="font-size: 1.25rem; font-weight: 800; color: #06D6A0; margin-top: 4px;">Bit-Perfect UAC2 DAC</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">libsoxr DSP • Dual Clock Family</div>
+      <div class="notice-body">
+        <p><strong>Development Status: Temporarily On Hold / Halted</strong></p>
+        <p style="margin-top: 8px;">
+          Due to personal reasons, active development on this app and repository fork is temporarily paused. 
+          Once everything is sorted out, <strong>we will bounce back with a bang!</strong>
+        </p>
       </div>
-      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
-        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Design Systems</span>
-        <div style="font-size: 1.25rem; font-weight: 800; color: #FF2E93; margin-top: 4px;">Dual-Engine Hybrid</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">M3 Expressive & iOS Liquid Glass</div>
-      </div>
-      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
-        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Integrations</span>
-        <div style="font-size: 1.25rem; font-weight: 800; color: #FF0055; margin-top: 4px;">Squidify Lossless Hub</div>
-        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">Media3 • LRCLIB • Last.fm</div>
+      <div class="notice-pills">
+        <div class="notice-pill">🔬 Active Testing Phase</div>
+        <div class="notice-pill">🤖 Built Using Google Gemini 4 Aragon</div>
+        <div class="notice-pill">👤 Architected & Built by Ishan</div>
+        <div class="notice-pill">❤️ Passion Project & 1st Project Ever</div>
       </div>
     </div>
 
-    <!-- Tags Row -->
-    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
-      <div class="tag" style="background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(0, 229, 255, 0.3);">
-        <span>⚡</span> <strong style="color: #00E5FF;">android-17</strong>
+    <section>
+      <div class="section-title"><span>🌌</span> Vision & Philosophy</div>
+      <div class="card" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.6));">
+        <p style="font-size: 1.05rem; color: #E2E8F0; margin-bottom: 16px;">
+          <strong>Ananta Dhvani</strong> (Infinite Sound) was founded on an unapologetic premise: <strong>absolute acoustic transparency and cutting-edge visual modernism without compromise.</strong>
+        </p>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          Standard mobile operating systems systematically compress, resample, and throttle audio fidelity through native mixer algorithms. Ananta Dhvani bypasses the Android system audio flinger entirely, streaming high-definition digital signals directly to external hardware DACs in their pure, native resolution.
+        </p>
+        <p style="color: var(--text-muted);">
+          Visually, the app pioneers a seamless dual-engine design philosophy: fusing the tactile, asymmetric springs of <strong>Material 3 Expressive (Android 17)</strong> with the refractive specular translucency of <strong>Apple iOS Liquid Glass</strong>.
+        </p>
       </div>
-      <div class="tag" style="background: rgba(127, 82, 255, 0.15); border: 1px solid rgba(127, 82, 255, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 18px rgba(127, 82, 255, 0.35);">
-        <span>🪟</span> <strong style="color: #B899FF;">ios-liquid-glass</strong>
+    </section>
+
+    <section>
+      <div class="section-title"><span>🚀</span> Complete Feature Manifest (v1.7.0)</div>
+      <div class="card-grid">
+        <div class="card">
+          <h3 style="color: var(--hdr-emerald);"><span>🎵</span> Audiophile Audio Engine & DSP</h3>
+          <ul>
+            <li><strong>Bit-Perfect USB DAC Routing:</strong> Direct UAC2 hardware communication bypassing the Android OS audio flinger.</li>
+            <li><strong>Dual-Crystal Master Clocks:</strong> Native hardware switching (44.1 kHz vs. 48 kHz base) with <strong>libsoxr</strong> resampling fallback.</li>
+            <li><strong>High-Res Lossless Codecs:</strong> 24-bit / 192 kHz FLAC, Opus (160 kbps), and AAC (up to 256 kbps).</li>
+            <li><strong>AndroidX Media3 Framework:</strong> Solid background audio persistence, lock screen transports, and Android Auto interface.</li>
+            <li><strong>Real-Time FFT Visualizer:</strong> Hardware-accelerated OpenGL / Canvas audio oscilloscope and live spectrum tracking.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 style="color: var(--hdr-magenta);"><span>🎨</span> Dual-Engine UI Architecture</h3>
+          <ul>
+            <li><strong>Material 3 Expressive Engine:</strong> Dynamic Monet palette extraction, asymmetric pill geometry, and tactile spring physics.</li>
+            <li><strong>Apple iOS Liquid Glass Engine:</strong> Real-time refractive shader blur via <code>@kyant/backdrop</code> with specular frosted borders.</li>
+            <li><strong>Persistent Floating Mini-Player:</strong> Docked floating player with animated entry, spinning vinyl physics, and touch sheet expansion.</li>
+            <li><strong>Responsive Command Dock:</strong> 3-tab unified pill (Feed, Discover, Playlists) with active animated equalizer (<code>GraphicEq</code>).</li>
+            <li><strong>7 Shader Seekbar Variants:</strong> Android 17 Wavy Fluid, ViVi Capsule, Analog Mixing Console, Metro Segmented Dash, Minimal Needle, Prism Neon Ribbon, and Nuvia Live Waveform.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3 style="color: var(--hdr-cyan);"><span>🌐</span> Hybrid Integrations & Playback</h3>
+          <ul>
+            <li><strong>Squidify Audio Hub Bridge:</strong> Hardware-accelerated WebView engine with two-way JavaScript bindings (<code>SquidifyBridge</code>) and HTML5 audio pausing.</li>
+            <li><strong>Endless Radio Autoplay:</strong> Automatic queue replenishment using InnerTube/YouTube Music seeds when tracks near queue end.</li>
+            <li><strong>Synchronized Live Lyrics:</strong> Millisecond-accurate animated typography powered by the <strong>LRCLIB API</strong>.</li>
+            <li><strong>Universal Scrobbler:</strong> Native Last.fm REST synchronization and system-wide ListenBrainz broadcast support.</li>
+            <li><strong>Modern Storage:</strong> Jetpack Room SQLite local library caching and Jetpack DataStore reactive settings.</li>
+          </ul>
+        </div>
       </div>
-      <div class="tag" style="background: rgba(255, 46, 147, 0.12); border: 1px solid rgba(255, 46, 147, 0.5); border-radius: 18px 6px 18px 6px; padding: 10px 20px; box-shadow: 0 0 18px rgba(255, 46, 147, 0.3);">
-        <span>🎨</span> <strong style="color: #FF2E93;">material3-expressive</strong>
+    </section>
+
+    <section>
+      <div class="section-title"><span>🗺️</span> Future Roadmap & Upcoming Pipeline</div>
+      <div class="card" style="border-color: rgba(0, 229, 255, 0.3);">
+        <p style="color: #E2E8F0; margin-bottom: 18px; font-weight: 600;">
+          Our relentless ambition to provide the most advanced, modern, cutting-edge audiophile app in existence:
+        </p>
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: 14px; border-left: 4px solid var(--hdr-pink);">
+            <strong style="color: var(--hdr-pink); font-size: 1.05rem;">🦑 Squidify Anime OST, OP & ED Hub</strong>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">Direct native indexing, lossless streaming, and downloading for Anime Openings, Endings, and complete soundtracks.</p>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: 14px; border-left: 4px solid var(--hdr-amber);">
+            <strong style="color: var(--hdr-amber); font-size: 1.05rem;">💎 Studio-Master Streaming Quality</strong>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">Uncapped bitrate streaming pipeline targeting maximum master-grade acoustic reproduction.</p>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: 14px; border-left: 4px solid var(--hdr-indigo);">
+            <strong style="color: var(--hdr-indigo); font-size: 1.05rem;">🎛️ Bleeding-Edge Parametric DSP</strong>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">15-band parametric equalizer, AutoEQ database import, room impulse response convolution, and crossfeed filters.</p>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 18px; border-radius: 14px; border-left: 4px solid var(--hdr-lime);">
+            <strong style="color: var(--hdr-lime); font-size: 1.05rem;">📦 Modular Audio Providers (.lwp)</strong>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">Installer support for encrypted external community-developed stream provider packages.</p>
+          </div>
+        </div>
       </div>
-      <div class="tag" style="background: rgba(6, 214, 160, 0.12); border: 1px solid rgba(6, 214, 160, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(6, 214, 160, 0.3);">
-        <span>🎵</span> <strong style="color: #06D6A0;">bit-perfect-audio</strong>
+    </section>
+
+    <section>
+      <div class="section-title"><span>🤝</span> Credits & Acknowledgements</div>
+      <div class="card">
+        <p style="color: #CBD5E1; margin-bottom: 14px;">Ananta Dhvani stands on the shoulders of phenomenal open-source innovators:</p>
+        <ul style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+          <li><strong>LastWave & LastWave-Native:</strong> Foundational core player architecture and codebase inspiration.</li>
+          <li><strong>Google AndroidX Media3:</strong> Robust ExoPlayer core and media session infrastructure.</li>
+          <li><strong>@kyant/backdrop:</strong> Revolutionary Compose real-time backdrop blur and shader engine.</li>
+          <li><strong>libsoxr Team:</strong> Audiophile-grade one-dimensional sample rate conversion routines.</li>
+          <li><strong>LRCLIB API:</strong> Free, open community synchronized lyrics database.</li>
+          <li><strong>Squidify Project:</strong> Lossless web audio stream extraction and indexing service.</li>
+          <li><strong>InnerTube & Piped Contributors:</strong> YouTube Music backend reverse-engineering breakthroughs.</li>
+        </ul>
       </div>
-      <div class="tag" style="background: rgba(157, 78, 221, 0.12); border: 1px solid rgba(157, 78, 221, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(157, 78, 221, 0.3);">
-        <span>🎛️</span> <strong style="color: #C77DFF;">libsoxr-dsp</strong>
+    </section>
+
+    <footer>
+      <p>© 2026 <strong>Ananta Dhvani</strong> • Built with passion by <strong>Ishan</strong> via <strong>Google Gemini 4 Aragon</strong>.</p>
+      <div class="disclaimer-box">
+        <strong>⚖️ Disclaimer:</strong> Ananta Dhvani is an open-source, non-commercial software project developed strictly for personal use, educational research, and audiophile signal-processing experimentation. All media streams, album artworks, metadata, and lyrics are the intellectual property of their respective copyright holders, artists, and record labels. This project does not host, store, or distribute copyrighted media files.
       </div>
-      <div class="tag" style="background: rgba(255, 0, 85, 0.12); border: 1px solid rgba(255, 0, 85, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(255, 0, 85, 0.3);">
-        <span>🦑</span> <strong style="color: #FF2E7E;">squidify-audio-hub</strong>
-      </div>
-      <div class="tag" style="background: rgba(255, 183, 3, 0.12); border: 1px solid rgba(255, 183, 3, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(255, 183, 3, 0.3);">
-        <span>🔊</span> <strong style="color: #FFB703;">media3-exoplayer</strong>
-      </div>
-      <div class="tag" style="background: rgba(56, 239, 125, 0.12); border: 1px solid rgba(56, 239, 125, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(56, 239, 125, 0.3);">
-        <span>🎼</span> <strong style="color: #38EF7D;">lrclib-lyrics</strong>
-      </div>
-      <div class="tag" style="background: rgba(224, 170, 255, 0.12); border: 1px solid rgba(224, 170, 255, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(224, 170, 255, 0.3);">
-        <span>💎</span> <strong style="color: #E0AAFF;">high-res-lossless</strong>
-      </div>
-      <div class="tag" style="background: rgba(67, 97, 238, 0.12); border: 1px solid rgba(67, 97, 238, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(67, 97, 238, 0.3);">
-        <span>🧩</span> <strong style="color: #4CC9F0;">jetpack-compose</strong>
-      </div>
-    </div>
-  </section>
+    </footer>
+  </div>
 </body>
 </html>
