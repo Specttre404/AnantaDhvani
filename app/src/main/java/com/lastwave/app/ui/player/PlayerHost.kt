@@ -273,6 +273,8 @@ val LocalAddToPlaylist = staticCompositionLocalOf<(PlayableTrack) -> Unit> {
     error("Add-to-playlist is only available inside PlayerHost")
 }
 
+val LocalExpandPlayer = staticCompositionLocalOf<() -> Unit> { {} }
+
 /**
  * Extra list-end clearance needed while the collapsed player overlays a
  * screen. The Material 3 bar is about 86dp tall; 88dp clears it without
@@ -584,6 +586,7 @@ fun PlayerHost(
         LocalMusicPlayer provides viewModel.player,
         LocalAddToPlaylist provides requestAddToPlaylist,
         LocalMiniPlayerScrollClearance provides 0.dp,
+        LocalExpandPlayer provides { expanded = true },
     ) {
         Box(Modifier.fillMaxSize()) {
             content()
@@ -2241,7 +2244,7 @@ private fun SeekBar(
 ) {
     val progress by progressState.collectAsStateWithLifecycle()
 
-    if (wavyEnabled || seekbarStyle == com.lastwave.app.data.local.SeekbarStyle.STUDIO_CONSOLE) {
+    if (wavyEnabled || seekbarStyle != com.lastwave.app.data.local.SeekbarStyle.MINIMAL_PILL) {
         WavySeekBar(
             positionMs = progress.positionMs,
             durationMs = progress.durationMs,
@@ -2250,6 +2253,7 @@ private fun SeekBar(
             isTranslucent = isTranslucent,
             trackKey = trackKey,
             seekbarStyle = seekbarStyle,
+            ambientColor = MaterialTheme.colorScheme.primary,
         )
         return
     }

@@ -11,7 +11,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,9 +34,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.GraphicEq
-import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -62,13 +60,11 @@ import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.lastwave.app.ui.common.ExpressiveMotion
 import com.lastwave.app.ui.common.PredictiveBackScreen
+import com.lastwave.app.ui.discover.DiscoverScreen
 import com.lastwave.app.ui.feed.FeedScreen
-import com.lastwave.app.ui.home.HomeScreen
 import com.lastwave.app.ui.player.LocalMiniPlayerScrollClearance
 import com.lastwave.app.ui.player.LocalMusicPlayer
 import com.lastwave.app.ui.playlist.PlaylistScreen
-import com.lastwave.app.ui.search.SearchScreen
-import com.lastwave.app.ui.settings.SettingsScreen
 import com.lastwave.app.ui.theme.LiquidGlassPreset
 import com.lastwave.app.ui.theme.LocalLiquidGlass
 import com.lastwave.app.ui.theme.isLiquidGlassBackdropSupported
@@ -96,9 +92,8 @@ class MainShellViewModel @Inject constructor(
 
 private enum class MainTab(val labelRes: Int) {
     FEED(com.lastwave.app.R.string.nav_feed),
-    SEARCH(com.lastwave.app.R.string.nav_search),
+    DISCOVER(com.lastwave.app.R.string.nav_discover),
     PLAYLISTS(com.lastwave.app.R.string.nav_playlists),
-    SETTINGS(com.lastwave.app.R.string.nav_settings),
 }
 
 /** Shared with any screen hosted inside [MainShell] so their scrolling
@@ -129,6 +124,7 @@ fun MainShell(
     onOpenPlaylist: (Long) -> Unit = {},
     onOpenGenerator: () -> Unit = {},
     onOpenNewReleases: () -> Unit = {},
+    onOpenFullPlayer: () -> Unit = com.lastwave.app.ui.player.LocalExpandPlayer.current,
     mainShellViewModel: MainShellViewModel = hiltViewModel(),
 ) {
     val tabs = MainTab.entries
@@ -164,23 +160,11 @@ fun MainShell(
                         onOpenFriendProfile = onOpenFriendProfile,
                         onOpenNewReleases = onOpenNewReleases,
                     )
-                    MainTab.SEARCH -> SearchScreen(
+                    MainTab.DISCOVER -> DiscoverScreen(
                         onBack = { scope.launch { pagerState.animateScrollToPage(feedIndex) } },
-                        onOpenArtist = { _, _ -> },
-                        onOpenAlbum = { _, _, _ -> },
-                        onOpenPlaylist = { onOpenFeedPlaylist(it) },
                     )
-                    MainTab.PLAYLISTS -> PlaylistScreen(onOpenPlaylist = onOpenPlaylist)
-                    MainTab.SETTINGS -> SettingsScreen(
-                        onBack = { scope.launch { pagerState.animateScrollToPage(feedIndex) } },
-                        onLoggedOut = {},
-                        onOpenChooseApps = {},
-                        onOpenDownloads = {},
-                        onOpenHomeSections = {},
-                        onOpenExcludedSongs = {},
-                        onOpenYouTubeImport = {},
-                        onOpenYouTubeLogin = {},
-                        onOpenExternalImport = {},
+                    MainTab.PLAYLISTS -> PlaylistScreen(
+                        onOpenPlaylist = onOpenPlaylist,
                     )
                 }
             }
@@ -200,7 +184,7 @@ fun MainShell(
         ) {
             com.lastwave.app.ui.player.ExpressiveMiniPlayer(
                 playbackState = chromeState,
-                onExpand = { /* Full player host */ },
+                onExpand = onOpenFullPlayer,
                 onPlayPause = { musicPlayer.togglePlayPause() },
                 onNext = { musicPlayer.next() },
                 onPrevious = { musicPlayer.previous() },
@@ -311,7 +295,7 @@ private fun FloatingNavItem(
             shape = PillShape,
             color = backgroundColor,
             modifier = Modifier
-                .width(68.dp)
+                .width(76.dp)
                 .height(48.dp),
         ) {
             Column(
@@ -348,7 +332,7 @@ private fun FloatingNavItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .padding(horizontal = if (selected) 16.dp else 10.dp)
+                    .padding(horizontal = if (selected) 18.dp else 12.dp)
                     .height(48.dp),
             ) {
                 Icon(
@@ -389,7 +373,6 @@ private fun FloatingNavItem(
 
 private fun MainTab.icon(): ImageVector = when (this) {
     MainTab.FEED -> Icons.Filled.Home
-    MainTab.SEARCH -> Icons.Rounded.Search
+    MainTab.DISCOVER -> Icons.Rounded.Explore
     MainTab.PLAYLISTS -> Icons.AutoMirrored.Filled.QueueMusic
-    MainTab.SETTINGS -> Icons.Rounded.Settings
 }

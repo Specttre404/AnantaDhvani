@@ -30,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -108,12 +107,19 @@ fun SquidifyHubScreen(
                     val url = request?.url?.toString() ?: return super.shouldInterceptRequest(view, request)
                     val lower = url.lowercase()
                     if (lower.contains(".mp3") || lower.contains(".flac") || lower.contains(".m4a") || lower.contains(".aac") || lower.contains("/stream")) {
-                        val fileName = URLUtil.guessFileName(url, null, null).substringBeforeLast(".")
-                        val trackTitle = if (fileName.isNotBlank() && !fileName.contains("stream", ignoreCase = true)) fileName else "Squidify Stream"
+                        val webTitle = view?.title?.replace("Squidify", "", ignoreCase = true)?.trim(' ', '-', '|', '—').orEmpty()
+                        val guessedName = URLUtil.guessFileName(url, null, null).substringBeforeLast(".")
+                        val cleanTitle = when {
+                            webTitle.isNotBlank() && !webTitle.equals("Home", ignoreCase = true) -> webTitle
+                            guessedName.isNotBlank() && !guessedName.contains("stream", ignoreCase = true) -> guessedName
+                            else -> "Squidify Audio Stream"
+                        }
+
                         android.os.Handler(android.os.Looper.getMainLooper()).post {
+                            view?.evaluateJavascript("document.querySelectorAll('audio, video').forEach(el => { el.pause(); el.currentTime = 0; });", null)
                             musicPlayer.play(
                                 PlayableTrack(
-                                    title = trackTitle,
+                                    title = cleanTitle,
                                     artist = "Squidify Audio Hub",
                                     playbackUrl = url,
                                 ),

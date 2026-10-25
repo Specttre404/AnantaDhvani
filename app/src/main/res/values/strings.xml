@@ -5,6 +5,7 @@
 
     <!-- Bottom navigation -->
     <string name="nav_feed">Feed</string>
+    <string name="nav_discover" tools:ignore="MissingTranslation">Discover</string>
     <string name="nav_search" tools:ignore="MissingTranslation">Search</string>
     <string name="nav_playlists">Playlists</string>
     <string name="nav_settings" tools:ignore="MissingTranslation">Settings</string>
