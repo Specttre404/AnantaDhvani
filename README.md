@@ -45,6 +45,7 @@ Experience the live web app with interactive audio demonstrations and hardware t
   <img src="https://img.shields.io/badge/DSP-libsoxr%20Resampling-9D4EDD?style=for-the-badge&logo=audacity&logoColor=white" alt="libsoxr" />
   <img src="https://img.shields.io/badge/Bridge-Squidify%20Audio%20Hub-FF0055?style=for-the-badge&logo=octopusdeploy&logoColor=white" alt="Squidify Hub" />
   <img src="https://img.shields.io/badge/Engine-Media3%20ExoPlayer-FFB703?style=for-the-badge&logo=googleplay&logoColor=0B0F19" alt="Media3" />
+  <img src="https://img.shields.io/badge/Lyrics-Synced%20LRCLIB-38EF7D?style=for-the-badge&logo=genius&logoColor=0B0F19" alt="LRCLIB Lyrics" />
 </p>
 
 <p align="center">
@@ -106,9 +107,10 @@ Linguistics & Musician ──▶ Furigana Ruby Typography, Synchronized Lyrics,
 | :--- | :--- | :--- |
 | **Compiler** | R8 Shrinker & Optimizer | `9.6.0-alpha02` (Full Mode) |
 | **Media Engine** | Google Media3 / ExoPlayer | `1.12.0-alpha01` |
-| **Platform Target** | Android SDK | SDK 37 Canary |
-| **UI Toolkit** | Jetpack Compose Expressive | Compose Material 3 `1.4.0-alpha05` |
-| **Language** | Kotlin & C++26 Native | Kotlin `2.4.10` / NDK 28 |
+| **Platform Target** | Android 17 Preview / Canary | Target SDK 37 / Min SDK 29 (16 KB Page-Aligned) |
+| **Visual Pipeline** | Dual-Engine Hybrid | Material 3 Expressive & Apple iOS Liquid Glass |
+| **Language & Native** | Kotlin & C++26 Native NDK 28 | Kotlin `2.4.10` / Oboe `1.11.0` / FFmpeg `1.9.0` |
+| **Web Audio Bridge** | Squidify Audio Hub | Embedded JS Interface & Media Stream Interception |
 ```
 
 * **Zero-Jargon Background Automation:** All audio engineering settings have been removed from user-facing screens. The engine configures playback parameters autonomously in the background based on real-time device telemetry.
