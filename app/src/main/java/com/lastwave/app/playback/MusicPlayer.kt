@@ -1124,7 +1124,7 @@ class MusicPlayer @Inject constructor(
     fun play(
         track: PlayableTrack,
         sourceLabel: String = "LastWave",
-        startRadio: Boolean = (sourceLabel == "Search" || sourceLabel == "YouTube Music" || sourceLabel == "Spotify Link" || sourceLabel == "Shared Song"),
+        startRadio: Boolean = true,
     ) {
         pendingRestoredSession = null
         disableDiscoverQueue()
@@ -2850,9 +2850,12 @@ class MusicPlayer @Inject constructor(
     }
 
     private fun extendRadioQueueIfNeeded(currentIndex: Int) {
-        if (!radioQueueActive || radioQueueLoadJob?.isActive == true) return
+        if (radioQueueLoadJob?.isActive == true) return
         val currentCount = player.mediaItemCount
-        if (currentIndex < 0 || currentCount - currentIndex - 1 > RADIO_QUEUE_REFILL_THRESHOLD) return
+        if (currentIndex < 0 || (currentCount - currentIndex - 1 > RADIO_QUEUE_REFILL_THRESHOLD && !radioQueueActive)) return
+
+        radioQueueActive = true
+        _state.update { it.copy(isEndlessQueue = true) }
 
         radioQueueLoadJob = applicationScope.launch(Dispatchers.IO) {
             try {
@@ -2860,7 +2863,7 @@ class MusicPlayer @Inject constructor(
                     if (!playerDelegate.isInitialized()) emptyList()
                     else (0 until player.mediaItemCount).map { player.getMediaItemAt(it).toPlayableTrack() }
                 }
-                if (currentQueue.isEmpty() || !radioQueueActive) return@launch
+                if (currentQueue.isEmpty()) return@launch
 
                 val nextSeed = currentQueue
                     .drop(currentIndex.coerceAtLeast(0))
@@ -2880,7 +2883,6 @@ class MusicPlayer @Inject constructor(
                     innerTube.fetchRelatedSongs(seedVideoId, limit = RADIO_QUEUE_BATCH_SIZE, prefetchStreams = false)
                 }.getOrDefault(emptyList())
                 val related = relatedPrimaryExtend.ifEmpty {
-                    if (!radioQueueActive) return@launch
                     runCatching { innerTube.fetchCharts().take(RADIO_QUEUE_BATCH_SIZE) }
                         .getOrDefault(emptyList())
                         .ifEmpty {
@@ -2888,7 +2890,7 @@ class MusicPlayer @Inject constructor(
                                 .getOrDefault(emptyList())
                         }
                 }
-                if (related.isEmpty() || !radioQueueActive) return@launch
+                if (related.isEmpty()) return@launch
 
                 val knownVideoIds = currentQueue.mapNotNullTo(mutableSetOf()) { it.videoId }
                 val knownTitleArtists = currentQueue.mapTo(mutableSetOf()) {
@@ -2920,10 +2922,10 @@ class MusicPlayer @Inject constructor(
                     }
                 }
 
-                if (fresh.isEmpty() || !radioQueueActive) return@launch
+                if (fresh.isEmpty()) return@launch
 
                 withContext(Dispatchers.Main.immediate) {
-                    if (!radioQueueActive || !playerDelegate.isInitialized()) return@withContext
+                    if (!playerDelegate.isInitialized()) return@withContext
                     val existingKeys = (0 until player.mediaItemCount).mapTo(mutableSetOf()) {
                         player.getMediaItemAt(it).toPlayableTrack().queueKey()
                     }

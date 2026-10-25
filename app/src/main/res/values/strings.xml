@@ -5,8 +5,10 @@
 
     <!-- Bottom navigation -->
     <string name="nav_feed">Feed</string>
-    <string name="nav_stats">Stats</string>
+    <string name="nav_search" tools:ignore="MissingTranslation">Search</string>
     <string name="nav_playlists">Playlists</string>
+    <string name="nav_settings" tools:ignore="MissingTranslation">Settings</string>
+    <string name="nav_stats">Stats</string>
     <string name="nav_create_playlist">Create / Generate Playlist</string>
     <string name="update_available">Update Available</string>
     <string name="update">Update</string>

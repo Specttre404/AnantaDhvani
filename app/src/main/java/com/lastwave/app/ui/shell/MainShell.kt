@@ -8,8 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -29,7 +26,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -38,13 +34,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,28 +52,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kyant.backdrop.backdrops.LayerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.lastwave.app.ui.common.ExpressiveMotion
 import com.lastwave.app.ui.common.PredictiveBackScreen
-import com.lastwave.app.ui.common.adaptiveContentWidth
 import com.lastwave.app.ui.feed.FeedScreen
 import com.lastwave.app.ui.home.HomeScreen
 import com.lastwave.app.ui.player.LocalMiniPlayerScrollClearance
+import com.lastwave.app.ui.player.LocalMusicPlayer
 import com.lastwave.app.ui.playlist.PlaylistScreen
+import com.lastwave.app.ui.search.SearchScreen
+import com.lastwave.app.ui.settings.SettingsScreen
 import com.lastwave.app.ui.theme.LiquidGlassPreset
 import com.lastwave.app.ui.theme.LocalLiquidGlass
-import com.kyant.backdrop.backdrops.LayerBackdrop
-import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.lastwave.app.ui.theme.isLiquidGlassBackdropSupported
 import com.lastwave.app.ui.theme.liquidGlassChrome
-import com.lastwave.app.ui.theme.liquidGlassContainerColor
 import com.lastwave.app.ui.theme.liquidGlassSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -103,23 +96,16 @@ class MainShellViewModel @Inject constructor(
 
 private enum class MainTab(val labelRes: Int) {
     FEED(com.lastwave.app.R.string.nav_feed),
+    SEARCH(com.lastwave.app.R.string.nav_search),
     PLAYLISTS(com.lastwave.app.R.string.nav_playlists),
+    SETTINGS(com.lastwave.app.R.string.nav_settings),
 }
 
 /** Shared with any screen hosted inside [MainShell] so their scrolling
- *  lists know how much bottom content padding to reserve — the nav
- *  overlays content (it's not a Scaffold bottomBar reserving space), so
- *  each screen leaves this much room for its last item to clear it. */
+ *  lists know how much bottom content padding to reserve. */
 object FloatingNavDefaults {
     val ContentBottomPadding = 112.dp
 
-    /**
-     * Full bottom clearance for edge-to-edge scrolling content: the floating
-     * dock's visual height + margins ([ContentBottomPadding]) PLUS the live
-     * navigation-bar (gesture area) inset. Screens that let their list draw
-     * beneath the transparent gesture area must use this instead of the raw
-     * constant, otherwise the last row hides behind the dock/gesture bar.
-     */
     @Composable
     fun contentBottomPadding(): Dp =
         ContentBottomPadding +
@@ -150,6 +136,10 @@ fun MainShell(
     val scope = rememberCoroutineScope()
     val navigationBackdrop = if (isLiquidGlassBackdropSupported()) rememberLayerBackdrop() else null
 
+    val musicPlayer = LocalMusicPlayer.current
+    val chromeState by musicPlayer.chromeState.collectAsStateWithLifecycle()
+    val currentTrack = chromeState.current
+
     Box(Modifier.fillMaxSize()) {
         val feedIndex = tabs.indexOf(MainTab.FEED)
         HorizontalPager(
@@ -174,17 +164,58 @@ fun MainShell(
                         onOpenFriendProfile = onOpenFriendProfile,
                         onOpenNewReleases = onOpenNewReleases,
                     )
+                    MainTab.SEARCH -> SearchScreen(
+                        onBack = { scope.launch { pagerState.animateScrollToPage(feedIndex) } },
+                        onOpenArtist = { _, _ -> },
+                        onOpenAlbum = { _, _, _ -> },
+                        onOpenPlaylist = { onOpenFeedPlaylist(it) },
+                    )
                     MainTab.PLAYLISTS -> PlaylistScreen(onOpenPlaylist = onOpenPlaylist)
+                    MainTab.SETTINGS -> SettingsScreen(
+                        onBack = { scope.launch { pagerState.animateScrollToPage(feedIndex) } },
+                        onLoggedOut = {},
+                        onOpenChooseApps = {},
+                        onOpenDownloads = {},
+                        onOpenHomeSections = {},
+                        onOpenExcludedSongs = {},
+                        onOpenYouTubeImport = {},
+                        onOpenYouTubeLogin = {},
+                        onOpenExternalImport = {},
+                    )
                 }
             }
+        }
+
+        // Persistent MiniPlayer
+        AnimatedVisibility(
+            visible = currentTrack != null,
+            enter = slideInVertically { it } + fadeIn(),
+            exit = slideOutVertically { it } + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 84.dp)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
+                ),
+        ) {
+            com.lastwave.app.ui.player.ExpressiveMiniPlayer(
+                playbackState = chromeState,
+                onExpand = { /* Full player host */ },
+                onPlayPause = { musicPlayer.togglePlayPause() },
+                onNext = { musicPlayer.next() },
+                onPrevious = { musicPlayer.previous() },
+                modifier = Modifier
+                    .fillMaxWidth(0.94f)
+                    .padding(horizontal = 8.dp),
+            )
         }
 
         FloatingNavBar(
             backdrop = navigationBackdrop,
             tabs = tabs,
             selectedIndex = pagerState.currentPage,
+            isPlaying = chromeState.isPlaying,
             onSelect = { index -> scope.launch { pagerState.animateScrollToPage(index) } },
-            onOpenGenerator = onOpenGenerator,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
@@ -195,8 +226,8 @@ private fun FloatingNavBar(
     backdrop: LayerBackdrop?,
     tabs: List<MainTab>,
     selectedIndex: Int,
+    isPlaying: Boolean,
     onSelect: (Int) -> Unit,
-    onOpenGenerator: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val liquidGlass = LocalLiquidGlass.current
@@ -240,6 +271,7 @@ private fun FloatingNavBar(
                             label = androidx.compose.ui.res.stringResource(tab.labelRes),
                             icon = tab.icon(),
                             selected = selectedIndex == index,
+                            isPlaying = selectedIndex == index && isPlaying,
                             onClick = onClick,
                         )
                     }
@@ -254,6 +286,7 @@ private fun FloatingNavItem(
     label: String,
     icon: ImageVector,
     selected: Boolean,
+    isPlaying: Boolean,
     onClick: () -> Unit,
 ) {
     val liquidGlass = LocalLiquidGlass.current
@@ -270,14 +303,15 @@ private fun FloatingNavItem(
         label = "navItemContent",
     )
 
+    val activeIcon = if (isPlaying) Icons.Rounded.GraphicEq else icon
+
     if (!liquidGlass) {
-        // M3 Fixed-Width Stadium Tab Item
         Surface(
             onClick = onClick,
             shape = PillShape,
             color = backgroundColor,
             modifier = Modifier
-                .width(76.dp)
+                .width(68.dp)
                 .height(48.dp),
         ) {
             Column(
@@ -286,7 +320,7 @@ private fun FloatingNavItem(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Icon(
-                    imageVector = icon,
+                    imageVector = activeIcon,
                     contentDescription = label,
                     tint = contentColor,
                     modifier = Modifier.size(20.dp),
@@ -302,7 +336,6 @@ private fun FloatingNavItem(
             }
         }
     } else {
-        // iOS Liquid Glass Expanding Tab Item
         Surface(
             onClick = onClick,
             shape = PillShape,
@@ -315,14 +348,14 @@ private fun FloatingNavItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .padding(horizontal = if (selected) 18.dp else 12.dp)
+                    .padding(horizontal = if (selected) 16.dp else 10.dp)
                     .height(48.dp),
             ) {
                 Icon(
-                    imageVector = icon,
+                    imageVector = activeIcon,
                     contentDescription = label,
                     tint = contentColor,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(22.dp),
                 )
                 AnimatedVisibility(
                     visible = selected,
@@ -337,11 +370,11 @@ private fun FloatingNavItem(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(start = 6.dp),
                     ) {
                         Text(
                             text = label,
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = contentColor,
                             maxLines = 1,
@@ -356,5 +389,7 @@ private fun FloatingNavItem(
 
 private fun MainTab.icon(): ImageVector = when (this) {
     MainTab.FEED -> Icons.Filled.Home
+    MainTab.SEARCH -> Icons.Rounded.Search
     MainTab.PLAYLISTS -> Icons.AutoMirrored.Filled.QueueMusic
+    MainTab.SETTINGS -> Icons.Rounded.Settings
 }
