@@ -36,31 +36,29 @@ Experience the live web app with interactive audio demonstrations and hardware t
 ### अनन्त-ध्वनि • অনন্ত ধ্বনি
 **The Pure High-Performance Audiophile Music Workstation for Android**
 
-<!-- VIBGYOR Palette: Violet -> Indigo -> Blue -> Green -> Yellow -> Orange -> Red (Icons Removed) -->
+<!-- VIBGYOR Palette & Dynamic HDR Badges -->
 <p align="center">
   <a href="https://github.com/Specttre404/AnantaDhvani/releases/latest">
-    <img src="https://img.shields.io/badge/Latest_Release-v1.7.0--HDR_Preview-7F00FF?style=for-the-badge" alt="Latest Release" />
+    <img src="https://img.shields.io/badge/Latest_Release-v1.7.0--HDR-7F00FF?style=for-the-badge" alt="Latest Release" />
   </a>
-  <img src="https://img.shields.io/badge/Lifecycle-Testing_Phase_(Active_Evaluation)-4B0082?style=for-the-badge" alt="Testing Phase" />
+  <img src="https://img.shields.io/badge/Platform-Android_17_Canary_(API_37)-00E5FF?style=for-the-badge&logo=android" alt="Android 17 Canary" />
+  <img src="https://img.shields.io/badge/M3_Expressive-Design_Tokens-FF2E93?style=for-the-badge" alt="M3 Expressive" />
+  <img src="https://img.shields.io/badge/iOS_Liquid_Glass-Specular_Materials-7F52FF?style=for-the-badge" alt="iOS Liquid Glass" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Bit--Perfect_Audio-USB_Exclusive_Bypass-06D6A0?style=for-the-badge" alt="Bit-Perfect Audio" />
+  <img src="https://img.shields.io/badge/Squidify_Audio_Hub-Web_Stream_Bridge-FF0055?style=for-the-badge" alt="Squidify Audio Hub" />
+  <img src="https://img.shields.io/badge/Media3_ExoPlayer-1.12.0--alpha01-FFB703?style=for-the-badge" alt="Media3 ExoPlayer" />
   <a href="https://github.com/Specttre404/AnantaDhvani/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-GNU_GPL_v3.0-0284C7?style=for-the-badge" alt="License" />
   </a>
-  <img src="https://img.shields.io/badge/Platform-Android_12+_--_16_(API_31--36)-10B981?style=for-the-badge" alt="Platform" />
-  <img src="https://img.shields.io/badge/VirusTotal-100%25_Clean_(0/72)-EAB308?style=for-the-badge&labelColor=1E293B" alt="VirusTotal" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Architecture-Google_Media3_•_ExoPlayer-F97316?style=for-the-badge" alt="Architecture" />
-  <img src="https://img.shields.io/badge/DSP_Pipeline-Biquad_PEQ_•_BS2B_Crossfeed-EF4444?style=for-the-badge" alt="DSP Pipeline" />
-  <img src="https://img.shields.io/badge/UI_Style-M3_Expressive_•_Liquid_Glass-7F00FF?style=for-the-badge" alt="UI Style" />
-  <img src="https://img.shields.io/badge/Client-YouTube_Music_InnerTube-4B0082?style=for-the-badge" alt="YouTube Music Client" />
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Forked_From-LastWave-0284C7?style=for-the-badge" alt="Forked From LastWave" />
+  <img src="https://img.shields.io/badge/Native_ELF-16_KB_Page--Aligned-00E5FF?style=for-the-badge" alt="16 KB Page Aligned" />
   <img src="https://img.shields.io/badge/Built_With-Google_Gemini_4_Argon-10B981?style=for-the-badge" alt="Built With Gemini" />
-  <img src="https://img.shields.io/badge/Subsystems-16_Automated_Hardware_Engines-EAB308?style=for-the-badge&labelColor=1E293B" alt="Automated Subsystems" />
-  <img src="https://img.shields.io/badge/Codebase-Kotlin_•_Java_DSP_•_Compose-F97316?style=for-the-badge" alt="Codebase" />
+  <img src="https://img.shields.io/badge/VirusTotal-100%25_Clean_(0/72)-EAB308?style=for-the-badge&labelColor=1E293B" alt="VirusTotal" />
 </p>
 
 <p align="center">
