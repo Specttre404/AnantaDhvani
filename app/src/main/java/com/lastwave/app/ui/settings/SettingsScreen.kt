@@ -466,7 +466,7 @@ fun SettingsScreen(
                     // Last.fm is optional here — never a gate. Connected:
                     // global scrobbles + stats sync. Disconnected: Stats and
                     // recommendations run local-first from Room.
-                    SquidifyCard()
+                    SquidifyCard(onOpenSquidifyHub = onOpenSquidifyHub)
                     LastFmIntegrationCard(
                         isConnected = isLastFmConnected,
                         username = session.username,

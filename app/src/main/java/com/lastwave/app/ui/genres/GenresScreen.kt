@@ -155,11 +155,15 @@ fun GenresScreen(
 private fun PeriodDropdown(period: String, onChange: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val label = GENRE_PERIODS.firstOrNull { it.first == period }?.second ?: "Overall"
+    val isLiquidGlass = LocalLiquidGlass.current
+    val shape = if (isLiquidGlass) RoundedCornerShape(50) else com.lastwave.app.ui.theme.ExpressivePillShape
     Box {
         Surface(
-            shape = RoundedCornerShape(50),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.clickable { expanded = true },
+            shape = shape,
+            color = if (isLiquidGlass) liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHigh) else MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier
+                .liquidGlassChrome(shape, isLiquidGlass)
+                .clickable { expanded = true },
         ) {
             Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(label, style = MaterialTheme.typography.labelLarge)

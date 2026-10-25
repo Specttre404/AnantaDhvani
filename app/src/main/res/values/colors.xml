@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Splash screen background: Obsidian Void #0B0F19 -->
-    <color name="splash_background">#0B0F19</color>
+    <!-- Light theme splash background: #F8FAFC -->
+    <color name="splash_background">#F8FAFC</color>
 
     <!-- LastWaveX App Icon Background: Deep Obsidian Slate -->
     <color name="ic_launcher_background">#0F1115</color>

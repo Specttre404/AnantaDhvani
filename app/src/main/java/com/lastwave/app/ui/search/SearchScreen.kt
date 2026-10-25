@@ -1,6 +1,7 @@
 package com.lastwave.app.ui.search
 
 import androidx.compose.animation.Crossfade
+import com.lastwave.app.ui.theme.ExpressivePillShape
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -407,6 +408,7 @@ fun SearchScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
+                                val pillShape = if (liquidGlass) RoundedCornerShape(50) else ExpressivePillShape
                                 FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -425,17 +427,18 @@ fun SearchScreen(
                                                     fontWeight = FontWeight.Bold,
                                                 )
                                             },
-                                            border = BorderStroke(
+                                            border = if (liquidGlass) BorderStroke(
                                                 width = 1.dp,
                                                 brush = Brush.linearGradient(
-                                                    colors = listOf(Color(0xFF00F0FF), Color(0xFFFF2E93)),
+                                                    colors = listOf(Color(0xFF00F0FF).copy(alpha = 0.6f), Color(0xFFFF2E93).copy(alpha = 0.6f)),
                                                 ),
-                                            ),
+                                            ) else null,
                                             colors = AssistChipDefaults.assistChipColors(
-                                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                                containerColor = if (liquidGlass) liquidGlassContainerColor(MaterialTheme.colorScheme.surfaceContainerHighest) else MaterialTheme.colorScheme.surfaceContainerHighest,
                                                 labelColor = MaterialTheme.colorScheme.onSurface,
                                             ),
-                                            shape = RoundedCornerShape(16.dp),
+                                            shape = pillShape,
+                                            modifier = Modifier.liquidGlassChrome(pillShape, liquidGlass),
                                         )
                                     }
                                 }

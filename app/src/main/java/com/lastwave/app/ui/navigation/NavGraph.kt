@@ -456,6 +456,12 @@ fun LastWaveNavHost(
             }
         }
 
+        composable(Screen.SquidifyHub.route) {
+            PredictiveBackScreen(onBack = { navController.popBackStack() }) {
+                com.lastwave.app.ui.metro.SquidifyHubScreen(navController = navController)
+            }
+        }
+
         composable(Screen.ScrobblerApps.route) {
             PredictiveBackScreen(onBack = { navController.popBackStack() }) {
                 com.lastwave.app.ui.settings.ScrobblerAppsScreen(onBack = { navController.popBackStack() })

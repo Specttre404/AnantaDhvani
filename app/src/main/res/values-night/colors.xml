@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme splash background: #0B0F19 -->
+    <color name="splash_background">#0B0F19</color>
+</resources>

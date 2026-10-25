@@ -320,10 +320,10 @@ fun HomeScreen(
                                 )
                             }
 
-                            // Settings (Completely isolated 44.dp hit boundary)
+                            // Settings (Completely isolated 48.dp hit boundary)
                             Box(
                                 modifier = Modifier
-                                    .size(44.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
                                     .clickable(onClick = onOpenSettings),
                                 contentAlignment = Alignment.Center,
@@ -373,7 +373,6 @@ fun HomeScreen(
                     .adaptiveContentWidth(maxWidth = 860.dp)
                     .safeHorizontalContentPadding(),
             ) {
-            ThoughtOfSessionBanner()
             HeaderRow(
                 displayUsername = when {
                     uiState.isViewingFriend -> uiState.viewingUsername
@@ -386,6 +385,7 @@ fun HomeScreen(
                 viewModel = viewModel,
             )
             Spacer(Modifier.height(2.dp))
+            ThoughtOfSessionBanner()
 
             if (uiState.isLocalStatsMode && !uiState.isViewingFriend) {
                 LocalStatsBanner(
