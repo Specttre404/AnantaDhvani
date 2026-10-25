@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ananta Dhvani — Architecture & System Showcase</title>
+  <style>
+    body { margin: 0; background: #0B0F19; color: #F8FAFC; font-family: system-ui, -apple-system, sans-serif; }
+    @keyframes hdrGlow {
+      0% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.25); }
+      50% { box-shadow: 0 0 28px rgba(255, 46, 147, 0.35); }
+      100% { box-shadow: 0 0 16px rgba(0, 229, 255, 0.25); }
+    }
+    .tag { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; text-decoration: none; }
+    .tag:hover { transform: translateY(-3px) scale(1.02); }
+  </style>
+</head>
+<body>
+  <section style="padding: 64px 24px; text-align: center; max-width: 1140px; margin: 0 auto;">
+    <h1 style="font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, #00E5FF, #7F52FF, #FF2E93); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      Ananta Dhvani Core Architecture
+    </h1>
+    <p style="color: #94A3B8; font-size: 1.15rem; margin-bottom: 40px;">
+      Targeting <strong>Android 17</strong> with a Dual-Engine Visual Pipeline: <strong>Apple iOS Liquid Glass</strong> & <strong>Material 3 Expressive</strong>.
+    </p>
+
+    <!-- Spec Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 40px; text-align: left;">
+      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
+        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Runtime Target</span>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #00E5FF; margin-top: 4px;">Android 17 Preview</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">Min SDK 29 (16 KB Page-Aligned)</div>
+      </div>
+      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
+        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Audio Pipeline</span>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #06D6A0; margin-top: 4px;">Bit-Perfect UAC2 DAC</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">libsoxr DSP • Dual Clock Family</div>
+      </div>
+      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
+        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Design Systems</span>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #FF2E93; margin-top: 4px;">Dual-Engine Hybrid</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">M3 Expressive & iOS Liquid Glass</div>
+      </div>
+      <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; border-radius: 20px 8px 20px 8px;">
+        <span style="font-size: 0.8rem; text-transform: uppercase; color: #64748B; font-weight: 700;">Integrations</span>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #FF0055; margin-top: 4px;">Squidify Lossless Hub</div>
+        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 4px;">Media3 • LRCLIB • Last.fm</div>
+      </div>
+    </div>
+
+    <!-- Tags Row -->
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+      <div class="tag" style="background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(0, 229, 255, 0.3);">
+        <span>⚡</span> <strong style="color: #00E5FF;">android-17</strong>
+      </div>
+      <div class="tag" style="background: rgba(127, 82, 255, 0.15); border: 1px solid rgba(127, 82, 255, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 18px rgba(127, 82, 255, 0.35);">
+        <span>🪟</span> <strong style="color: #B899FF;">ios-liquid-glass</strong>
+      </div>
+      <div class="tag" style="background: rgba(255, 46, 147, 0.12); border: 1px solid rgba(255, 46, 147, 0.5); border-radius: 18px 6px 18px 6px; padding: 10px 20px; box-shadow: 0 0 18px rgba(255, 46, 147, 0.3);">
+        <span>🎨</span> <strong style="color: #FF2E93;">material3-expressive</strong>
+      </div>
+      <div class="tag" style="background: rgba(6, 214, 160, 0.12); border: 1px solid rgba(6, 214, 160, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(6, 214, 160, 0.3);">
+        <span>🎵</span> <strong style="color: #06D6A0;">bit-perfect-audio</strong>
+      </div>
+      <div class="tag" style="background: rgba(157, 78, 221, 0.12); border: 1px solid rgba(157, 78, 221, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(157, 78, 221, 0.3);">
+        <span>🎛️</span> <strong style="color: #C77DFF;">libsoxr-dsp</strong>
+      </div>
+      <div class="tag" style="background: rgba(255, 0, 85, 0.12); border: 1px solid rgba(255, 0, 85, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(255, 0, 85, 0.3);">
+        <span>🦑</span> <strong style="color: #FF2E7E;">squidify-audio-hub</strong>
+      </div>
+      <div class="tag" style="background: rgba(255, 183, 3, 0.12); border: 1px solid rgba(255, 183, 3, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(255, 183, 3, 0.3);">
+        <span>🔊</span> <strong style="color: #FFB703;">media3-exoplayer</strong>
+      </div>
+      <div class="tag" style="background: rgba(56, 239, 125, 0.12); border: 1px solid rgba(56, 239, 125, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(56, 239, 125, 0.3);">
+        <span>🎼</span> <strong style="color: #38EF7D;">lrclib-lyrics</strong>
+      </div>
+      <div class="tag" style="background: rgba(224, 170, 255, 0.12); border: 1px solid rgba(224, 170, 255, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(224, 170, 255, 0.3);">
+        <span>💎</span> <strong style="color: #E0AAFF;">high-res-lossless</strong>
+      </div>
+      <div class="tag" style="background: rgba(67, 97, 238, 0.12); border: 1px solid rgba(67, 97, 238, 0.5); border-radius: 9999px; padding: 10px 20px; box-shadow: 0 0 16px rgba(67, 97, 238, 0.3);">
+        <span>🧩</span> <strong style="color: #4CC9F0;">jetpack-compose</strong>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
